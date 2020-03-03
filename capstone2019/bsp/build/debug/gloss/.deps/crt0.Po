@@ -1,0 +1,2 @@
+gloss/crt0.o: \
+ /home/picard/Documents/cleanflight/freedom-metal/gloss/crt0.S

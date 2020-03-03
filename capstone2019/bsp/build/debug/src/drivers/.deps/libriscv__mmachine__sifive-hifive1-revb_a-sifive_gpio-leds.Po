@@ -1,0 +1,158 @@
+src/drivers/libriscv__mmachine__sifive-hifive1-revb_a-sifive_gpio-leds.o: \
+ /home/picard/Documents/cleanflight/freedom-metal/src/drivers/sifive_gpio-leds.c \
+ metal/machine/platform.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/string.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/_ansi.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/newlib-nano/newlib.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/_newlib_version.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/config.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/machine/ieeefp.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/features.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/reent.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/_ansi.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/lib/gcc/riscv64-unknown-elf/8.3.0/include/stddef.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/_types.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/machine/_types.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/machine/_default_types.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/lock.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/cdefs.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/_locale.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/strings.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/string.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/gpio.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/compiler.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/interrupt.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_gpio-leds.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_gpio0.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/led.h \
+ metal/machine.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/fixed-clock.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/clock.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/memory.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/lib/gcc/riscv64-unknown-elf/8.3.0/include/stdint.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/stdint.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/_intsup.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/_stdint.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/riscv_clint0.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/riscv_cpu.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/cpu.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/riscv_plic0.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/pmp.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_rtc0.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/io.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/rtc.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_spi0.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/spi.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_uart0.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/uart.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_wdog0.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/watchdog.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_fe310-g000_hfrosc.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_fe310-g000_prci.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_fe310-g000_hfxosc.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_fe310-g000_lfrosc.h \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_fe310-g000_pll.h
+
+metal/machine/platform.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/string.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/_ansi.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/newlib-nano/newlib.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/_newlib_version.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/config.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/machine/ieeefp.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/features.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/reent.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/_ansi.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/lib/gcc/riscv64-unknown-elf/8.3.0/include/stddef.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/_types.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/machine/_types.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/machine/_default_types.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/lock.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/cdefs.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/_locale.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/strings.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/string.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/gpio.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/compiler.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/interrupt.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_gpio-leds.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_gpio0.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/led.h:
+
+metal/machine.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/fixed-clock.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/clock.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/memory.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/lib/gcc/riscv64-unknown-elf/8.3.0/include/stdint.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/stdint.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/_intsup.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/riscv64-unknown-elf/include/sys/_stdint.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/riscv_clint0.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/riscv_cpu.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/cpu.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/riscv_plic0.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/pmp.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_rtc0.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/io.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/rtc.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_spi0.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/spi.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_uart0.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/uart.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_wdog0.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/watchdog.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_fe310-g000_hfrosc.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_fe310-g000_prci.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_fe310-g000_hfxosc.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_fe310-g000_lfrosc.h:
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/drivers/sifive_fe310-g000_pll.h:

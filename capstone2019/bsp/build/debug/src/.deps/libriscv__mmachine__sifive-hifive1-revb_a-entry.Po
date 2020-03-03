@@ -1,0 +1,2 @@
+src/libriscv__mmachine__sifive-hifive1-revb_a-entry.o: \
+ /home/picard/Documents/cleanflight/freedom-metal/src/entry.S

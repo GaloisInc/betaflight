@@ -1,0 +1,8 @@
+src/libriscv__mmachine__sifive-hifive1-revb_a-clock.o: \
+ /home/picard/Documents/cleanflight/freedom-metal/src/clock.c \
+ /home/picard/Documents/cleanflight/freedom-metal/metal/clock.h \
+ /home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/lib/gcc/riscv64-unknown-elf/8.3.0/include/stddef.h
+
+/home/picard/Documents/cleanflight/freedom-metal/metal/clock.h:
+
+/home/picard/Documents/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14/lib/gcc/riscv64-unknown-elf/8.3.0/include/stddef.h:
