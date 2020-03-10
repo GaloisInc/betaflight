@@ -1,0 +1,288 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Watchdog &#8212; Freedom Metal v201908 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="UARTs" href="uart.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="watchdog">
+<h1>Watchdog<a class="headerlink" href="#watchdog" title="Permalink to this headline">¶</a></h1>
+<p>API for configuring watchdog timers. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Enums</p>
+<dl class="type">
+<dt id="_CPPv325metal_watchdog_run_option">
+<span id="_CPPv225metal_watchdog_run_option"></span><span id="metal_watchdog_run_option"></span><span class="target" id="watchdog_8h_1a6bd35fd2934577de040403b371fa9426"></span><em class="property">enum </em><code class="descname">metal_watchdog_run_option</code><a class="headerlink" href="#_CPPv325metal_watchdog_run_option" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>List of watchdog timer count behaviors. </p>
+<p><em>Values:</em></p>
+<dl class="enumerator">
+<dt id="_CPPv319METAL_WATCHDOG_STOP">
+<span id="_CPPv219METAL_WATCHDOG_STOP"></span><span class="target" id="watchdog_8h_1a6bd35fd2934577de040403b371fa9426aa4f56d307a17ae058211aee8f11a5fe2"></span><code class="descname">METAL_WATCHDOG_STOP</code> = 0<a class="headerlink" href="#_CPPv319METAL_WATCHDOG_STOP" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Stop the watchdog </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv325METAL_WATCHDOG_RUN_ALWAYS">
+<span id="_CPPv225METAL_WATCHDOG_RUN_ALWAYS"></span><span class="target" id="watchdog_8h_1a6bd35fd2934577de040403b371fa9426ad8cdb6bb606fea871673dbaf087b9fc6"></span><code class="descname">METAL_WATCHDOG_RUN_ALWAYS</code><a class="headerlink" href="#_CPPv325METAL_WATCHDOG_RUN_ALWAYS" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Run the watchdog continuously, even during sleep </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv324METAL_WATCHDOG_RUN_AWAKE">
+<span id="_CPPv224METAL_WATCHDOG_RUN_AWAKE"></span><span class="target" id="watchdog_8h_1a6bd35fd2934577de040403b371fa9426a37c7b5377b9ff93b8579c5f16fb89f5a"></span><code class="descname">METAL_WATCHDOG_RUN_AWAKE</code><a class="headerlink" href="#_CPPv324METAL_WATCHDOG_RUN_AWAKE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Run the watchdog only while the CPU is awake </p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="type">
+<dt id="_CPPv321metal_watchdog_result">
+<span id="_CPPv221metal_watchdog_result"></span><span id="metal_watchdog_result"></span><span class="target" id="watchdog_8h_1a2ed40bfc5edf767d7c5056d29e5f8224"></span><em class="property">enum </em><code class="descname">metal_watchdog_result</code><a class="headerlink" href="#_CPPv321metal_watchdog_result" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>List of behaviors when a watchdog triggers. </p>
+<p><em>Values:</em></p>
+<dl class="enumerator">
+<dt id="_CPPv324METAL_WATCHDOG_NO_RESULT">
+<span id="_CPPv224METAL_WATCHDOG_NO_RESULT"></span><span class="target" id="watchdog_8h_1a2ed40bfc5edf767d7c5056d29e5f8224a412ecbcbe2a3353238df8d005877407e"></span><code class="descname">METAL_WATCHDOG_NO_RESULT</code> = 0<a class="headerlink" href="#_CPPv324METAL_WATCHDOG_NO_RESULT" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>When the watchdog triggers, do nothing </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv324METAL_WATCHDOG_INTERRUPT">
+<span id="_CPPv224METAL_WATCHDOG_INTERRUPT"></span><span class="target" id="watchdog_8h_1a2ed40bfc5edf767d7c5056d29e5f8224a7a3712a91413857399357dd8a2ddb5c4"></span><code class="descname">METAL_WATCHDOG_INTERRUPT</code><a class="headerlink" href="#_CPPv324METAL_WATCHDOG_INTERRUPT" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>When the watchdog triggers, fire an interrupt </p>
+</dd></dl>
+
+<dl class="enumerator">
+<dt id="_CPPv325METAL_WATCHDOG_FULL_RESET">
+<span id="_CPPv225METAL_WATCHDOG_FULL_RESET"></span><span class="target" id="watchdog_8h_1a2ed40bfc5edf767d7c5056d29e5f8224a91179a20e3397f07fd9e1efd1a10b0e3"></span><code class="descname">METAL_WATCHDOG_FULL_RESET</code><a class="headerlink" href="#_CPPv325METAL_WATCHDOG_FULL_RESET" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>When the watchdog triggers, cause a full system reset </p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric">Functions</p>
+<dl class="function">
+<dt id="_CPPv319metal_watchdog_feedPCK14metal_watchdog">
+<span id="_CPPv219metal_watchdog_feedPCK14metal_watchdog"></span><span id="metal_watchdog_feed__metal_watchdogCPC"></span><span class="target" id="watchdog_8h_1a0ae97e368bea7e7643a8b1b884a0bd82"></span>int <code class="descname">metal_watchdog_feed</code><span class="sig-paren">(</span><em class="property">const</em> <em class="property">struct</em> <a class="reference internal" href="#_CPPv314metal_watchdog" title="metal_watchdog">metal_watchdog</a> *<em class="property">const</em> <em>wdog</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv319metal_watchdog_feedPCK14metal_watchdog" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Feed the watchdog timer. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv323metal_watchdog_get_ratePCK14metal_watchdog">
+<span id="_CPPv223metal_watchdog_get_ratePCK14metal_watchdog"></span><span id="metal_watchdog_get_rate__metal_watchdogCPC"></span><span class="target" id="watchdog_8h_1a108ccfd7e2ed5ff66014bf9057036bc2"></span>long int <code class="descname">metal_watchdog_get_rate</code><span class="sig-paren">(</span><em class="property">const</em> <em class="property">struct</em> <a class="reference internal" href="#_CPPv314metal_watchdog" title="metal_watchdog">metal_watchdog</a> *<em class="property">const</em> <em>wdog</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv323metal_watchdog_get_ratePCK14metal_watchdog" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the rate of the watchdog timer in Hz. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the rate of the watchdog timer </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv323metal_watchdog_set_ratePCK14metal_watchdogKl">
+<span id="_CPPv223metal_watchdog_set_ratePCK14metal_watchdogKl"></span><span id="metal_watchdog_set_rate__metal_watchdogCPC.l-iC"></span><span class="target" id="watchdog_8h_1ad7839be68dc1e7f767d1526b821ad049"></span>long int <code class="descname">metal_watchdog_set_rate</code><span class="sig-paren">(</span><em class="property">const</em> <em class="property">struct</em> <a class="reference internal" href="#_CPPv314metal_watchdog" title="metal_watchdog">metal_watchdog</a> *<em class="property">const</em> <em>wdog</em>, <em class="property">const</em> long int <em>rate</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv323metal_watchdog_set_ratePCK14metal_watchdogKl" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Set the rate of the watchdog timer in Hz. </p>
+<p>There is no guarantee that the new rate will match the requested rate.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the new rate of the watchdog timer </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv326metal_watchdog_get_timeoutPCK14metal_watchdog">
+<span id="_CPPv226metal_watchdog_get_timeoutPCK14metal_watchdog"></span><span id="metal_watchdog_get_timeout__metal_watchdogCPC"></span><span class="target" id="watchdog_8h_1a49f10a5f58b941c0fdfe4881c0616480"></span>long int <code class="descname">metal_watchdog_get_timeout</code><span class="sig-paren">(</span><em class="property">const</em> <em class="property">struct</em> <a class="reference internal" href="#_CPPv314metal_watchdog" title="metal_watchdog">metal_watchdog</a> *<em class="property">const</em> <em>wdog</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv326metal_watchdog_get_timeoutPCK14metal_watchdog" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the timeout of the watchdog timer. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the watchdog timeout value </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv326metal_watchdog_set_timeoutPCK14metal_watchdogKl">
+<span id="_CPPv226metal_watchdog_set_timeoutPCK14metal_watchdogKl"></span><span id="metal_watchdog_set_timeout__metal_watchdogCPC.l-iC"></span><span class="target" id="watchdog_8h_1a2d37f4149ad884d3f3030094239c2134"></span>long int <code class="descname">metal_watchdog_set_timeout</code><span class="sig-paren">(</span><em class="property">const</em> <em class="property">struct</em> <a class="reference internal" href="#_CPPv314metal_watchdog" title="metal_watchdog">metal_watchdog</a> *<em class="property">const</em> <em>wdog</em>, <em class="property">const</em> long int <em>timeout</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv326metal_watchdog_set_timeoutPCK14metal_watchdogKl" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Set the timeout of the watchdog timer. </p>
+<p>The set rate will be the minimimum of the requested and maximum supported rates.</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>the new watchdog timeout value </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv325metal_watchdog_set_resultPCK14metal_watchdogK21metal_watchdog_result">
+<span id="_CPPv225metal_watchdog_set_resultPCK14metal_watchdogK21metal_watchdog_result"></span><span id="metal_watchdog_set_result__metal_watchdogCPC.metal_watchdog_resultC"></span><span class="target" id="watchdog_8h_1a5532940de1a7379a6c86b053a037c1b9"></span>int <code class="descname">metal_watchdog_set_result</code><span class="sig-paren">(</span><em class="property">const</em> <em class="property">struct</em> <a class="reference internal" href="#_CPPv314metal_watchdog" title="metal_watchdog">metal_watchdog</a> *<em class="property">const</em> <em>wdog</em>, <em class="property">const</em> <em class="property">enum</em> <a class="reference internal" href="#_CPPv321metal_watchdog_result" title="metal_watchdog_result">metal_watchdog_result</a> <em>result</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv325metal_watchdog_set_resultPCK14metal_watchdogK21metal_watchdog_result" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Sets the result behavior of a watchdog timer timeout. </p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>0 if the requested result behavior is supported </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv318metal_watchdog_runPCK14metal_watchdogK25metal_watchdog_run_option">
+<span id="_CPPv218metal_watchdog_runPCK14metal_watchdogK25metal_watchdog_run_option"></span><span id="metal_watchdog_run__metal_watchdogCPC.metal_watchdog_run_optionC"></span><span class="target" id="watchdog_8h_1a68bc95a97ac952ae1135306b5c97bb06"></span>int <code class="descname">metal_watchdog_run</code><span class="sig-paren">(</span><em class="property">const</em> <em class="property">struct</em> <a class="reference internal" href="#_CPPv314metal_watchdog" title="metal_watchdog">metal_watchdog</a> *<em class="property">const</em> <em>wdog</em>, <em class="property">const</em> <em class="property">enum</em> <a class="reference internal" href="#_CPPv325metal_watchdog_run_option" title="metal_watchdog_run_option">metal_watchdog_run_option</a> <em>option</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv318metal_watchdog_runPCK14metal_watchdogK25metal_watchdog_run_option" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Set the run behavior of the watchdog. </p>
+<p>Used to enable/disable the watchdog timer</p>
+<p><dl class="docutils">
+<dt><strong>Return</strong></dt>
+<dd>0 if the watchdog was successfully started/stopped </dd>
+</dl>
+</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv328metal_watchdog_get_interruptPCK14metal_watchdog">
+<span id="_CPPv228metal_watchdog_get_interruptPCK14metal_watchdog"></span><span id="metal_watchdog_get_interrupt__metal_watchdogCPC"></span><span class="target" id="watchdog_8h_1a09a332f498bb51f42eb79a1b62fee4b1"></span><em class="property">struct</em> <a class="reference internal" href="interrupt.html#_CPPv315metal_interrupt" title="metal_interrupt">metal_interrupt</a> *<code class="descname">metal_watchdog_get_interrupt</code><span class="sig-paren">(</span><em class="property">const</em> <em class="property">struct</em> <a class="reference internal" href="#_CPPv314metal_watchdog" title="metal_watchdog">metal_watchdog</a> *<em class="property">const</em> <em>wdog</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv328metal_watchdog_get_interruptPCK14metal_watchdog" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the interrupt controller for the watchdog interrupt. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv331metal_watchdog_get_interrupt_idPCK14metal_watchdog">
+<span id="_CPPv231metal_watchdog_get_interrupt_idPCK14metal_watchdog"></span><span id="metal_watchdog_get_interrupt_id__metal_watchdogCPC"></span><span class="target" id="watchdog_8h_1a55dd33f4382000363fcb0a9684916c16"></span>int <code class="descname">metal_watchdog_get_interrupt_id</code><span class="sig-paren">(</span><em class="property">const</em> <em class="property">struct</em> <a class="reference internal" href="#_CPPv314metal_watchdog" title="metal_watchdog">metal_watchdog</a> *<em class="property">const</em> <em>wdog</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv331metal_watchdog_get_interrupt_idPCK14metal_watchdog" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>&#64;Brief Get the interrupt id for the watchdog interrupt </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv330metal_watchdog_clear_interruptPCK14metal_watchdog">
+<span id="_CPPv230metal_watchdog_clear_interruptPCK14metal_watchdog"></span><span id="metal_watchdog_clear_interrupt__metal_watchdogCPC"></span><span class="target" id="watchdog_8h_1abc1e6118b4b4b8d642201df4a1d979e1"></span>int <code class="descname">metal_watchdog_clear_interrupt</code><span class="sig-paren">(</span><em class="property">const</em> <em class="property">struct</em> <a class="reference internal" href="#_CPPv314metal_watchdog" title="metal_watchdog">metal_watchdog</a> *<em class="property">const</em> <em>wdog</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv330metal_watchdog_clear_interruptPCK14metal_watchdog" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Clear the watchdog interrupt. </p>
+</dd></dl>
+
+<dl class="function">
+<dt id="_CPPv325metal_watchdog_get_deviceKi">
+<span id="_CPPv225metal_watchdog_get_deviceKi"></span><span id="metal_watchdog_get_device__iC"></span><span class="target" id="watchdog_8h_1a7c41c4da9b395298d4301504b1d810a4"></span><em class="property">struct</em> <a class="reference internal" href="#_CPPv314metal_watchdog" title="metal_watchdog">metal_watchdog</a> *<code class="descname">metal_watchdog_get_device</code><span class="sig-paren">(</span><em class="property">const</em> int <em>index</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv325metal_watchdog_get_deviceKi" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get a watchdog handle. </p>
+</dd></dl>
+
+</div>
+<dl class="class">
+<dt id="_CPPv314metal_watchdog">
+<span id="_CPPv214metal_watchdog"></span><span id="metal_watchdog"></span><span class="target" id="structmetal__watchdog"></span><em class="property">struct </em><code class="descname">metal_watchdog</code><a class="headerlink" href="#_CPPv314metal_watchdog" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;watchdog.h&gt;</em><p>Handle for a Watchdog Timer. </p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Freedom Metal</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction to Freedom Metal</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../devguide.html">Developer Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="button.html">Buttons</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cache.html">Caches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="clock.html">Clocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpu.html">CPU</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gpio.html">GPIO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="interrupt.html">Interrupts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="itim.html">ITIM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="led.html">LEDs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="lock.html">Locks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="memory.html">Memory Enumeration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pmp.html">PMPs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rtc.html">Real-Time Clock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shutdown.html">Shutdown</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spi.html">SPIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="switch.html">Switches</a></li>
+<li class="toctree-l2"><a class="reference internal" href="time.html">Time</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timer.html">Timer API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tty.html">TTY</a></li>
+<li class="toctree-l2"><a class="reference internal" href="uart.html">UARTs</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Watchdog</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API Reference</a><ul>
+      <li>Previous: <a href="uart.html" title="previous chapter">UARTs</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, SiFive Inc..
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      
+      |
+      <a href="../_sources/apiref/watchdog.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
