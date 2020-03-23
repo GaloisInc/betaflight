@@ -1,2 +1,0 @@
-src/libriscv__mmachine__sifive-hifive1-revb_a-vector.o: \
- /home/picard/Documents/cleanflight/freedom-metal/src/vector.S
