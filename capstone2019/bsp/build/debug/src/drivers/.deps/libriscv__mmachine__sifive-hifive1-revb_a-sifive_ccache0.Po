@@ -1,5 +1,0 @@
-src/drivers/libriscv__mmachine__sifive-hifive1-revb_a-sifive_ccache0.o: \
- /home/picard/Documents/cleanflight/freedom-metal/src/drivers/sifive_ccache0.c \
- metal/machine/platform.h
-
-metal/machine/platform.h:

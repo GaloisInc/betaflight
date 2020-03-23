@@ -16,17 +16,6 @@
 #
 
 # The target to build, see VALID_TARGETS below
-TARGET    ?= sifive-hifive1-revb
-
-# Build example program
-PROGRAM = hello
-
-# The configuration defaults to Debug. Valid choices are:
-#   - debug
-#   - release
-CONFIGURATION ?= debug
-
-# The target to build, see VALID_TARGETS below
 TARGET    ?= STM32F405
 
 # Compile-time options
@@ -105,6 +94,9 @@ export RM := rm
 # import macros that are OS specific
 include $(ROOT)/make/$(OSFAMILY).mk
 
+# include the tools makefile
+include $(ROOT)/make/tools.mk
+
 # default xtal value for F4 targets
 HSE_VALUE       ?= 8000000
 
@@ -118,13 +110,7 @@ FEATURE_CUT_LEVEL =
 # The list of targets to build for 'pre-push'
 PRE_PUSH_TARGET_LIST ?= OMNIBUSF4 STM32F405 SPRACINGF7DUAL STM32F7X2 NUCLEOH743 SITL test-representative
 
-# include the targets makefile
 include $(ROOT)/make/targets.mk
-
-# include the tools makefile
-ifneq ($(TARGET_MCU), HIFIVE1_REVB)
-include $(ROOT)/make/tools.mk
-endif
 
 REVISION := norevision
 ifeq ($(shell git diff --shortstat),)
@@ -206,9 +192,7 @@ ifeq ($(OPBL),yes)
 TARGET_FLAGS := -DOPBL $(TARGET_FLAGS)
 .DEFAULT_GOAL := binary
 else
-ifneq ($(TARGET_MCU), HIFIVE1_REVB)
 .DEFAULT_GOAL := hex
-endif
 endif
 
 ifeq ($(CUSTOM_DEFAULTS_EXTENDED),yes)
@@ -229,43 +213,6 @@ include $(ROOT)/make/source.mk
 ###############################################################################
 # Things that might need changing to use different tools
 #
-
-#############################################################
-# RISC-V Toolchain
-#############################################################
-
-# Allow users to select a different cross compiler.
-RISCV_PATH ?= ~/SDK_toolchains/RISC-V_GNU_Toolchain/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14
-
-CROSS_COMPILE ?= riscv64-unknown-elf
-
-# If users don't specify RISCV_PATH then assume that the tools will just be in
-# their path.
-ifeq ($(RISCV_PATH),)
-RISCV_GCC     := $(CROSS_COMPILE)-gcc
-RISCV_GXX     := $(CROSS_COMPILE)-g++
-RISCV_OBJDUMP := $(CROSS_COMPILE)-objdump
-RISCV_OBJCOPY := $(CROSS_COMPILE)-objcopy
-RISCV_GDB     := $(CROSS_COMPILE)-gdb
-RISCV_AR      := $(CROSS_COMPILE)-ar
-RISCV_SIZE    := $(CROSS_COMPILE)-size
-else
-RISCV_GCC     := $(abspath $(RISCV_PATH)/bin/$(CROSS_COMPILE)-gcc)
-RISCV_GXX     := $(abspath $(RISCV_PATH)/bin/$(CROSS_COMPILE)-g++)
-RISCV_OBJDUMP := $(abspath $(RISCV_PATH)/bin/$(CROSS_COMPILE)-objdump)
-RISCV_OBJCOPY := $(abspath $(RISCV_PATH)/bin/$(CROSS_COMPILE)-objcopy)
-RISCV_GDB     := $(abspath $(RISCV_PATH)/bin/$(CROSS_COMPILE)-gdb)
-RISCV_AR      := $(abspath $(RISCV_PATH)/bin/$(CROSS_COMPILE)-ar)
-RISCV_SIZE    := $(abspath $(RISCV_PATH)/bin/$(CROSS_COMPILE)-size)
-PATH          := $(abspath $(RISCV_PATH)/bin):$(PATH)
-endif
-
-SEGGER_JLINK_EXE := JLinkExe
-SEGGER_JLINK_GDB_SERVER := JLinkGDBServer
-
-QEMU_RISCV32 = qemu-system-riscv32
-QEMU_RISCV64 = qemu-system-riscv64
-#############################################################
 
 # Find out if ccache is installed on the system
 CCACHE := ccache
@@ -349,163 +296,6 @@ endif
 # No user-serviceable parts below
 ###############################################################################
 
-ifeq ($(TARGET_MCU), HIFIVE1_REVB)
-#############################################################
-# Software
-#############################################################
-
-PROGRAM_ELF ?= $(SIFIVE_SRC_DIR)/$(CONFIGURATION)/$(PROGRAM).elf
-PROGRAM_HEX ?= $(SIFIVE_SRC_DIR)/$(CONFIGURATION)/$(PROGRAM).hex
-PROGRAM_LST ?= $(SIFIVE_SRC_DIR)/$(CONFIGURATION)/$(PROGRAM).lst
-
-.PHONY: all
-all: software
-
-.PHONY: software
-software: $(PROGRAM_ELF)
-
-software: $(PROGRAM_HEX)
-
-PROGRAM_SRCS = $(wildcard $(SIFIVE_SRC_DIR)/*.c) $(wildcard $(SIFIVE_SRC_DIR)/*.h) $(wildcard $(SIFIVE_SRC_DIR)/*.S)
-
-$(PROGRAM_ELF): \
-		$(PROGRAM_SRCS) \
-		$(BSP_DIR)/install/lib/$(CONFIGURATION)/libmetal.a \
-		$(BSP_DIR)/install/lib/$(CONFIGURATION)/libmetal-gloss.a \
-		$(BSP_DIR)/metal.$(LINK_TARGET).lds
-	mkdir -p $(dir $@)
-	$(MAKE) -C $(SIFIVE_SRC_DIR) $(basename $(notdir $@)) \
-		PORT_DIR=$(PORT_DIR) \
-		AR=$(RISCV_AR) \
-		CC=$(RISCV_GCC) \
-		CXX=$(RISCV_GXX) \
-		ASFLAGS="$(RISCV_ASFLAGS)" \
-		CCASFLAGS="$(RISCV_CCASFLAGS)" \
-		CFLAGS="$(RISCV_CFLAGS)" \
-		CXXFLAGS="$(RISCV_CXXFLAGS)" \
-		XCFLAGS="$(RISCV_XCFLAGS)" \
-		LDFLAGS="$(RISCV_LDFLAGS)" \
-		LDLIBS="$(RISCV_LDLIBS)"
-	mv $(SIFIVE_SRC_DIR)/$(basename $(notdir $@)).map $(dir $@)
-	mv $(SIFIVE_SRC_DIR)/$(basename $(notdir $@)) $@
-	touch -c $@
-	$(RISCV_OBJDUMP) --source --all-headers --demangle --line-numbers --wide $@ > $(PROGRAM_LST)
-	$(RISCV_SIZE) $@
-
-# Use elf2hex if we're creating a hex file for RTL simulation
-ifneq ($(filter rtl,$(TARGET_TAGS)),)
-.PHONY: software
-$(PROGRAM_HEX): \
-		scripts/elf2hex/install/bin/$(CROSS_COMPILE)-elf2hex \
-		$(PROGRAM_ELF)
-	$< --output $@ --input $(PROGRAM_ELF) --bit-width $(COREIP_MEM_WIDTH)
-else
-$(PROGRAM_HEX): \
-		$(PROGRAM_ELF)
-	$(RISCV_OBJCOPY) -O ihex $(PROGRAM_ELF) $@
-endif
-
-
-.PHONY: clean-software
-clean-software:
-	$(MAKE) -C $(SIFIVE_SRC_DIR) PORT_DIR=$(PORT_DIR) clean
-	rm -rf $(SIFIVE_SRC_DIR)/$(CONFIGURATION)
-.PHONY: clean
-clean: clean-software
-
-#############################################################
-# elf2hex
-#############################################################
-scripts/elf2hex/build/Makefile: scripts/elf2hex/configure
-	@rm -rf $(dir $@)
-	@mkdir -p $(dir $@)
-	cd $(dir $@); \
-		$(abspath $<) \
-		--prefix=$(abspath $(dir $<))/install \
-		--target=$(CROSS_COMPILE)
-
-scripts/elf2hex/install/bin/$(CROSS_COMPILE)-elf2hex: scripts/elf2hex/build/Makefile
-	$(MAKE) -C $(dir $<) install
-	touch -c $@
-
-.PHONY: clean-elf2hex
-clean-elf2hex:
-	rm -rf scripts/elf2hex/build scripts/elf2hex/install
-clean: clean-elf2hex
-
-
-#############################################################
-# Compiles an instance of Metal targeted at $(TARGET)
-#############################################################
-METAL_SOURCE_PATH ?= freedom-metal
-METAL_LDSCRIPT	   = $(BSP_DIR)/metal.$(LINK_TARGET).lds
-METAL_HEADER	   = $(BSP_DIR)/metal.h
-METAL_INLINE       = $(BSP_DIR)/metal-inline.h
-PLATFORM_HEADER	   = $(BSP_DIR)/metal-platform.h
-
-METAL_PREFIX       = $(abspath $(BSP_DIR)/install)
-METAL_BUILD_DIR    = $(abspath $(BSP_DIR)/build/$(CONFIGURATION))
-METAL_LIB_DIR	   = $(abspath $(BSP_DIR)/install/lib/$(CONFIGURATION))
-
-.PHONY: metal
-metal: $(METAL_LIB_DIR)/stamp
-
-$(METAL_BUILD_DIR)/Makefile:
-	@rm -rf $(dir $@)
-	@mkdir -p $(dir $@)
-	cd $(dir $@) && \
-		CFLAGS="$(RISCV_CFLAGS)" \
-		$(abspath $(METAL_SOURCE_PATH)/configure) \
-		--host=$(CROSS_COMPILE) \
-		--prefix=$(METAL_PREFIX) \
-		--libdir=$(METAL_LIB_DIR) \
-		--disable-maintainer-mode \
-		--with-preconfigured \
-		--with-machine-name=$(TARGET) \
-		--with-machine-header=$(abspath $(METAL_HEADER)) \
-                --with-machine-inline=$(abspath $(METAL_INLINE)) \
-		--with-platform-header=$(abspath $(PLATFORM_HEADER)) \
-		--with-machine-ldscript=$(abspath $(METAL_LDSCRIPT)) \
-		--with-builtin-libgloss
-	touch -c $@
-
-$(METAL_LIB_DIR)/stamp: $(BSP_DIR)/build/$(CONFIGURATION)/Makefile
-	$(MAKE) -C $(abspath $(BSP_DIR)/build/$(CONFIGURATION)) install
-	date > $@
-
-$(METAL_LIB_DIR)/libriscv%.a: $(METAL_LIB_DIR)/stamp ;@:
-
-$(METAL_LIB_DIR)/libmetal.a: $(METAL_LIB_DIR)/libriscv__mmachine__$(TARGET).a
-	cp $< $@
-
-$(METAL_LIB_DIR)/libmetal-gloss.a: $(METAL_LIB_DIR)/libriscv__menv__metal.a
-	cp $< $@
-
-# If we're cleaning the last Metal library for a TARGET, then remove
-# the install directory, otherwise just remove the built libs for that
-# CONFIGURATION.
-ifeq ($(words $(wildcard $(METAL_PREFIX)/lib/*)),1)
-METAL_CLEAN = $(METAL_PREFIX)
-else
-METAL_CLEAN = $(METAL_LIB_DIR)
-endif
-
-.PHONY: clean-metal
-clean-metal:
-	rm -rf $(METAL_CLEAN)
-	rm -rf $(METAL_BUILD_DIR)
-clean: clean-metal
-
-metal_install: metal
-	$(MAKE) -C $(METAL_SOURCE_PATH) install
-endif
-#############################################################
-
-#############################################################
-# Original Betaflight code below
-#############################################################
-
-ifneq ($(TARGET_MCU), HIFIVE1_REVB)
 CPPCHECK        = cppcheck $(CSOURCES) --enable=all --platform=unix64 \
                   --std=c99 --inline-suppr --quiet --force \
                   $(addprefix -I,$(INCLUDE_DIRS)) \
@@ -910,4 +700,3 @@ $(TARGET_OBJS): Makefile $(TARGET_DIR)/target.mk $(wildcard make/*)
 
 # include auto-generated dependencies
 -include $(TARGET_DEPS)
-endif

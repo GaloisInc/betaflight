@@ -1,5 +1,0 @@
-gloss/sys_exit.o: \
- /home/picard/Documents/cleanflight/freedom-metal/gloss/sys_exit.c \
- /home/picard/Documents/cleanflight/freedom-metal/metal/shutdown.h
-
-/home/picard/Documents/cleanflight/freedom-metal/metal/shutdown.h:
