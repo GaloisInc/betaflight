@@ -117,7 +117,11 @@
 
 #elif defined(SIMULATOR_BUILD)
 
-// Nop
+//NOP
+
+#elif defined(MAIXBIT)
+
+//NOP
 
 #else // STM32F10X
 #error "Invalid chipset specified. Update platform.h"

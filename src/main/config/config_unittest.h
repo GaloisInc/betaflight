@@ -18,81 +18,81 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+// #pragma once
 
-#ifdef SRC_MAIN_SCHEDULER_C_
-#ifdef UNIT_TEST
+// #ifdef SRC_MAIN_SCHEDULER_C_
+// #ifdef UNIT_TEST
 
-cfTask_t *unittest_scheduler_selectedTask;
-uint8_t unittest_scheduler_selectedTaskDynamicPriority;
-uint16_t unittest_scheduler_waitingTasks;
+// cfTask_t *unittest_scheduler_selectedTask;
+// uint8_t unittest_scheduler_selectedTaskDynamicPriority;
+// uint16_t unittest_scheduler_waitingTasks;
 
-#define GET_SCHEDULER_LOCALS() \
-    { \
-    unittest_scheduler_selectedTask = selectedTask; \
-    unittest_scheduler_selectedTaskDynamicPriority = selectedTaskDynamicPriority; \
-    unittest_scheduler_waitingTasks = waitingTasks; \
-    }
+// #define GET_SCHEDULER_LOCALS() \
+//     { \
+//     unittest_scheduler_selectedTask = selectedTask; \
+//     unittest_scheduler_selectedTaskDynamicPriority = selectedTaskDynamicPriority; \
+//     unittest_scheduler_waitingTasks = waitingTasks; \
+//     }
 
-#else
+// #else
 
-#define GET_SCHEDULER_LOCALS() {}
+// #define GET_SCHEDULER_LOCALS() {}
 
-#endif
-#endif
+// #endif
+// #endif
 
 
-#ifdef SRC_MAIN_FLIGHT_PID_C_
-#ifdef UNIT_TEST
+// #ifdef SRC_MAIN_FLIGHT_PID_C_
+// #ifdef UNIT_TEST
 
-float unittest_pidLuxFloat_lastErrorForDelta[3];
-float unittest_pidLuxFloat_delta1[3];
-float unittest_pidLuxFloat_delta2[3];
-float unittest_pidLuxFloat_pterm[3];
-float unittest_pidLuxFloat_iterm[3];
-float unittest_pidLuxFloat_dterm[3];
+// float unittest_pidLuxFloat_lastErrorForDelta[3];
+// float unittest_pidLuxFloat_delta1[3];
+// float unittest_pidLuxFloat_delta2[3];
+// float unittest_pidLuxFloat_pterm[3];
+// float unittest_pidLuxFloat_iterm[3];
+// float unittest_pidLuxFloat_dterm[3];
 
-#define SET_PID_LUX_FLOAT_LOCALS(axis) \
-    { \
-        lastErrorForDelta[axis] = unittest_pidLuxFloat_lastErrorForDelta[axis]; \
-        delta1[axis] = unittest_pidLuxFloat_delta1[axis]; \
-        delta2[axis] = unittest_pidLuxFloat_delta2[axis]; \
-    }
+// #define SET_PID_LUX_FLOAT_LOCALS(axis) \
+//     { \
+//         lastErrorForDelta[axis] = unittest_pidLuxFloat_lastErrorForDelta[axis]; \
+//         delta1[axis] = unittest_pidLuxFloat_delta1[axis]; \
+//         delta2[axis] = unittest_pidLuxFloat_delta2[axis]; \
+//     }
 
-#define GET_PID_LUX_FLOAT_LOCALS(axis) \
-    { \
-        unittest_pidLuxFloat_lastErrorForDelta[axis] = lastErrorForDelta[axis]; \
-        unittest_pidLuxFloat_delta1[axis] = delta1[axis]; \
-        unittest_pidLuxFloat_delta2[axis] = delta2[axis]; \
-        unittest_pidLuxFloat_pterm[axis] = pterm; \
-        unittest_pidLuxFloat_iterm[axis] = iterm; \
-        unittest_pidLuxFloat_dterm[axis] = dterm; \
-    }
+// #define GET_PID_LUX_FLOAT_LOCALS(axis) \
+//     { \
+//         unittest_pidLuxFloat_lastErrorForDelta[axis] = lastErrorForDelta[axis]; \
+//         unittest_pidLuxFloat_delta1[axis] = delta1[axis]; \
+//         unittest_pidLuxFloat_delta2[axis] = delta2[axis]; \
+//         unittest_pidLuxFloat_pterm[axis] = pterm; \
+//         unittest_pidLuxFloat_iterm[axis] = iterm; \
+//         unittest_pidLuxFloat_dterm[axis] = dterm; \
+//     }
 
-int32_t unittest_pidMultiWiiRewrite_lastErrorForDelta[3];
-int32_t unittest_pidMultiWiiRewrite_pterm[3];
-int32_t unittest_pidMultiWiiRewrite_iterm[3];
-int32_t unittest_pidMultiWiiRewrite_dterm[3];
+// int32_t unittest_pidMultiWiiRewrite_lastErrorForDelta[3];
+// int32_t unittest_pidMultiWiiRewrite_pterm[3];
+// int32_t unittest_pidMultiWiiRewrite_iterm[3];
+// int32_t unittest_pidMultiWiiRewrite_dterm[3];
 
-#define SET_PID_MULTI_WII_REWRITE_LOCALS(axis) \
-    { \
-    lastErrorForDelta[axis] = unittest_pidMultiWiiRewrite_lastErrorForDelta[axis]; \
-    }
+// #define SET_PID_MULTI_WII_REWRITE_LOCALS(axis) \
+//     { \
+//     lastErrorForDelta[axis] = unittest_pidMultiWiiRewrite_lastErrorForDelta[axis]; \
+//     }
 
-#define GET_PID_MULTI_WII_REWRITE_LOCALS(axis) \
-    { \
-        unittest_pidMultiWiiRewrite_lastErrorForDelta[axis] = lastErrorForDelta[axis]; \
-        unittest_pidMultiWiiRewrite_pterm[axis] = pterm; \
-        unittest_pidMultiWiiRewrite_iterm[axis] = iterm; \
-        unittest_pidMultiWiiRewrite_dterm[axis] = dterm; \
-    }
+// #define GET_PID_MULTI_WII_REWRITE_LOCALS(axis) \
+//     { \
+//         unittest_pidMultiWiiRewrite_lastErrorForDelta[axis] = lastErrorForDelta[axis]; \
+//         unittest_pidMultiWiiRewrite_pterm[axis] = pterm; \
+//         unittest_pidMultiWiiRewrite_iterm[axis] = iterm; \
+//         unittest_pidMultiWiiRewrite_dterm[axis] = dterm; \
+//     }
 
-#else
+// #else
 
-#define SET_PID_LUX_FLOAT_LOCALS(axis) {}
-#define GET_PID_LUX_FLOAT_LOCALS(axis) {}
-#define SET_PID_MULTI_WII_REWRITE_LOCALS(axis) {}
-#define GET_PID_MULTI_WII_REWRITE_LOCALS(axis) {}
+// #define SET_PID_LUX_FLOAT_LOCALS(axis) {}
+// #define GET_PID_LUX_FLOAT_LOCALS(axis) {}
+// #define SET_PID_MULTI_WII_REWRITE_LOCALS(axis) {}
+// #define GET_PID_MULTI_WII_REWRITE_LOCALS(axis) {}
 
-#endif // UNIT_TEST
-#endif // SRC_MAIN_FLIGHT_PID_C_
+// #endif // UNIT_TEST
+// #endif // SRC_MAIN_FLIGHT_PID_C_
