@@ -50,11 +50,11 @@ LD_FLAGS    := \
               -Wl,--cref \
               -T$(LD_SCRIPT)
 
-ifneq ($(filter SITL_STATIC,$(OPTIONS)),)
-LD_FLAGS     += \
-              -static \
-              -static-libgcc
-endif
+# ifneq ($(filter SITL_STATIC,$(OPTIONS)),)
+# LD_FLAGS     += \
+#               -static \
+#               -static-libgcc
+# endif
 
 ifneq ($(DEBUG),GDB)
 OPTIMISE_DEFAULT    := -Ofast
