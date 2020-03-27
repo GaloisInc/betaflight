@@ -1,41 +1,40 @@
-INCLUDE_DIRS    := $(INCLUDE_DIRS) \
-                   $(ROOT)/lib/main/MAIXBIT
+#
+# K210 Make file include
+#
 
-MCU_COMMON_SRC  := $(ROOT)/lib/main/MAIXBIT/Src
+MCU_FLASH_SIZE := 128
+#MAIXBIT drivers
+STDPERIPH_DIR   = $(ROOT)/lib/main/MAIXBIT/Drivers/MAIXBIT_Driver
+STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
+EXCLUDES        = 
+STARTUP_SRC     = crt.S
+STDPERIPH_SRC   := $(filter-out ${EXCLUDES}, $(STDPERIPH_SRC))
+
+INCLUDE_DIRS    := $(INCLUDE_DIRS) \
+                   $(STDPERIPH_DIR)/inc
+
+DEVICE_STDPERIPH_SRC = $(STDPERIPH_SRC)
+
+# If VCP is enabled in target.h (VCP may be only for STM boards?)
+#ifneq ($(filter VCP, $(FEATURES)),)
+#INCLUDE_DIRS    := $(INCLUDE_DIRS) \
+#                   $(USBFS_DIR)/inc \
+#                  $(ROOT)/src/main/vcp
+
+#VPATH           := $(VPATH):$(USBFS_DIR)/src
+
+#DEVICE_STDPERIPH_SRC := $(DEVICE_STDPERIPH_SRC) \
+#                        $(USBPERIPH_SRC)
+#endif
+
+ifeq ($(LD_SCRIPT),)
+LD_SCRIPT       = $(LINKER_DIR)/k210.ld
+endif
 
 #Flags
-ARCH_FLAGS      =
-DEVICE_FLAGS    =
-LD_SCRIPT       = src/link/k210.ld
-STARTUP_SRC     =
+ARCH_FLAGS      = #-mthumb -mcpu=cortex-m3
 
-TARGET_FLAGS    = -D$(TARGET)
-MCU_FLASH_SIZE  := 2048
-
-MCU_EXCLUDES = \
-            drivers/adc.c \
-            drivers/bus_i2c.c \
-            drivers/bus_i2c_config.c \
-            drivers/bus_spi.c \
-            drivers/bus_spi_config.c \
-            drivers/bus_spi_pinconfig.c \
-            drivers/dma.c \
-            drivers/pwm_output.c \
-            drivers/timer.c \
-            drivers/system.c \
-            drivers/rcc.c \
-            drivers/serial_escserial.c \
-            drivers/serial_pinconfig.c \
-            drivers/serial_uart.c \
-            drivers/serial_uart_init.c \
-            drivers/serial_uart_pinconfig.c \
-            drivers/rx/rx_xn297.c \
-            drivers/display_ug2864hsweg01.c \
-            telemetry/crsf.c \
-            telemetry/srxl.c \
-            io/displayport_oled.c
-
-TARGET_MAP  = $(OBJECT_DIR)/$(FORKNAME)_$(TARGET).map
+DEVICE_FLAGS    = #-DSTM32F10X_MD
 
 LD_FLAGS    := \
               -lm \
@@ -50,16 +49,37 @@ LD_FLAGS    := \
               -Wl,--cref \
               -T$(LD_SCRIPT)
 
-# ifneq ($(filter SITL_STATIC,$(OPTIONS)),)
-# LD_FLAGS     += \
-#               -static \
-#               -static-libgcc
-# endif
+#(VCP may be only for STM boards?)
+#VCP_SRC = \
+#            vcp/hw_config.c \
+#            vcp/stm32_it.c \
+#            vcp/usb_desc.c \
+#            vcp/usb_endp.c \
+#            vcp/usb_istr.c \
+#            vcp/usb_prop.c \
+#            vcp/usb_pwr.c \
+#            drivers/serial_usb_vcp.c \
+#            drivers/usb_io.c
+
+#BF drivers
+MCU_COMMON_SRC = \
+            #drivers/adc_stm32f10x.c \
+            #drivers/bus_i2c_stm32f10x.c \
+            #drivers/bus_spi_stdperiph.c \
+            #drivers/dma.c \
+            #drivers/inverter.c \
+            #drivers/light_ws2811strip_stdperiph.c \
+            #drivers/serial_uart_stdperiph.c \
+            #drivers/serial_uart_stm32f10x.c \
+            #drivers/system_stm32f10x.c \
+            #drivers/timer_stm32f10x.c
+
+DSP_LIB :=
 
 ifneq ($(DEBUG),GDB)
-OPTIMISE_DEFAULT    := -Ofast
-OPTIMISE_SPEED      := -Ofast
-OPTIMISE_SIZE       := -Os
+OPTIMISE_DEFAULT    := -Os
+OPTIMISE_SPEED      :=
+OPTIMISE_SIZE       :=
 
-LTO_FLAGS           := $(OPTIMISATION_BASE) $(OPTIMISE_SPEED)
+LTO_FLAGS           := $(OPTIMISATION_BASE) $(OPTIMISE_DEFAULT)
 endif
