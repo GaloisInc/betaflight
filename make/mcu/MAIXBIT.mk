@@ -58,7 +58,8 @@ endif
 #Flags
 ARCH_FLAGS      = rv64imafc
 #DEVICE_FLAGS    = #-DSTM32F10X_MD
-LD_FLAGS       :=  -nostartfiles\
+LD_FLAGS       :=  \
+                    -nostartfiles\
                     -static\
                     -Wl,\
                     --gc-sections\
@@ -95,18 +96,9 @@ LD_FLAGS       :=  -nostartfiles\
 
 #BF drivers
 MCU_COMMON_SRC = \
-            #drivers/adc_stm32f10x.c \
-            #drivers/bus_i2c_stm32f10x.c \
-            #drivers/bus_spi_stdperiph.c \
-            #drivers/dma.c \
-            #drivers/inverter.c \
-            #drivers/light_ws2811strip_stdperiph.c \
-            #drivers/serial_uart_stdperiph.c \
-            #drivers/serial_uart_stm32f10x.c \
-            #drivers/system_stm32f10x.c \
-            #drivers/timer_stm32f10x.c
+                drivers/accgyro/accgyro_mpu.c \
 
-DSP_LIB :=
+# DSP_LIB :=
 
 ifneq ($(DEBUG),GDB)
 OPTIMISE_DEFAULT    := -Os
