@@ -4,7 +4,7 @@
 
 MCU_FLASH_SIZE := 128
 #MAIXBIT drivers
-STDPERIPH_DIR   = $(ROOT)/lib/main/MAIXBIT/Drivers/MAIXBIT_Driver
+STDPERIPH_DIR   = $(ROOT)/lib/main/RISCV_K210/Drivers
 STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
 EXCLUDES        = 
 STARTUP_SRC     = crt.S
@@ -28,7 +28,7 @@ DEVICE_STDPERIPH_SRC = $(STDPERIPH_SRC)
 #endif
 
 ifeq ($(LD_SCRIPT),)
-LD_SCRIPT       = $(LINKER_DIR)/k210.ld
+LD_SCRIPT       = $(LINKER_DIR)/riscv_flash_k210_128k.ld
 endif
 
 #Flags
