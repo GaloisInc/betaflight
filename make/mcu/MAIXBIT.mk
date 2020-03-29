@@ -1,17 +1,41 @@
 #
-# K210 Make file include
+# RISCV_K210
 #
-
 MCU_FLASH_SIZE := 128
 #MAIXBIT drivers
 STDPERIPH_DIR   = $(ROOT)/lib/main/RISCV_K210/Drivers
-STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/src/*.c))
-EXCLUDES        = 
-STARTUP_SRC     = crt.S
-STDPERIPH_SRC   := $(filter-out ${EXCLUDES}, $(STDPERIPH_SRC))
+STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/Src/*.c))    
+DEFAULT_LD_SCRIPT = $(LINKER_DIR)/riscv_flash_k210_128k.ld
+EXCLUDES        =  \
+                aes.c\
+                apu.c\
+                clint.c\
+                dmac.c\
+                drivers.txt\
+                dvp.c\
+                fft.c\
+                fpioa.c\
+                gpio.c\
+                gpiohs.c\
+                i2c.c\
+                i2s.c\
+                kpu.c\
+                plic.c\
+                pwm.c\
+                rtc.c\
+                sha256.c\
+                spi.c\
+                sysctl.c\
+                timer.c\
+                uart.c\
+                uarths.c\
+                utils.c\
+                wdt.c\
 
-INCLUDE_DIRS    := $(INCLUDE_DIRS) \
-                   $(STDPERIPH_DIR)/inc
+
+INCLUDE_DIRS   := $(INCLUDE_DIRS) \
+                  $(STDPERIPH_DIR)/Inc\
+                  $(STDPERIPH_DIR)/Inc/Utils
 
 DEVICE_STDPERIPH_SRC = $(STDPERIPH_SRC)
 
@@ -32,22 +56,30 @@ LD_SCRIPT       = $(LINKER_DIR)/riscv_flash_k210_128k.ld
 endif
 
 #Flags
-ARCH_FLAGS      = #-mthumb -mcpu=cortex-m3
+ARCH_FLAGS      = rv64imafc
+#DEVICE_FLAGS    = #-DSTM32F10X_MD
+LD_FLAGS       :=  -nostartfiles\
+                    -static\
+                    -Wl,\
+                    --gc-sections\
+                    -Wl,\
+                    -static\
+                    -Wl,\
+                    --start-group\
+                    -Wl,\
+                    --whole-archive\
+                    -Wl,\
+                    --no-whole-archive\
+                    -Wl,\
+                    --end-group\
+                    -Wl,\
+                    -EL\
+                    -Wl,\
+                    --no-relax\
+                    -T$(LD_SCRIPT)
 
-DEVICE_FLAGS    = #-DSTM32F10X_MD
-
-LD_FLAGS    := \
-              -lm \
-              -lpthread \
-              -lc \
-              -lrt \
-              $(ARCH_FLAGS) \
-              $(LTO_FLAGS) \
-              $(DEBUG_FLAGS) \
-              -Wl,-gc-sections,-Map,$(TARGET_MAP) \
-              -Wl,-L$(LINKER_DIR) \
-              -Wl,--cref \
-              -T$(LD_SCRIPT)
+# STDPERIPH_SRC   := $(filter-out ${EXCLUDES}, $(STDPERIPH_SRC))
+                     
 
 #(VCP may be only for STM boards?)
 #VCP_SRC = \
