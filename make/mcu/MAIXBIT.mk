@@ -5,7 +5,7 @@ MCU_FLASH_SIZE := 128
 #MAIXBIT drivers
 STDPERIPH_DIR   = $(ROOT)/lib/main/RISCV_K210/Drivers
 STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/Src/*.c))    
-DEFAULT_LD_SCRIPT = $(LINKER_DIR)/riscv_flash_k210_128k.ld
+LD_SCRIPT = $(LINKER_DIR)/riscv_flash_k210_128k.ld
 EXCLUDES        =  \
                 aes.c\
                 apu.c\
