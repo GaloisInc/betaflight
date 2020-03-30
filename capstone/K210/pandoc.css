@@ -1,11 +1,11 @@
 body {
   font-family: Helvetica, arial, sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.6;
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   background-color: white;
-  padding: 20px; }
+  padding: 30px; }
 
 body > *:first-child {
   margin-top: 0 !important; }
@@ -57,16 +57,16 @@ h6 tt, h6 code {
   font-size: inherit; }
 
 h1 {
-  font-size: 24px;
+  font-size: 28px;
   color: black; }
 
 h2 {
-  font-size: 20px;
+  font-size: 24px;
   border-bottom: 1px solid #cccccc;
   color: black; }
 
 h3 {
-  font-size: 18px; }
+  font-size: 20px; }
 
 h4 {
   font-size: 16px; }
