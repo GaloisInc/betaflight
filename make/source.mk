@@ -1,4 +1,4 @@
-# COMMON_SRC = \
+ COMMON_SRC = main.c \
 #             build/build_config.c \
 #             build/debug.c \
 #             build/debug_pin.c \
@@ -395,7 +395,7 @@
 #             $(MSC_SRC)
 # endif
 
-# SRC += $(COMMON_SRC)
+ SRC += $(COMMON_SRC)
 
 # #excludes
 # SRC   := $(filter-out $(MCU_EXCLUDES), $(SRC))
