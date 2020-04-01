@@ -16,7 +16,7 @@
 #
 
 # The target to build, see VALID_TARGETS below
-TARGET    ?= MAIXBIT
+TARGET    ?= STM32F405
 
 # Compile-time options
 OPTIONS   ?=
@@ -62,6 +62,7 @@ SRC_DIR         := $(ROOT)/src/main
 OBJECT_DIR      := $(ROOT)/obj/main
 BIN_DIR         := $(ROOT)/obj
 CMSIS_DIR       := $(ROOT)/lib/main/CMSIS
+# TODO Add the directory for bsp 
 INCLUDE_DIRS    := $(SRC_DIR) \
                    $(ROOT)/src/main/target \
                    $(ROOT)/src/main/startup
@@ -108,7 +109,7 @@ FEATURE_CUT_LEVEL_SUPPLIED := $(FEATURE_CUT_LEVEL)
 FEATURE_CUT_LEVEL =
 
 # The list of targets to build for 'pre-push'
-PRE_PUSH_TARGET_LIST ?= OMNIBUSF4 STM32F405 SPRACINGF7DUAL STM32F7X2 NUCLEOH743 SITL test-representative
+PRE_PUSH_TARGET_LIST ?= OMNIBUSF4 STM32F405 SPRACINGF7DUAL STM32F7X2 NUCLEOH743 SITL MAIXBIT test-representative
 
 include $(ROOT)/make/targets.mk
 
@@ -222,12 +223,12 @@ CCACHE :=
 endif
 
 # Tool names
-CROSS_CC    := $(CCACHE) $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-gcc  #$(CCACHE) $(ARM_SDK_PREFIX)gcc
-CROSS_CXX   := $(CCACHE) $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-g++  #$(CCACHE) $(ARM_SDK_PREFIX)g++
-CROSS_GDB   := $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-gdb  #$(ARM_SDK_PREFIX)gdb
-OBJCOPY     := $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-objcopy  #$(ARM_SDK_PREFIX)objcopy
-OBJDUMP     := $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-objdump  #$(ARM_SDK_PREFIX)objdump
-SIZE        := $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-size  #$(ARM_SDK_PREFIX)size
+CROSS_CC    := $(CCACHE) $(ARM_SDK_PREFIX)gcc
+CROSS_CXX   := $(CCACHE) $(ARM_SDK_PREFIX)g++
+CROSS_GDB   := $(ARM_SDK_PREFIX)gdb
+OBJCOPY     := $(ARM_SDK_PREFIX)objcopy
+OBJDUMP     := $(ARM_SDK_PREFIX)objdump
+SIZE        := $(ARM_SDK_PREFIX)size
 DFUSE-PACK  := src/utils/dfuse-pack.py
 
 #
