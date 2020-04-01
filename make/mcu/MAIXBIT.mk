@@ -57,7 +57,7 @@ endif
 
 #Flags
 #ARCH_FLAGS unique to K210
-ARCH_FLAGS      = -march=rv64imafc\
+ARCH_FLAGS      = -march=rv64imafc
                   -mabi=lp64f\
 
 #Not sure if we need these for RISCV
@@ -67,25 +67,17 @@ ARCH_FLAGS      = -march=rv64imafc\
 LD_FLAGS       :=  \
                -nostartfiles\
                -static\
-               -Wl, -gc-sections,-Map,$(TARGET_MAP)\
                -Wl, -L$(LINKER_DIR) \
                $(ARCH_FLAGS) \
                $(LTO_FLAGS) \
                $(DEBUG_FLAGS) \
                -Wl, -static\
-               -Wl, --start-group\
-               -Wl, --whole-archive\
-               -Wl, --no-whole-archive\
-               -Wl, --end-group\
-               -Wl, -EL\
-               -Wl, --no-relax\
-               -Wl, --print-memory-usage \
-               -T$(LD_SCRIPT)
+               -T$(LD_SCRIPT)\
                $(EXTRA_LD_FLAGS)
 
+#-Wl, -gc-sections,-Map,$(TARGET_MAP)\
 #CLAGS unique to K210. These get appended to CFLAGS in Makefile.
 CFLAGS     :=  -mcmodel=medany\
-               #-march=rv64imafc\
                #-fno-common\
                #-ffunction-sections\
                #-fdata-sections\
@@ -139,7 +131,7 @@ CFLAGS     :=  -mcmodel=medany\
 
 #BF drivers
 MCU_COMMON_SRC = \
-                drivers/accgyro/accgyro_mpu.c \
+                drivers/accgyro/accgyro_mpu.c
 
 # DSP_LIB :=
 
@@ -150,3 +142,23 @@ OPTIMISE_SIZE       :=
 
 LTO_FLAGS           := $(OPTIMISATION_BASE) $(OPTIMISE_DEFAULT)
 endif
+
+
+#LD_FLAGS       :=  \
+               -nostartfiles\
+               -static\
+               -Wl, --gc-sections,-Map,$(TARGET_MAP)\
+               -Wl, -L$(LINKER_DIR) \
+               $(ARCH_FLAGS) \
+               $(LTO_FLAGS) \
+               $(DEBUG_FLAGS) \
+               -Wl, -static\
+               -Wl, --start-group\
+               -Wl, --whole-archive\
+               -Wl, --no-whole-archive\
+               -Wl, --end-group\
+               -Wl, -EL\
+               -Wl, --no-relax\
+               -Wl, --print-memory-usage \
+               -T$(LD_SCRIPT)
+               $(EXTRA_LD_FLAGS)
