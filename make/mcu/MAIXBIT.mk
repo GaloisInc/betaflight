@@ -2,6 +2,10 @@
 # RISCV_K210
 #
 MCU_FLASH_SIZE := 128
+
+# this flag is used for eeprom mem config
+DEVICE_FLAGS += -DRISCVK210
+
 #MAIXBIT drivers
 STDPERIPH_DIR   = $(ROOT)/lib/main/RISCV_K210
 STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/drivers/*.c))    
