@@ -21,13 +21,13 @@
 #pragma once
 
 #define TARGET_BOARD_IDENTIFIER "MAIXBIT"
-#define USBD_PRODUCT_STRING "Minimal MAIXBIT"
+// #define USBD_PRODUCT_STRING "Minimal MAIXBIT"
 
 #undef USE_BEEPER
 
-#define USE_VCP
+// #define USE_VCP
 
-#define SERIAL_PORT_COUNT       1 // VCP
+// #define SERIAL_PORT_COUNT       1 // VCP
 
 #define TARGET_IO_PORTA (0xffff & ~(BIT(14)|BIT(13)))
 #define TARGET_IO_PORTB (0xffff & ~(BIT(2)))
@@ -90,5 +90,5 @@
 #undef USE_RTC_TIME
 #undef USE_RCDEVICE
 
-#define USABLE_TIMER_CHANNEL_COUNT 14
-#define USED_TIMERS ( TIM_N(1) | TIM_N(2) | TIM_N(3) | TIM_N(4) | TIM_N(5) | TIM_N(10) | TIM_N(12) | TIM_N(8) | TIM_N(9))
+#undef USABLE_TIMER_CHANNEL_COUNT 14
+#undef USED_TIMERS ( TIM_N(1) | TIM_N(2) | TIM_N(3) | TIM_N(4) | TIM_N(5) | TIM_N(10) | TIM_N(12) | TIM_N(8) | TIM_N(9))

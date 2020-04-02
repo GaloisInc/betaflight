@@ -1,2 +1,2 @@
 MAIXBIT_TARGETS  += $(TARGET)
-FEATURES       += VCP
+# FEATURES       += VCP

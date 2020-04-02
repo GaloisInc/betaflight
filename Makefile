@@ -69,7 +69,7 @@ LINKER_DIR      := $(ROOT)/src/link
 
 ## V                 : Set verbosity level based on the V= parameter
 ##                     V=0 Low
-##                     V=1 High
+                    V=1 High
 include $(ROOT)/make/build_verbosity.mk
 
 # Build tools, so we all share the same versions
@@ -124,7 +124,7 @@ FC_VER_PATCH := $(shell grep " FC_VERSION_PATCH" src/main/build/version.h | awk 
 FC_VER := $(FC_VER_MAJOR).$(FC_VER_MINOR).$(FC_VER_PATCH)
 
 # Search path for sources
-VPATH           := $(SRC_DIR):$(SRC_DIR)/startup
+# VPATH           := $(SRC_DIR):$(SRC_DIR)/startup
 USBFS_DIR       = $(ROOT)/lib/main/STM32_USB-FS-Device_Driver
 USBPERIPH_SRC   = $(notdir $(wildcard $(USBFS_DIR)/src/*.c))
 FATFS_DIR       = $(ROOT)/lib/main/FatFS
@@ -221,14 +221,17 @@ ifneq ($(RESULT),0)
 CCACHE :=
 endif
 
-# Tool names
-CROSS_CC    := $(CCACHE) $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-gcc  #$(CCACHE) $(ARM_SDK_PREFIX)gcc
-CROSS_CXX   := $(CCACHE) $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-g++  #$(CCACHE) $(ARM_SDK_PREFIX)g++
-CROSS_GDB   := $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-gdb  #$(ARM_SDK_PREFIX)gdb
-OBJCOPY     := $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-objcopy  #$(ARM_SDK_PREFIX)objcopy
-OBJDUMP     := $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-objdump  #$(ARM_SDK_PREFIX)objdump
-SIZE        := $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-size  #$(ARM_SDK_PREFIX)size
+
+
+# # Tool names
+CROSS_CC    := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-gcc #$(CCACHE) $(ARM_SDK_PREFIX)gcc
+CROSS_CXX   := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-g++  #$(CCACHE) $(ARM_SDK_PREFIX)g++
+CROSS_GDB   := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-gdb  #$(ARM_SDK_PREFIX)gdb
+OBJCOPY     := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-objcopy  #$(ARM_SDK_PREFIX)objcopy
+OBJDUMP     := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-objdump  #$(ARM_SDK_PREFIX)objdump
+SIZE        := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-size  #$(ARM_SDK_PREFIX)size
 DFUSE-PACK  := src/utils/dfuse-pack.py
+
 
 #
 # Tool options.
