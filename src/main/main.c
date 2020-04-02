@@ -33,7 +33,7 @@ int main(void)
 {
     // init();
 
-    // run();
+    run();
 
     return 0;
 }
