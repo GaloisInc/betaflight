@@ -23,7 +23,7 @@
 #define TARGET_BOARD_IDENTIFIER "MAIXBIT"
 #define USBD_PRODUCT_STRING "Minimal MAIXBIT"
 
-# this flag is used for config mem
+// this flag is used for config mem
 #define CONFIG_IN_EXTERNAL_FLASH
 
 #undef USE_BEEPER
