@@ -238,58 +238,58 @@ CC_SPEED_OPTIMISATION   := $(OPTIMISATION_BASE) $(OPTIMISE_SPEED)
 CC_SIZE_OPTIMISATION    := $(OPTIMISATION_BASE) $(OPTIMISE_SIZE)
 CC_NO_OPTIMISATION      := 
 
-#
-# Added after GCC version update, remove once the warnings have been fixed
-#
-TEMPORARY_FLAGS :=
+# #
+# # Added after GCC version update, remove once the warnings have been fixed
+# #
+# TEMPORARY_FLAGS :=
 
-CFLAGS     += $(ARCH_FLAGS) \
-              $(addprefix -D,$(OPTIONS)) \
-              $(addprefix -I,$(INCLUDE_DIRS)) \
-              $(DEBUG_FLAGS) \
-              -std=gnu11 \
-              -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \
-              -ffunction-sections \
-              -fdata-sections \
-              -fno-common \
-              -pedantic \
-              $(TEMPORARY_FLAGS) \
-              $(DEVICE_FLAGS) \
-              -D_GNU_SOURCE \
-              -DUSE_STDPERIPH_DRIVER \
-              -D$(TARGET) \
-              $(TARGET_FLAGS) \
-              -D'__FORKNAME__="$(FORKNAME)"' \
-              -D'__TARGET__="$(TARGET)"' \
-              -D'__REVISION__="$(REVISION)"' \
-              -save-temps=obj \
-              -MMD -MP \
-              $(EXTRA_FLAGS)
+# CFLAGS     += $(ARCH_FLAGS) \
+#               $(addprefix -D,$(OPTIONS)) \
+#               $(addprefix -I,$(INCLUDE_DIRS)) \
+#               $(DEBUG_FLAGS) \
+#               -std=gnu11 \
+#               -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \
+#               -ffunction-sections \
+#               -fdata-sections \
+#               -fno-common \
+#               -pedantic \
+#               $(TEMPORARY_FLAGS) \
+#               $(DEVICE_FLAGS) \
+#               -D_GNU_SOURCE \
+#               -DUSE_STDPERIPH_DRIVER \
+#               -D$(TARGET) \
+#               $(TARGET_FLAGS) \
+#               -D'__FORKNAME__="$(FORKNAME)"' \
+#               -D'__TARGET__="$(TARGET)"' \
+#               -D'__REVISION__="$(REVISION)"' \
+#               -save-temps=obj \
+#               -MMD -MP \
+#               $(EXTRA_FLAGS)
 
-ASFLAGS     = $(ARCH_FLAGS) \
-              $(DEBUG_FLAGS) \
-              -x assembler-with-cpp \
-              $(addprefix -I,$(INCLUDE_DIRS)) \
-              -MMD -MP
+# ASFLAGS     = $(ARCH_FLAGS) \
+#               $(DEBUG_FLAGS) \
+#               -x assembler-with-cpp \
+#               $(addprefix -I,$(INCLUDE_DIRS)) \
+#               -MMD -MP
 
-ifeq ($(LD_FLAGS),)
-LD_FLAGS     = -lm \
-              -nostartfiles \
-              --specs=nano.specs \
-              -lc \
-              -lnosys \
-              $(ARCH_FLAGS) \
-              $(LTO_FLAGS) \
-              $(DEBUG_FLAGS) \
-              -static \
-              -Wl,-gc-sections,-Map,$(TARGET_MAP) \
-              -Wl,-L$(LINKER_DIR) \
-              -Wl,--cref \
-              -Wl,--no-wchar-size-warning \
-              -Wl,--print-memory-usage \
-              -T$(LD_SCRIPT) \
-               $(EXTRA_LD_FLAGS)
-endif
+# ifeq ($(LD_FLAGS),)
+# LD_FLAGS     = -lm \
+#               -nostartfiles \
+#               --specs=nano.specs \
+#               -lc \
+#               -lnosys \
+#               $(ARCH_FLAGS) \
+#               $(LTO_FLAGS) \
+#               $(DEBUG_FLAGS) \
+#               -static \
+#               -Wl,-gc-sections,-Map,$(TARGET_MAP) \
+#               -Wl,-L$(LINKER_DIR) \
+#               -Wl,--cref \
+#               -Wl,--no-wchar-size-warning \
+#               -Wl,--print-memory-usage \
+#               -T$(LD_SCRIPT) \
+#                $(EXTRA_LD_FLAGS)
+# endif
 
 ###############################################################################
 # No user-serviceable parts below

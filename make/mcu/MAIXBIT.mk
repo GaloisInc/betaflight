@@ -68,19 +68,22 @@ LD_FLAGS       :=  \
                -nostartfiles\
                -static\
                -Wl,\
-               --data-sections\
+               --gc-sections\
                -Wl,\
                -static\
                -Wl,\
-               --stdarg-opt\
+               --start-group\
                -Wl,\
-               --whole-file\
+               --whole-archive\
                -Wl,\
+               --no-whole-archive\
                -Wl,\
-               -E\
+               --end-group\
                -Wl,\
-               -mno-relax\
-               -T$(LD_SCRIPT)
+               -EL\
+               -Wl,\
+               -no-relax\
+               -T $(LD_SCRIPT)
 
 #CLAGS unique to K210. These get appended to CFLAGS in Makefile.
 CFLAGS     :=  -mcmodel=medany\
@@ -120,7 +123,8 @@ CFLAGS     :=  -mcmodel=medany\
                -Wno-error=logical-not-parentheses\
                -Wno-error=duplicate-decl-specifier\
                -Wno-error=parentheses\
-               -Wno-old-style-declaration
+               -Wno-old-style-declaration\
+               -g
 
 #(VCP may be only for STM boards?)
 #VCP_SRC = \
