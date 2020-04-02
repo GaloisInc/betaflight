@@ -66,24 +66,9 @@ ARCH_FLAGS      = -march=rv64imafc -mabi=lp64f
 #A mix of K210 flags and BF flags
 LD_FLAGS       :=  \
                -nostartfiles\
-               -static\
-               -Wl,\
-               --gc-sections\
-               -Wl,\
-               -static\
-               -Wl,\
-               --start-group\
-               -Wl,\
-               --whole-archive\
-               -Wl,\
-               --no-whole-archive\
-               -Wl,\
-               --end-group\
-               -Wl,\
-               -EL\
-               -Wl,\
-               -no-relax\
+               -mno-relax\
                -T $(LD_SCRIPT)
+               
 
 #CLAGS unique to K210. These get appended to CFLAGS in Makefile.
 CFLAGS     :=  -mcmodel=medany\
