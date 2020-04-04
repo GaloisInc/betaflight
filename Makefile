@@ -222,21 +222,12 @@ CCACHE :=
 endif
 
 # Tool names
-<<<<<<< HEAD
-CROSS_CC    := $(CCACHE) $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-gcc  #$(CCACHE) $(ARM_SDK_PREFIX)gcc
-CROSS_CXX   := $(CCACHE) $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-g++  #$(CCACHE) $(ARM_SDK_PREFIX)g++
-CROSS_GDB   := $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-gdb  #$(ARM_SDK_PREFIX)gdb
-OBJCOPY     := $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-objcopy  #$(ARM_SDK_PREFIX)objcopy
-OBJDUMP     := $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-objdump  #$(ARM_SDK_PREFIX)objdump
-SIZE        := $(ROOT)/tools/kendryte-toolchain/bin/riscv64-unknown-elf-size  #$(ARM_SDK_PREFIX)size
-=======
 CROSS_CC    := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-gcc #$(CCACHE) $(ARM_SDK_PREFIX)gcc
 CROSS_CXX   := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-g++  #$(CCACHE) $(ARM_SDK_PREFIX)g++
 CROSS_GDB   := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-gdb  #$(ARM_SDK_PREFIX)gdb
 OBJCOPY     := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-objcopy  #$(ARM_SDK_PREFIX)objcopy
 OBJDUMP     := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-objdump  #$(ARM_SDK_PREFIX)objdump
 SIZE        := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-size  #$(ARM_SDK_PREFIX)size
->>>>>>> c8922faeae7bac83f34324493c4792fbbcf5473e
 DFUSE-PACK  := src/utils/dfuse-pack.py
 #
 # Tool options.
