@@ -13,3 +13,5 @@
 ## Other
 
   - K210 Frameworks and examples: <https://docs.platformio.org/en/latest/platforms/kendryte210.html\#frameworks>
+  - Platformio: <https://github.com/sipeed/platform-kendryte210/tree/master/examples/kendryte-standalone-sdk_hello?utm_source=platformio.org&utm_medium=docs>
+  - K210 Platforms: <https://docs.platformio.org/en/latest/platforms/kendryte210.html>

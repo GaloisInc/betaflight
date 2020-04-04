@@ -2,10 +2,14 @@
 # RISCV_K210
 #
 MCU_FLASH_SIZE := 128
+
+# this flag is used for eeprom mem config
+DEVICE_FLAGS += -DRISCVK210
+
 #MAIXBIT drivers
-STDPERIPH_DIR   = $(ROOT)/lib/main/RISCV_K210/Drivers
-STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/Src/*.c))    
-LD_SCRIPT = $(LINKER_DIR)/riscv_flash_k210_128k.ld
+STDPERIPH_DIR   = $(ROOT)/lib/main/RISCV_K210
+STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/drivers/*.c))    
+LD_SCRIPT       = $(LINKER_DIR)/riscv_flash_k210_128k.ld
 EXCLUDES        =  \
                 aes.c\
                 apu.c\
@@ -34,8 +38,10 @@ EXCLUDES        =  \
 
 
 INCLUDE_DIRS   := $(INCLUDE_DIRS) \
-                  $(STDPERIPH_DIR)/Inc\
-                  $(STDPERIPH_DIR)/Inc/Utils
+                  $(STDPERIPH_DIR)\
+                  $(STDPERIPH_DIR)/drivers\
+                  $(STDPERIPH_DIR)/utils\
+                  $(STDPERIPH_DIR)/bsp
 
 DEVICE_STDPERIPH_SRC = $(STDPERIPH_SRC)
 
@@ -47,40 +53,30 @@ DEVICE_STDPERIPH_SRC = $(STDPERIPH_SRC)
 
 #VPATH           := $(VPATH):$(USBFS_DIR)/src
 
-#DEVICE_STDPERIPH_SRC := $(DEVICE_STDPERIPH_SRC) \
+# DEVICE_STDPERIPH_SRC := $(DEVICE_STDPERIPH_SRC) \
 #                        $(USBPERIPH_SRC)
-#endif
+# endif
 
-ifeq ($(LD_SCRIPT),)
-LD_SCRIPT       = $(LINKER_DIR)/riscv_flash_k210_128k.ld
-endif
 
 #Flags
 #ARCH_FLAGS unique to K210
-ARCH_FLAGS      = -march=rv64imafc
-                  -mabi=lp64f\
 
-#Not sure if we need these for RISCV
-#DEVICE_FLAGS    = #-DSTM32F10X_MD
+ARCH_FLAGS      = -march=rv64imafc -mabi=lp64f
 
 #A mix of K210 flags and BF flags
 LD_FLAGS       :=  \
                -nostartfiles\
-               -static\
-               -Wl, -L$(LINKER_DIR) \
-               $(ARCH_FLAGS) \
-               $(LTO_FLAGS) \
-               $(DEBUG_FLAGS) \
-               -Wl, -static\
-               -T$(LD_SCRIPT)\
-               $(EXTRA_LD_FLAGS)
+               -mno-relax\
+               -T $(LD_SCRIPT)
 
 #-Wl, -gc-sections,-Map,$(TARGET_MAP)\
 #CLAGS unique to K210. These get appended to CFLAGS in Makefile.
 CFLAGS     :=  -mcmodel=medany\
-               #-fno-common\
-               #-ffunction-sections\
-               #-fdata-sections\
+               -mabi=lp64f\
+               -march=rv64imafc\
+               -fno-common\
+               -ffunction-sections\
+               -fdata-sections\
                -fstrict-volatile-bitfields\
                -fno-zero-initialized-in-bss\
                -ffast-math\
@@ -88,15 +84,15 @@ CFLAGS     :=  -mcmodel=medany\
                -fsingle-precision-constant\
                -Os\
                -ggdb\
-               #-std=gnu11\
+               -std=gnu11\
                -Wno-pointer-to-int-cast\
-               #-Wall\
+               -Wall\
                -Werror=all\
                -Wno-error=unused-function\
                -Wno-error=unused-but-set-variable\
                -Wno-error=unused-variable\
                -Wno-error=deprecated-declarations\
-               #-Wextra\
+               -Wextra\
                -Werror=frame-larger-than=32768\
                -Wno-unused-parameter\
                -Wno-sign-compare\
@@ -112,10 +108,8 @@ CFLAGS     :=  -mcmodel=medany\
                -Wno-error=logical-not-parentheses\
                -Wno-error=duplicate-decl-specifier\
                -Wno-error=parentheses\
-               -Wno-old-style-declaration
-
-# STDPERIPH_SRC   := $(filter-out ${EXCLUDES}, $(STDPERIPH_SRC))
-                     
+               -Wno-old-style-declaration\
+               -g
 
 #(VCP may be only for STM boards?)
 #VCP_SRC = \
@@ -129,36 +123,12 @@ CFLAGS     :=  -mcmodel=medany\
 #            drivers/serial_usb_vcp.c \
 #            drivers/usb_io.c
 
-#BF drivers
+# Common drivers
 MCU_COMMON_SRC = \
                 drivers/accgyro/accgyro_mpu.c
-
-# DSP_LIB :=
 
 ifneq ($(DEBUG),GDB)
 OPTIMISE_DEFAULT    := -Os
 OPTIMISE_SPEED      :=
 OPTIMISE_SIZE       :=
-
 LTO_FLAGS           := $(OPTIMISATION_BASE) $(OPTIMISE_DEFAULT)
-endif
-
-
-#LD_FLAGS       :=  \
-               -nostartfiles\
-               -static\
-               -Wl, --gc-sections,-Map,$(TARGET_MAP)\
-               -Wl, -L$(LINKER_DIR) \
-               $(ARCH_FLAGS) \
-               $(LTO_FLAGS) \
-               $(DEBUG_FLAGS) \
-               -Wl, -static\
-               -Wl, --start-group\
-               -Wl, --whole-archive\
-               -Wl, --no-whole-archive\
-               -Wl, --end-group\
-               -Wl, -EL\
-               -Wl, --no-relax\
-               -Wl, --print-memory-usage \
-               -T$(LD_SCRIPT)
-               $(EXTRA_LD_FLAGS)
