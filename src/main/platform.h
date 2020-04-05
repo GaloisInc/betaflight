@@ -26,6 +26,11 @@
 #pragma GCC poison sprintf snprintf
 #endif
 
+//this should not be defined here. will fix after build
+//#ifndef RISCV_K210
+//#define RISCV_K210
+//#endif
+
 #if defined(STM32H743xx) || defined(STM32H750xx)
 #include "stm32h7xx.h"
 #include "stm32h7xx_hal.h"
@@ -119,8 +124,28 @@
 
 //NOP
 
-#elif defined(MAIXBIT)
+#elif defined(RISCV_K210)
 
+#include "platform_k210.h"
+//#include "stm32h7xx_hal.h"
+//#include "system_stm32h7xx.h"
+
+#include "spi.h"
+#include "gpio.h"
+#include "dmac.h"
+#include "rtc.h"
+//#include "stm32h7xx_ll_bus.h"
+#include "timer.h"
+#include "sysctl.h"
+//#include "drivers/stm32h7xx_ll_ex.h"
+
+// this defines the mcu selection
+#ifndef MAIXBIT
+#define MAIXBIT
+#endif
+
+#pragma message ( "inside src/main/platfrom.h RUBEN" )
+//#warning "inside src/main/platfrom.h RUBEN"
 //NOP
 
 #else // STM32F10X

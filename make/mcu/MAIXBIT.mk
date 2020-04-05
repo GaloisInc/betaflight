@@ -1,10 +1,14 @@
 #
 # RISCV_K210
 #
-MCU_FLASH_SIZE := 128
+# flash size is 128kb = 16MB
+MCU_FLASH_SIZE := 16384
 
 # this flag is used for eeprom mem config
-DEVICE_FLAGS += -DRISCVK210
+DEVICE_FLAGS += -DRISCV_K210
+TARGET_FLAGS  = -D$(TARGET)
+
+#$(warning "inside this platfrom.h RUBEN)
 
 #MAIXBIT drivers
 STDPERIPH_DIR   = $(ROOT)/lib/main/RISCV_K210
@@ -38,10 +42,11 @@ EXCLUDES        =  \
 
 
 INCLUDE_DIRS   := $(INCLUDE_DIRS) \
-                  $(STDPERIPH_DIR)\
-                  $(STDPERIPH_DIR)/drivers\
-                  $(STDPERIPH_DIR)/utils\
-                  $(STDPERIPH_DIR)/bsp
+                  $(STDPERIPH_DIR) \
+                  $(STDPERIPH_DIR)/drivers/include \
+                  $(STDPERIPH_DIR)/utils \
+                  $(STDPERIPH_DIR)/bsp/include \
+                  $(ROOT)/src/main/target/$(TARGET) \
 
 DEVICE_STDPERIPH_SRC = $(STDPERIPH_SRC)
 
@@ -61,54 +66,59 @@ DEVICE_STDPERIPH_SRC = $(STDPERIPH_SRC)
 #Flags
 #ARCH_FLAGS unique to K210
 
-ARCH_FLAGS      = -march=rv64imafc -mabi=lp64f
+ARCH_FLAGS      = -march=rv64imafc -mabi=lp64f -mcmodel=medany
 
 #A mix of K210 flags and BF flags
 LD_FLAGS       :=  \
-               -nostartfiles\
-               -mno-relax\
+               -nostartfiles \
+               -mno-relax \
                -T $(LD_SCRIPT)
 
 #-Wl, -gc-sections,-Map,$(TARGET_MAP)\
 #CLAGS unique to K210. These get appended to CFLAGS in Makefile.
-CFLAGS     :=  -mcmodel=medany\
-               -mabi=lp64f\
-               -march=rv64imafc\
-               -fno-common\
-               -ffunction-sections\
-               -fdata-sections\
-               -fstrict-volatile-bitfields\
-               -fno-zero-initialized-in-bss\
-               -ffast-math\
-               -fno-math-errno\
-               -fsingle-precision-constant\
-               -Os\
-               -ggdb\
-               -std=gnu11\
-               -Wno-pointer-to-int-cast\
-               -Wall\
-               -Werror=all\
-               -Wno-error=unused-function\
-               -Wno-error=unused-but-set-variable\
-               -Wno-error=unused-variable\
-               -Wno-error=deprecated-declarations\
-               -Wextra\
-               -Werror=frame-larger-than=32768\
-               -Wno-unused-parameter\
-               -Wno-sign-compare\
-               -Wno-error=missing-braces\
-               -Wno-error=return-type\
-               -Wno-error=pointer-sign\
-               -Wno-missing-braces\
-               -Wno-strict-aliasing\
-               -Wno-implicit-fallthrough\
-               -Wno-missing-field-initializers\
-               -Wno-int-to-pointer-cast\
-               -Wno-error=comment\
-               -Wno-error=logical-not-parentheses\
-               -Wno-error=duplicate-decl-specifier\
-               -Wno-error=parentheses\
-               -Wno-old-style-declaration\
+CFLAGS     :=  $(ARCH_FLAGS) \
+               -fno-common \
+               -ffunction-sections \
+               -fdata-sections \
+               -fstrict-volatile-bitfields \
+               -fno-zero-initialized-in-bss \
+               -ffast-math \
+               -fno-math-errno \
+               -fsingle-precision-constant \
+               -Os \
+               -ggdb \
+               -std=gnu11 \
+               -Wno-pointer-to-int-cast \
+               -Wall \
+               -Werror=all \
+               -Wno-error=unused-function \
+               -Wno-error=unused-but-set-variable \
+               -Wno-error=unused-variable \
+               -Wno-error=deprecated-declarations \
+               -Wextra \
+               -Werror=frame-larger-than=32768 \
+               -Wno-unused-parameter \
+               -Wno-sign-compare \
+               -Wno-error=missing-braces \
+               -Wno-error=return-type \
+               -Wno-error=pointer-sign \
+               -Wno-missing-braces \
+               -Wno-strict-aliasing \
+               -Wno-implicit-fallthrough \
+               -Wno-missing-field-initializers \
+               -Wno-int-to-pointer-cast \
+               -Wno-error=comment \
+               -Wno-error=logical-not-parentheses \
+               -Wno-error=duplicate-decl-specifier \
+               -Wno-error=parentheses \
+               -Wno-old-style-declaration \
+               $(addprefix -I,$(INCLUDE_DIRS)) \
+               $(TARGET_FLAGS) \
+               $(DEVICE_FLAGS) \
+               -D$(TARGET) \
+               -D'__FORKNAME__="$(FORKNAME)"' \
+               -D'__TARGET__="$(TARGET)"' \
+               -D'__REVISION__="$(REVISION)"' \
                -g
 
 #(VCP may be only for STM boards?)
@@ -132,3 +142,4 @@ OPTIMISE_DEFAULT    := -Os
 OPTIMISE_SPEED      :=
 OPTIMISE_SIZE       :=
 LTO_FLAGS           := $(OPTIMISATION_BASE) $(OPTIMISE_DEFAULT)
+endif

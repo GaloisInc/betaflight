@@ -18,17 +18,17 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-// #pragma once
+#pragma once
 
-// #include <stdint.h>
-// #include <stdbool.h>
+#include <stdint.h>
+#include <stdbool.h>
 
-// #define EEPROM_CONF_VERSION 172
+#define EEPROM_CONF_VERSION 172
 
-// bool isEEPROMVersionValid(void);
-// bool isEEPROMStructureValid(void);
-// bool loadEEPROM(void);
-// void writeConfigToEEPROM(void);
+bool isEEPROMVersionValid(void);
+bool isEEPROMStructureValid(void);
+bool loadEEPROM(void);
+void writeConfigToEEPROM(void);
 
-// uint16_t getEEPROMConfigSize(void);
-// size_t getEEPROMStorageSize(void);
+uint16_t getEEPROMConfigSize(void);
+size_t getEEPROMStorageSize(void);
