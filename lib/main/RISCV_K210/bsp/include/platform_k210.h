@@ -20,7 +20,7 @@
 extern "C" {
 #endif
 
-#pragma message ( "inside ROSCV_K210/bsp/include/platfrom_k210.h RUBEN" )
+#pragma once
 //#warning "inside ROSCV_K210/bsp/include/platfrom_k210.h RUBEN"
 
 #ifndef RISCVK210
