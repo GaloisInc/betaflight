@@ -23,9 +23,6 @@
 #define TARGET_BOARD_IDENTIFIER "MAIXBIT"
 #define USBD_PRODUCT_STRING "Minimal MAIXBIT"
 
-#pragma message ( "inside src/main/target/MAIXBIT/target.h RUBEN" )
-//#warning "inside src/main/target/MAIXBIT/target.h RUBEN"
-
 // this flag is used for config mem
 #define CONFIG_IN_EXTERNAL_FLASH
 
