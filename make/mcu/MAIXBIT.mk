@@ -22,8 +22,6 @@ EXCLUDES        =  \
                 drivers.txt\
                 dvp.c\
                 fft.c\
-                fpioa.c\
-                gpio.c\
                 gpiohs.c\
                 i2c.c\
                 i2s.c\
