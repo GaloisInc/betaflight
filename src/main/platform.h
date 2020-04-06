@@ -144,7 +144,7 @@
 #define MAIXBIT
 #endif
 
-#pragma message ( "inside src/main/platfrom.h RUBEN" )
+#pragma once
 //#warning "inside src/main/platfrom.h RUBEN"
 //NOP
 

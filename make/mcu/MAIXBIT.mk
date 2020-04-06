@@ -133,7 +133,7 @@ CFLAGS     :=  $(ARCH_FLAGS) \
 
 # Common drivers
 MCU_COMMON_SRC = \
-                drivers/accgyro/accgyro_mpu.c
+                # drivers/accgyro/accgyro_mpu.c
 
 ifneq ($(DEBUG),GDB)
 OPTIMISE_DEFAULT    := -Os
