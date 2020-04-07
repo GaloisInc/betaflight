@@ -20,6 +20,10 @@
 extern "C" {
 #endif
 
+#ifndef RISCVK210
+#define RISCVK210
+#endif
+
 /* clang-format off */
 /* Register base address */
 

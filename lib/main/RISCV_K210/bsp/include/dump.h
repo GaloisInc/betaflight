@@ -24,7 +24,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#define CONFIG_LOG_LEVEL LOG_ERROR
 #define DUMP_PRINTF printk
 
 static inline void

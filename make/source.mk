@@ -4,7 +4,6 @@
 #             build/debug_pin.c \
 #             build/version.c \
 #             $(TARGET_DIR_SRC) \
-#             main.c \
 #             $(addprefix pg/, $(notdir $(wildcard $(SRC_DIR)/pg/*.c))) \
 #             $(addprefix common/,$(notdir $(wildcard $(SRC_DIR)/common/*.c))) \
 #             $(addprefix config/,$(notdir $(wildcard $(SRC_DIR)/config/*.c))) \
@@ -362,7 +361,7 @@
 # endif #!F1
 
 # # check if target.mk supplied
-# SRC := $(STARTUP_SRC) $(MCU_COMMON_SRC) $(TARGET_SRC) $(VARIANT_SRC)
+SRC := $(STARTUP_SRC) $(MCU_COMMON_SRC) $(TARGET_SRC) $(VARIANT_SRC)
 
 # # Files that should not be optimized, useful for debugging IMPRECISE cpu faults.
 # # Specify FULL PATH, e.g. "./lib/main/STM32F7/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c"
@@ -395,7 +394,7 @@
 #             $(MSC_SRC)
 # endif
 
- SRC += $(COMMON_SRC)
+# SRC += $(COMMON_SRC)
 
 # #excludes
 # SRC   := $(filter-out $(MCU_EXCLUDES), $(SRC))

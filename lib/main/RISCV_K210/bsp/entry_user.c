@@ -30,7 +30,8 @@ extern volatile uint64_t g_wake_up[2];
 
 core_instance_t core1_instance;
 
-volatile char * const ram = (volatile char*)RAM_BASE_ADDR;
+//volatile char * const ram = (volatile char*)RAM_BASE_ADDR;
+volatile char * const ram = (volatile char*)(0x80000000U);
 
 extern char _heap_start[];
 extern char _heap_end[];
