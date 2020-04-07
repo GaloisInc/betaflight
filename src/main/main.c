@@ -23,6 +23,7 @@
 #include "fpioa.h"
 #include "gpio.h"
 
+<<<<<<< HEAD
 int main(void)
 {
     fpioa_set_function(24, FUNC_GPIO3);
@@ -47,13 +48,23 @@ int main(void)
 
 #include "fc/init.h"
 
+=======
+#include "platform.h"
+
+#include "fc/init.h"
+
+>>>>>>> 62eb123b451bf7115453fb13863d4befb70db427
 #include "scheduler/scheduler.h"
 
 void run(void);
 
 int main(void)
 {
+<<<<<<< HEAD
     //init();
+=======
+    init();
+>>>>>>> 62eb123b451bf7115453fb13863d4befb70db427
 
     run();
 
@@ -70,4 +81,7 @@ void FAST_CODE FAST_CODE_NOINLINE run(void)
 #endif
     }
 }
+<<<<<<< HEAD
 */
+=======
+>>>>>>> 62eb123b451bf7115453fb13863d4befb70db427

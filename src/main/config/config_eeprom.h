@@ -23,7 +23,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+<<<<<<< HEAD
 #pragma message ( "inside config_eeprom.h RUBEN" )
+=======
+>>>>>>> 62eb123b451bf7115453fb13863d4befb70db427
 #define EEPROM_CONF_VERSION 172
 
 bool isEEPROMVersionValid(void);

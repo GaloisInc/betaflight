@@ -268,11 +268,19 @@ CC_NO_OPTIMISATION      :=
 #               -MMD -MP \
 #               $(EXTRA_FLAGS)
 
+<<<<<<< HEAD
 ASFLAGS     = $(ARCH_FLAGS) \
                $(DEBUG_FLAGS) \
                -x assembler-with-cpp \
                $(addprefix -I,$(INCLUDE_DIRS)) \
                -MMD -MP
+=======
+# ASFLAGS     = $(ARCH_FLAGS) \
+#               $(DEBUG_FLAGS) \
+#               -x assembler-with-cpp \
+#               $(addprefix -I,$(INCLUDE_DIRS)) \
+#               -MMD -MP
+>>>>>>> 62eb123b451bf7115453fb13863d4befb70db427
 
  ifeq ($(LD_FLAGS),)
  LD_FLAGS     = -lm \
