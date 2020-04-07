@@ -23,6 +23,7 @@
 #include <string.h>
 #include <math.h>
 
+#pragma message ( "inside init.c RUBEN" )
 #include "platform.h"
 
 #include "blackbox/blackbox.h"
