@@ -95,7 +95,7 @@ export RM := rm
 include $(ROOT)/make/$(OSFAMILY).mk
 
 # include the tools makefile
-include $(ROOT)/make/tools.mk
+#include $(ROOT)/make/tools.mk
 
 # default xtal value for F4 targets
 HSE_VALUE       ?= 8000000
@@ -222,12 +222,14 @@ CCACHE :=
 endif
 
 # Tool names
-CROSS_CC    := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-gcc #$(CCACHE) $(ARM_SDK_PREFIX)gcc
-CROSS_CXX   := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-g++  #$(CCACHE) $(ARM_SDK_PREFIX)g++
-CROSS_GDB   := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-gdb  #$(ARM_SDK_PREFIX)gdb
-OBJCOPY     := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-objcopy  #$(ARM_SDK_PREFIX)objcopy
-OBJDUMP     := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-objdump  #$(ARM_SDK_PREFIX)objdump
-SIZE        := /opt/kendryte-toolchain/bin/riscv64-unknown-elf-size  #$(ARM_SDK_PREFIX)size
+RISCV64_SDK_PREFIX = /opt/kendryte-toolchain/bin/riscv64-unknown-elf-
+
+CROSS_CC    := $(RISCV64_SDK_PREFIX)gcc #$(CCACHE) $(ARM_SDK_PREFIX)gcc
+CROSS_CXX   := $(RISCV64_SDK_PREFIX)g++  #$(CCACHE) $(ARM_SDK_PREFIX)g++
+CROSS_GDB   := $(RISCV64_SDK_PREFIX)-gdb  #$(ARM_SDK_PREFIX)gdb
+OBJCOPY     := $(RISCV64_SDK_PREFIX)objcopy  #$(ARM_SDK_PREFIX)objcopy
+OBJDUMP     := $(RISCV64_SDK_PREFIX)objdump  #$(ARM_SDK_PREFIX)objdump
+SIZE        := $(RISCV64_SDK_PREFIX)size  #$(ARM_SDK_PREFIX)size
 DFUSE-PACK  := src/utils/dfuse-pack.py
 #
 # Tool options.
@@ -266,30 +268,30 @@ CC_NO_OPTIMISATION      :=
 #               -MMD -MP \
 #               $(EXTRA_FLAGS)
 
-# ASFLAGS     = $(ARCH_FLAGS) \
-#               $(DEBUG_FLAGS) \
-#               -x assembler-with-cpp \
-#               $(addprefix -I,$(INCLUDE_DIRS)) \
-#               -MMD -MP
+ASFLAGS     = $(ARCH_FLAGS) \
+               $(DEBUG_FLAGS) \
+               -x assembler-with-cpp \
+               $(addprefix -I,$(INCLUDE_DIRS)) \
+               -MMD -MP
 
-# ifeq ($(LD_FLAGS),)
-# LD_FLAGS     = -lm \
-#               -nostartfiles \
-#               --specs=nano.specs \
-#               -lc \
-#               -lnosys \
-#               $(ARCH_FLAGS) \
-#               $(LTO_FLAGS) \
-#               $(DEBUG_FLAGS) \
-#               -static \
-#               -Wl,-gc-sections,-Map,$(TARGET_MAP) \
-#               -Wl,-L$(LINKER_DIR) \
-#               -Wl,--cref \
-#               -Wl,--no-wchar-size-warning \
-#               -Wl,--print-memory-usage \
-#               -T$(LD_SCRIPT) \
-#                $(EXTRA_LD_FLAGS)
-# endif
+ ifeq ($(LD_FLAGS),)
+ LD_FLAGS     = -lm \
+               -nostartfiles \
+               --specs=nano.specs \
+               -lc \
+               -lnosys \
+               $(ARCH_FLAGS) \
+               $(LTO_FLAGS) \
+               $(DEBUG_FLAGS) \
+               -static \
+               -Wl,-gc-sections,-Map,$(TARGET_MAP) \
+               -Wl,-L$(LINKER_DIR) \
+               -Wl,--cref \
+               -Wl,--no-wchar-size-warning \
+               -Wl,--print-memory-usage \
+               -T$(LD_SCRIPT) \
+                $(EXTRA_LD_FLAGS)
+ endif
 
 ###############################################################################
 # No user-serviceable parts below

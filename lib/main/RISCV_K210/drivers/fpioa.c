@@ -17,8 +17,8 @@
 #include "sysctl.h"
 #include "fpioa.h"
 
-volatile fpioa_t *const fpioa = (volatile fpioa_t *)FPIOA_BASE_ADDR;
-
+//volatile fpioa_t *const fpioa = (volatile fpioa_t *)FPIOA_BASE_ADDR;
+volatile fpioa_t *const fpioa = (volatile fpioa_t *)(0x502B0000U);
 /**
  * @brief      Internal used FPIOA function initialize cell
  *

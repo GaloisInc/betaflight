@@ -20,6 +20,7 @@
 
 #pragma once
 
+#pragma message ( "inside init.h RUBEN" )
 typedef enum {
     SYSTEM_STATE_INITIALISING   = 0,
     SYSTEM_STATE_CONFIG_LOADED  = (1 << 0),

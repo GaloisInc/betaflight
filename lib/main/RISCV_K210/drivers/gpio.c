@@ -18,8 +18,8 @@
 #include "sysctl.h"
 #define GPIO_MAX_PINNO 8
 
-volatile gpio_t* const gpio = (volatile gpio_t*)GPIO_BASE_ADDR;
-
+//volatile gpio_t* const gpio = (volatile gpio_t*)GPIO_BASE_ADDR;
+volatile gpio_t* const gpio = (volatile gpio_t*)(0x50200000U);
 int gpio_init(void)
 {
     return sysctl_clock_enable(SYSCTL_CLOCK_GPIO);

@@ -23,7 +23,7 @@
 #define NOINLINE __attribute__((noinline))
 
 #if !defined(UNIT_TEST) && !defined(SIMULATOR_BUILD) && !(USBD_DEBUG_LEVEL > 0)
-#pragma GCC poison sprintf snprintf
+//#pragma GCC poison sprintf snprintf
 #endif
 
 #if defined(STM32H743xx) || defined(STM32H750xx)
@@ -119,7 +119,30 @@
 
 //NOP
 
-#elif defined(MAIXBIT)
+#elif defined(RISCV_K210)
+
+#include "platform.h"
+//#include "stm32h7xx_hal.h"
+//#include "system_stm32h7xx.h"
+
+#include "bsp.h"
+#include "spi.h"
+#include "fpioa.h"
+#include "gpio.h"
+#include "dmac.h"
+#include "rtc.h"
+//#include "stm32h7xx_ll_bus.h"
+#include "timer.h"
+#include "clint.h"
+#include "sleep.h"
+#include "syscalls.h"
+
+//#include "drivers/stm32h7xx_ll_ex.h"
+
+// this defines the mcu selection
+#ifndef MAIXBIT
+#define MAIXBIT
+#endif
 
 //NOP
 

@@ -25,6 +25,7 @@
 
 // this flag is used for config mem
 #define CONFIG_IN_EXTERNAL_FLASH
+#define USE_FLASH_CHIP
 
 #undef USE_BEEPER
 
@@ -47,7 +48,12 @@
 #undef USE_ACC
 #undef USE_PPM
 #undef USE_PWM
-#undef USE_UART
+//#undef USE_UART
+#define USE_UART
+#define USE_UART1
+#define UART1_RX_PIN            PB15
+#define UART1_TX_PIN            PB14
+
 #undef USE_SERIAL_RX
 #undef USE_SERIALRX_CRSF       // Team Black Sheep Crossfire protocol
 #undef USE_SERIALRX_IBUS       // FlySky and Turnigy receivers
