@@ -23,10 +23,6 @@
 #include "fpioa.h"
 #include "gpio.h"
 
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
->>>>>>> 29eb4da4e634b1ec552fb8a0755d6d1867b139ed
 int main(void)
 {
     fpioa_set_function(24, FUNC_GPIO3);
@@ -42,7 +38,6 @@ int main(void)
     }
     return 0;
 }
-<<<<<<< HEAD
 
 //#include <stdbool.h>
 //#include <stdint.h>
@@ -52,38 +47,13 @@ int main(void)
 
 #include "fc/init.h"
 
-=======
-
-//#include <stdbool.h>
-//#include <stdint.h>
-
-/*
-#include "platform.h"
-
-#include "fc/init.h"
-
-=======
-#include "platform.h"
-
-#include "fc/init.h"
-
->>>>>>> 62eb123b451bf7115453fb13863d4befb70db427
->>>>>>> 29eb4da4e634b1ec552fb8a0755d6d1867b139ed
 #include "scheduler/scheduler.h"
 
 void run(void);
 
 int main(void)
 {
-<<<<<<< HEAD
     //init();
-=======
-<<<<<<< HEAD
-    //init();
-=======
-    init();
->>>>>>> 62eb123b451bf7115453fb13863d4befb70db427
->>>>>>> 29eb4da4e634b1ec552fb8a0755d6d1867b139ed
 
     run();
 
@@ -100,11 +70,4 @@ void FAST_CODE FAST_CODE_NOINLINE run(void)
 #endif
     }
 }
-<<<<<<< HEAD
 */
-=======
-<<<<<<< HEAD
-*/
-=======
->>>>>>> 62eb123b451bf7115453fb13863d4befb70db427
->>>>>>> 29eb4da4e634b1ec552fb8a0755d6d1867b139ed
