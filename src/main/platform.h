@@ -144,8 +144,6 @@
 #define MAIXBIT
 #endif
 
-//NOP
-
 #else // STM32F10X
 #error "Invalid chipset specified. Update platform.h"
 #endif
