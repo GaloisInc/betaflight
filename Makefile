@@ -58,9 +58,9 @@ FORKNAME      = betaflight
 
 # Working directories
 ROOT            := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
-SRC_DIR         := $(ROOT)/src/main \
-				$(ROOT)/lib/main/RISCV_K210/bsp \
-				$(ROOT)/lib/main/RISCV_K210/drivers
+SRC_DIR         := $(ROOT)/src/main/ \
+					$(ROOT)/lib/main/RISCV_K210/bsp \
+				   $(ROOT)/lib/main/RISCV_K210/drivers\
 
 OBJECT_DIR      := $(ROOT)/obj/main
 BIN_DIR         := $(ROOT)/obj
@@ -69,7 +69,6 @@ INCLUDE_DIRS    := $(SRC_DIR) \
                    $(ROOT)/src/main/target \
                    $(ROOT)/src/main/startup \
 				  
-				   
 
 LINKER_DIR		:= $(ROOT)/src/link
 
@@ -135,7 +134,7 @@ USBFS_DIR       = $(ROOT)/lib/main/STM32_USB-FS-Device_Driver
 USBPERIPH_SRC   = $(notdir $(wildcard $(USBFS_DIR)/src/*.c))
 FATFS_DIR       = $(ROOT)/lib/main/FatFS
 FATFS_SRC       = $(notdir $(wildcard $(FATFS_DIR)/*.c))
-CSOURCES        := $(shell find $(SRC_DIR) -name '*.c')
+CSOURCES        := $(shell find $(RISCV_SRC) -name '*.c')
 
 LD_FLAGS        :=
 EXTRA_LD_FLAGS  :=

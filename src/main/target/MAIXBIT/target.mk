@@ -1,11 +1,13 @@
 MAIXBIT_TARGETS  += $(TARGET)
 FEATURES         += ONBOARDFLASH
 
-TARGET_SRC      +=\
-                riscv_k210_gpio.c \
-			    riscv_k210_fpioa.c 
+# TARGET_SRC      +=\
+#                 riscv_k210_gpio.c \
+# 			    riscv_k210_fpioa.c 
 
 TARGET_SRC      += \
+                main.c \
+                crt.S\
                 riscv_k210_locks.c \
                 riscv_k210_entry.c \
                 riscv_k210_interrupt.c \
@@ -41,4 +43,5 @@ TARGET_SRC      += \
                 riscv_k210_gpiohs.c \
                 riscv_k210_plic.c \
                 riscv_k210_sysctl.c \
-                riscv_k210_wdt.c
+                riscv_k210_wdt.c \
+                main.c \

@@ -22,7 +22,7 @@
 #include <riscv_k210_fpioa.h>
 #include <riscv_k210_gpio.h>
 
-int main(void)
+int main()
 {
     fpioa_set_function(24, FUNC_GPIO3);
     gpio_init();
