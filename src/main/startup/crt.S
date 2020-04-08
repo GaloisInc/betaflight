@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#include "encoding.h"
+#include "riscv_k210_encoding.h"
 
 # define LREG ld
 # define SREG sd

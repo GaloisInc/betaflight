@@ -1,11 +1,11 @@
- COMMON_SRC = main.c \
-#             build/build_config.c \
-#             build/debug.c \
-#             build/debug_pin.c \
-#             build/version.c \
-#             $(TARGET_DIR_SRC) \
-#             main.c \
-#             $(addprefix pg/, $(notdir $(wildcard $(SRC_DIR)/pg/*.c))) \
+ COMMON_SRC =   main.c \
+                $(TARGET_DIR_SRC) \
+			    # build/build_config.c\
+            #    build/debug.c \
+            #    build/debug_pin.c \
+#               build/version.c 
+# #             main.c \
+#               $(addprefix pg/, $(notdir $(wildcard $(SRC_DIR)/pg/*.c))) \
 #             $(addprefix common/,$(notdir $(wildcard $(SRC_DIR)/common/*.c))) \
 #             $(addprefix config/,$(notdir $(wildcard $(SRC_DIR)/config/*.c))) \
 #             cli/cli.c \
@@ -190,19 +190,22 @@
 #             io/vtx_tramp.c \
 #             io/vtx_control.c
 
+# check if target.mk supplied
+SRC := $(STARTUP_SRC) $(MCU_COMMON_SRC) $(TARGET_SRC) $(VARIANT_SRC)
+
 # COMMON_DEVICE_SRC = \
 #             $(CMSIS_SRC) \
 #             $(DEVICE_STDPERIPH_SRC)
 
-# COMMON_SRC := $(COMMON_SRC) $(COMMON_DEVICE_SRC)
+COMMON_SRC := $(COMMON_SRC) $(COMMON_DEVICE_SRC)
 
 # ifeq ($(EXST),yes)
 # TARGET_FLAGS := -DUSE_EXST $(TARGET_FLAGS)
 # endif
 
-# ifeq ($(RAM_BASED),yes)
-# TARGET_FLAGS := -DUSE_EXST -DCONFIG_IN_RAM -DRAMBASED $(TARGET_FLAGS)
-# endif
+ifeq ($(RAM_BASED),yes)
+TARGET_FLAGS := -DUSE_EXST -DCONFIG_IN_RAM -DRAMBASED $(TARGET_FLAGS)
+endif
 
 # ifeq ($(SIMULATOR_BUILD),yes)
 # TARGET_FLAGS := -DSIMULATOR_BUILD $(TARGET_FLAGS)
@@ -361,8 +364,7 @@
 # endif #!F3
 # endif #!F1
 
-# # check if target.mk supplied
-SRC := $(STARTUP_SRC) $(MCU_COMMON_SRC) $(TARGET_SRC) $(VARIANT_SRC)
+
 
 # # Files that should not be optimized, useful for debugging IMPRECISE cpu faults.
 # # Specify FULL PATH, e.g. "./lib/main/STM32F7/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c"
@@ -397,7 +399,7 @@ SRC := $(STARTUP_SRC) $(MCU_COMMON_SRC) $(TARGET_SRC) $(VARIANT_SRC)
 
 # SRC += $(COMMON_SRC)
 
-# #excludes
+#excludes
 # SRC   := $(filter-out $(MCU_EXCLUDES), $(SRC))
 
 # ifneq ($(filter SDCARD_SPI,$(FEATURES)),)

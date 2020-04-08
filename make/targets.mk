@@ -46,6 +46,7 @@ SIMULATOR_BUILD = yes
 
 else ifeq ($(TARGET),$(filter $(TARGET), $(MAIXBIT_TARGETS)))
 TARGET_MCU := MAIXBIT
+RISCV_K210 = yes
 
 else ifeq ($(TARGET),$(filter $(TARGET), $(F1_TARGETS)))
 TARGET_MCU := STM32F1

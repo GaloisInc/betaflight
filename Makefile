@@ -22,7 +22,7 @@ TARGET    ?= MAIXBIT
 OPTIONS   ?=
 
 # compile for OpenPilot BootLoader support
-OPBL      ?= no
+OPBL      ?= yes
 
 # compile for External Storage Bootloader support
 EXST      ?= no
@@ -58,14 +58,20 @@ FORKNAME      = betaflight
 
 # Working directories
 ROOT            := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
-SRC_DIR         := $(ROOT)/src/main
+SRC_DIR         := $(ROOT)/src/main \
+				$(ROOT)/lib/main/RISCV_K210/bsp \
+				$(ROOT)/lib/main/RISCV_K210/drivers
+
 OBJECT_DIR      := $(ROOT)/obj/main
 BIN_DIR         := $(ROOT)/obj
 CMSIS_DIR       := $(ROOT)/lib/main/CMSIS
 INCLUDE_DIRS    := $(SRC_DIR) \
                    $(ROOT)/src/main/target \
-                   $(ROOT)/src/main/startup
-LINKER_DIR      := $(ROOT)/src/link
+                   $(ROOT)/src/main/startup \
+				  
+				   
+
+LINKER_DIR		:= $(ROOT)/src/link
 
 ## V                 : Set verbosity level based on the V= parameter
 ##                     V=0 Low
@@ -95,7 +101,7 @@ export RM := rm
 include $(ROOT)/make/$(OSFAMILY).mk
 
 # include the tools makefile
-#include $(ROOT)/make/tools.mk
+# include $(ROOT)/make/tools.mk
 
 # default xtal value for F4 targets
 HSE_VALUE       ?= 8000000
@@ -129,7 +135,6 @@ USBFS_DIR       = $(ROOT)/lib/main/STM32_USB-FS-Device_Driver
 USBPERIPH_SRC   = $(notdir $(wildcard $(USBFS_DIR)/src/*.c))
 FATFS_DIR       = $(ROOT)/lib/main/FatFS
 FATFS_SRC       = $(notdir $(wildcard $(FATFS_DIR)/*.c))
-
 CSOURCES        := $(shell find $(SRC_DIR) -name '*.c')
 
 LD_FLAGS        :=
@@ -274,24 +279,24 @@ ASFLAGS     = $(ARCH_FLAGS) \
                $(addprefix -I,$(INCLUDE_DIRS)) \
                -MMD -MP
 
- ifeq ($(LD_FLAGS),)
- LD_FLAGS     = -lm \
-               -nostartfiles \
-               --specs=nano.specs \
-               -lc \
-               -lnosys \
-               $(ARCH_FLAGS) \
-               $(LTO_FLAGS) \
-               $(DEBUG_FLAGS) \
-               -static \
-               -Wl,-gc-sections,-Map,$(TARGET_MAP) \
-               -Wl,-L$(LINKER_DIR) \
-               -Wl,--cref \
-               -Wl,--no-wchar-size-warning \
-               -Wl,--print-memory-usage \
-               -T$(LD_SCRIPT) \
-                $(EXTRA_LD_FLAGS)
- endif
+#  ifeq ($(LD_FLAGS),)
+#  LD_FLAGS     = -lm \
+#                -nostartfiles \
+#                --specs=nano.specs \
+#                -lc \
+#                -lnosys \
+#                $(ARCH_FLAGS) \
+#                $(LTO_FLAGS) \
+#                $(DEBUG_FLAGS) \
+#                -static \
+#                -Wl,-gc-sections,-Map,$(TARGET_MAP) \
+#                -Wl,-L$(LINKER_DIR) \
+#                -Wl,--cref \
+#                -Wl,--no-wchar-size-warning \
+#                -Wl,--print-memory-usage \
+#                -T$(LD_SCRIPT) \
+#                 $(EXTRA_LD_FLAGS)
+#  endif
 
 ###############################################################################
 # No user-serviceable parts below
