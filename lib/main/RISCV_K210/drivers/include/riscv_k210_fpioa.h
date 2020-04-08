@@ -36,7 +36,7 @@
 #define _DRIVER_FPIOA_H
 
 #include <stdint.h>
-#include "/home/picard/Documents/betaflight/lib/main/RISCV_K210/bsp/include/riscv_k210_platform.h"
+#include <riscv_k210_platform.h>
 
 #ifdef __cplusplus
 extern "C" {
