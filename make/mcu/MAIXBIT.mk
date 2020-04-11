@@ -44,7 +44,7 @@ INCLUDE_DIRS    	:= \
 ARCH_FLAGS      	= -march=rv64imafc -mabi=lp64f -mcmodel=medany	#
 #-------------------------------------------------------------------#
 # Assembly FLAGS-----------------------------------------------------
-ASFLAGS   			= $(ARCH_FLAGS) \
+#ASFLAGS   			= $(ARCH_FLAGS) \
 					-x assembler-with-cpp -D __riscv64 \
 					$(addprefix -I,$(INCLUDE_DIRS)) 
 #-------------------------------------------------------------------#
@@ -147,3 +147,6 @@ OPTIMISE_SIZE       :=
 LTO_FLAGS           := $(OPTIMISATION_BASE) $(OPTIMISE_DEFAULT)
 endif
 #---------------------------------------------------------------
+
+VPATH           += $(ROOT)/lib/main/RISCV_K210/bsp:\
+                                   $(ROOT)/lib/main/RISCV_K210/drivers
