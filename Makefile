@@ -58,19 +58,14 @@ FORKNAME      = betaflight
 
 # Working directories
 ROOT            := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
-SRC_DIR         := $(ROOT)/src/main/ \
-					$(ROOT)/lib/main/RISCV_K210/bsp \
-				   $(ROOT)/lib/main/RISCV_K210/drivers\
-
+SRC_DIR         := $(ROOT)/src/main
 OBJECT_DIR      := $(ROOT)/obj/main
 BIN_DIR         := $(ROOT)/obj
 CMSIS_DIR       := $(ROOT)/lib/main/CMSIS
 INCLUDE_DIRS    := $(SRC_DIR) \
                    $(ROOT)/src/main/target \
                    $(ROOT)/src/main/startup \
-				  
-
-LINKER_DIR		:= $(ROOT)/src/link
+LINKER_DIR	:= $(ROOT)/src/link
 
 ## V                 : Set verbosity level based on the V= parameter
 ##                     V=0 Low
@@ -134,7 +129,7 @@ USBFS_DIR       = $(ROOT)/lib/main/STM32_USB-FS-Device_Driver
 USBPERIPH_SRC   = $(notdir $(wildcard $(USBFS_DIR)/src/*.c))
 FATFS_DIR       = $(ROOT)/lib/main/FatFS
 FATFS_SRC       = $(notdir $(wildcard $(FATFS_DIR)/*.c))
-CSOURCES        := $(shell find $(RISCV_SRC) -name '*.c')
+CSOURCES        := $(shell find $(SRC_DIR) -name '*.c')
 
 LD_FLAGS        :=
 EXTRA_LD_FLAGS  :=
@@ -226,6 +221,15 @@ CCACHE :=
 endif
 
 # Tool names
+CROSS_CC    := $(CCACHE) $(ARM_SDK_PREFIX)gcc
+CROSS_CXX   := $(CCACHE) $(ARM_SDK_PREFIX)g++
+CROSS_GDB   := $(ARM_SDK_PREFIX)gdb
+OBJCOPY     := $(ARM_SDK_PREFIX)objcopy
+OBJDUMP     := $(ARM_SDK_PREFIX)objdump
+SIZE        := $(ARM_SDK_PREFIX)size
+DFUSE-PACK  := src/utils/dfuse-pack.py
+
+ifneq ($(RISCV_K210),)
 RISCV64_SDK_PREFIX = /opt/kendryte-toolchain/bin/riscv64-unknown-elf-
 
 CROSS_CC    := $(RISCV64_SDK_PREFIX)gcc #$(CCACHE) $(ARM_SDK_PREFIX)gcc
@@ -235,6 +239,7 @@ OBJCOPY     := $(RISCV64_SDK_PREFIX)objcopy  #$(ARM_SDK_PREFIX)objcopy
 OBJDUMP     := $(RISCV64_SDK_PREFIX)objdump  #$(ARM_SDK_PREFIX)objdump
 SIZE        := $(RISCV64_SDK_PREFIX)size  #$(ARM_SDK_PREFIX)size
 DFUSE-PACK  := src/utils/dfuse-pack.py
+endif
 #
 # Tool options.
 #
@@ -250,27 +255,27 @@ CC_NO_OPTIMISATION      :=
 # TEMPORARY_FLAGS :=
 
 # CFLAGS     += $(ARCH_FLAGS) \
-#               $(addprefix -D,$(OPTIONS)) \
-#               $(addprefix -I,$(INCLUDE_DIRS)) \
-#               $(DEBUG_FLAGS) \
-#               -std=gnu11 \
-#               -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \
-#               -ffunction-sections \
-#               -fdata-sections \
-#               -fno-common \
-#               -pedantic \
-#               $(TEMPORARY_FLAGS) \
-#               $(DEVICE_FLAGS) \
-#               -D_GNU_SOURCE \
-#               -DUSE_STDPERIPH_DRIVER \
-#               -D$(TARGET) \
-#               $(TARGET_FLAGS) \
-#               -D'__FORKNAME__="$(FORKNAME)"' \
-#               -D'__TARGET__="$(TARGET)"' \
-#               -D'__REVISION__="$(REVISION)"' \
-#               -save-temps=obj \
-#               -MMD -MP \
-#               $(EXTRA_FLAGS)
+               $(addprefix -D,$(OPTIONS)) \
+               $(addprefix -I,$(INCLUDE_DIRS)) \
+               $(DEBUG_FLAGS) \
+               -std=gnu11 \
+               -Wall -Wextra -Wunsafe-loop-optimizations -Wdouble-promotion \
+               -ffunction-sections \
+               -fdata-sections \
+               -fno-common \
+               -pedantic \
+               $(TEMPORARY_FLAGS) \
+               $(DEVICE_FLAGS) \
+               -D_GNU_SOURCE \
+               -DUSE_STDPERIPH_DRIVER \
+               -D$(TARGET) \
+               $(TARGET_FLAGS) \
+               -D'__FORKNAME__="$(FORKNAME)"' \
+               -D'__TARGET__="$(TARGET)"' \
+               -D'__REVISION__="$(REVISION)"' \
+               -save-temps=obj \
+               -MMD -MP \
+               $(EXTRA_FLAGS)
 
 ASFLAGS     = $(ARCH_FLAGS) \
                $(DEBUG_FLAGS) \
@@ -278,24 +283,24 @@ ASFLAGS     = $(ARCH_FLAGS) \
                $(addprefix -I,$(INCLUDE_DIRS)) \
                -MMD -MP
 
-#  ifeq ($(LD_FLAGS),)
-#  LD_FLAGS     = -lm \
-#                -nostartfiles \
-#                --specs=nano.specs \
-#                -lc \
-#                -lnosys \
-#                $(ARCH_FLAGS) \
-#                $(LTO_FLAGS) \
-#                $(DEBUG_FLAGS) \
-#                -static \
-#                -Wl,-gc-sections,-Map,$(TARGET_MAP) \
-#                -Wl,-L$(LINKER_DIR) \
-#                -Wl,--cref \
-#                -Wl,--no-wchar-size-warning \
-#                -Wl,--print-memory-usage \
-#                -T$(LD_SCRIPT) \
-#                 $(EXTRA_LD_FLAGS)
-#  endif
+ifeq ($(LD_FLAGS),)
+LD_FLAGS     = -lm \
+                  -nostartfiles \
+                  --specs=nano.specs \
+                  -lc \
+                  -lnosys \
+                  $(ARCH_FLAGS) \
+                  $(LTO_FLAGS) \
+                  $(DEBUG_FLAGS) \
+                  -static \
+                  -Wl,-gc-sections,-Map,$(TARGET_MAP) \
+                  -Wl,-L$(LINKER_DIR) \
+                  -Wl,--cref \
+                  -Wl,--no-wchar-size-warning \
+                  -Wl,--print-memory-usage \
+                  -T$(LD_SCRIPT) \
+                   $(EXTRA_LD_FLAGS)
+endif
 
 ###############################################################################
 # No user-serviceable parts below
