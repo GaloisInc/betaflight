@@ -1,11 +1,11 @@
- COMMON_SRC =   main.c \
-                $(TARGET_DIR_SRC) \
-			    # build/build_config.c\
-            #    build/debug.c \
-            #    build/debug_pin.c \
-#               build/version.c 
-# #             main.c \
-#               $(addprefix pg/, $(notdir $(wildcard $(SRC_DIR)/pg/*.c))) \
+COMMON_SRC =   main.c \
+               $(TARGET_DIR_SRC) \
+#             build/build_config.c\
+#             build/debug.c \
+#             build/debug_pin.c \
+#             build/version.c 
+#             main.c \
+#             $(addprefix pg/, $(notdir $(wildcard $(SRC_DIR)/pg/*.c))) \
 #             $(addprefix common/,$(notdir $(wildcard $(SRC_DIR)/common/*.c))) \
 #             $(addprefix config/,$(notdir $(wildcard $(SRC_DIR)/config/*.c))) \
 #             cli/cli.c \
@@ -193,9 +193,9 @@
 # check if target.mk supplied
 SRC := $(STARTUP_SRC) $(MCU_COMMON_SRC) $(TARGET_SRC) $(VARIANT_SRC)
 
-# COMMON_DEVICE_SRC = \
-#             $(CMSIS_SRC) \
-#             $(DEVICE_STDPERIPH_SRC)
+COMMON_DEVICE_SRC = \
+             $(DEVICE_STDPERIPH_SRC)\
+#            $(CMSIS_SRC)
 
 COMMON_SRC := $(COMMON_SRC) $(COMMON_DEVICE_SRC)
 
@@ -397,7 +397,7 @@ endif
 #             $(MSC_SRC)
 # endif
 
-# SRC += $(COMMON_SRC)
+SRC += $(COMMON_SRC)
 
 #excludes
 # SRC   := $(filter-out $(MCU_EXCLUDES), $(SRC))
