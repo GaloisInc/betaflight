@@ -13,13 +13,15 @@ LD_SCRIPT       	= $(LINKER_DIR)/riscv_flash_k210_128k.ld
 TARGET_MAP  		= $(OBJECT_DIR)/$(FORKNAME)_$(TARGET).map
 DEVICE_FLAGS  		+= -DRISCV_K210
 TARGET_FLAGS  		:= -D$(TARGET)
-# STARTUP_SRC    		= $(ROOT)/src/main/startup/crt.S
+STARTUP_SRC                   = crt.S
 #---------------------------------------------------------------#
 #Source------------------------------------------------------#
-DRIVERS_SRC 		= $(notdir $(wildcard $(RISCV_SRC)/drivers/*.c))
-BSP_SRC 			= $(notdir $(wildcard $(RISCV_SRC)/bsp/*.c))
-STDPERIPH_DIR 		:= 	$(DRIVERS_SRC) \
-						$(BSP_SRC)
+STDPERIPH_DIR   = $(ROOT)/lib/main/RISCV_K210
+STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/bsp/*.c))\
+                    $(notdir $(wildcard $(STDPERIPH_DIR)/drivers/*.c))
+EXCLUDES        = 
+STDPERIPH_SRC   := $(filter-out ${EXCLUDES}, $(STDPERIPH_SRC))
+DEVICE_STDPERIPH_SRC = $(STDPERIPH_SRC)
 #-----------------------------------------------------------------#
 #Includes
 DRIVER_INCLUDES 	= $(RISCV_SRC)/drivers/include
