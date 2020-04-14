@@ -283,8 +283,8 @@ ASFLAGS     = $(ARCH_FLAGS) \
                $(addprefix -I,$(INCLUDE_DIRS)) \
                -MMD -MP
 
-ifeq ($(LD_FLAGS),)
-LD_FLAGS     = -lm \
+#ifeq ($(LD_FLAGS),)
+#LD_FLAGS     = -lm \
                   -nostartfiles \
                   --specs=nano.specs \
                   -lc \
@@ -300,7 +300,7 @@ LD_FLAGS     = -lm \
                   -Wl,--print-memory-usage \
                   -T$(LD_SCRIPT) \
                    $(EXTRA_LD_FLAGS)
-endif
+#endif
 
 ###############################################################################
 # No user-serviceable parts below
