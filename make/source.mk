@@ -1,5 +1,11 @@
 COMMON_SRC =   main.c \
                $(TARGET_DIR_SRC) \
+              config/config.c \
+              config/config_eeprom.c \
+              config/config_streamer.c\
+              drivers/flash.c \
+              fc/init.c \
+              pg/pg.c\                                                         
 #             build/build_config.c\
 #             build/debug.c \
 #             build/debug_pin.c \
@@ -10,7 +16,6 @@ COMMON_SRC =   main.c \
 #             $(addprefix config/,$(notdir $(wildcard $(SRC_DIR)/config/*.c))) \
 #             cli/cli.c \
 #             cli/settings.c \
-#             config/config.c \
 #             drivers/adc.c \
 #             drivers/dshot.c \
 #             drivers/dshot_dpwm.c \
@@ -73,7 +78,6 @@ COMMON_SRC =   main.c \
 #             sensors/current.c \
 #             sensors/voltage.c \
 #             target/config_helper.c \
-#             fc/init.c \
 #             fc/controlrate_profile.c \
 #             drivers/camera_control.c \
 #             drivers/accgyro/gyro_sync.c \
