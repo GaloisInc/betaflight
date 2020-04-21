@@ -441,6 +441,7 @@ void init(void)
 
     if (!readSuccess || !isEEPROMVersionValid() || strncasecmp(systemConfig()->boardIdentifier, TARGET_BOARD_IDENTIFIER, sizeof(TARGET_BOARD_IDENTIFIER))) {
         resetEEPROM(false);
+        printf("From init.c, line 444: Config load from flash failed, resetting EEPROM to default configs\n\n");
     }
 
     systemState |= SYSTEM_STATE_CONFIG_LOADED;
