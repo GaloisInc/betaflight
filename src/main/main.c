@@ -17,37 +17,35 @@
  *
  * If not, see <http://www.gnu.org/licenses/>.
  */
-#include <stdio.h>
-#include <unistd.h>
-#include <riscv_k210_fpioa.h>
-#include <riscv_k210_gpio.h>
 
-int main()
+#include <stdbool.h>
+#include <stdint.h>
+
+#include "platform.h"
+
+#include "fc/init.h"
+
+#include "scheduler/scheduler.h"
+
+//void run(void);
+
+int main(void)
 {
+    init();
 
-    // Too fast to probably be seen
-    //printf("Bliss was here #1\n");
+    //run();
 
-    /* Spams the screen
-    for (int i = 0; i < 10000; i++) {
-    printf("Bliss was here #2\n");
-    }*/
-
-    fpioa_set_function(24, FUNC_GPIO3);
-    gpio_init();
-    gpio_set_drive_mode(3, GPIO_DM_OUTPUT);
-    gpio_pin_value_t value = GPIO_PV_HIGH;
-    gpio_set_pin(3, value);
-    while (1)
-    {
-        sleep(1);
-        gpio_set_pin(3, value = !value);
-
-	// Prints out messages to minicom
-	printf("Bliss was here #3\n");
-    }
     return 0;
 }
 
-
+/*void FAST_CODE FAST_CODE_NOINLINE run(void)
+{
+    while (true) {
+        scheduler();
+        processLoopback();
+#ifdef SIMULATOR_BUILD
+        delayMicroseconds_real(50); // max rate 20kHz
+#endif
+    }
+*/}
 
