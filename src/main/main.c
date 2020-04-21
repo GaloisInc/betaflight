@@ -24,15 +24,6 @@
 
 int main()
 {
-
-    // Too fast to probably be seen
-    //printf("Bliss was here #1\n");
-
-    /* Spams the screen
-    for (int i = 0; i < 10000; i++) {
-    printf("Bliss was here #2\n");
-    }*/
-
     fpioa_set_function(24, FUNC_GPIO3);
     gpio_init();
     gpio_set_drive_mode(3, GPIO_DM_OUTPUT);
@@ -42,9 +33,6 @@ int main()
     {
         sleep(1);
         gpio_set_pin(3, value = !value);
-
-	// Prints out messages to minicom
-	printf("Bliss was here #3\n");
     }
     return 0;
 }
