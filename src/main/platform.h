@@ -120,29 +120,21 @@
 //NOP
 
 #elif defined(RISCV_K210)
+#include "riscv_k210_platform.h"
+// #include "riscv_k210_entry.h"
+// #include "riscv_k210_interrupt.h"
+// #include "riscv_k210_printf.h"  
+// #include "riscv_k210_syscalls.h"
+// #include "riscv_k210_entry_user.h"
+// #include "riscv_k210_locks.h" 
+// #include "riscv_k210_sleep.h"
+// #include "riscv_k210_fpioa.h"
 
-#include "platform.h"
-//#include "stm32h7xx_hal.h"
-//#include "system_stm32h7xx.h"
-
-#include "bsp.h"
-#include "spi.h"
-#include "fpioa.h"
-#include "gpio.h"
-#include "dmac.h"
-#include "rtc.h"
-//#include "stm32h7xx_ll_bus.h"
-#include "timer.h"
-#include "clint.h"
-#include "sleep.h"
-#include "syscalls.h"
-
-//#include "drivers/stm32h7xx_ll_ex.h"
-
-// this defines the mcu selection
 #ifndef MAIXBIT
 #define MAIXBIT
 #endif
+
+//NOP
 
 #else // STM32F10X
 #error "Invalid chipset specified. Update platform.h"
