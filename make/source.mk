@@ -1,11 +1,12 @@
-COMMON_SRC =   main.c \
-               $(TARGET_DIR_SRC) \
-              config/config.c \
-              config/config_eeprom.c \
-              config/config_streamer.c\
-              drivers/flash.c \
+COMMON_SRC =   $(TARGET_DIR_SRC) \
+              main.c \
               fc/init.c \
-              pg/pg.c\                                                         
+              #config/config.c \
+              #config/config_eeprom.c \
+              #config/config_streamer.c\
+              #drivers/flash.c \
+              #pg/pg.c\
+              \                                                         
 #             build/build_config.c\
 #             build/debug.c \
 #             build/debug_pin.c \
