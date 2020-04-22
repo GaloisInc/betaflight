@@ -22,6 +22,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <stdio.h>
+
 #include "platform.h"
 
 #include "build/build_config.h"
