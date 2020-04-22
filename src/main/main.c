@@ -38,7 +38,8 @@ int main(void)
     return 0;
 }
 
-/*void FAST_CODE FAST_CODE_NOINLINE run(void)
+/*
+void FAST_CODE FAST_CODE_NOINLINE run(void)
 {
     while (true) {
         scheduler();
@@ -47,5 +48,5 @@ int main(void)
         delayMicroseconds_real(50); // max rate 20kHz
 #endif
     }
-*/}
+*/
 
