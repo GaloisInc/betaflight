@@ -429,7 +429,8 @@ void init(void)
     bool haveFlash = flashInit(flashConfig());
 
     if (!haveFlash) {
-        failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
+        //failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
+        printf("From init.c, line 433: FAILURE_EXTERNAL_FLASH_INIT_FAILED");
     }
     initFlags |= FLASH_INIT_ATTEMPTED;
 
