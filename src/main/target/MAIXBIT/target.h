@@ -17,6 +17,7 @@
  *
  * If not, see <http://www.gnu.org/licenses/>.
  */
+#include <stdint.h>
 
 #pragma once
 
@@ -105,6 +106,7 @@
 
 
 // Declare typedefs needed for config storage compilation
+
 typedef enum
 {
     Mode_TEST = 0x0,
