@@ -121,7 +121,7 @@ PG_RESET_TEMPLATE(systemConfig_t, systemConfig,
     .schedulerOptimizeRate = SCHEDULER_OPTIMIZE_RATE_AUTO,
     .enableStickArming = false,
 );
-
+/*
 uint8_t getCurrentPidProfileIndex(void)
 {
     return systemConfig()->pidProfileIndex;
@@ -141,7 +141,7 @@ uint16_t getCurrentMinthrottle(void)
 {
     return motorConfig()->minthrottle;
 }
-
+*/
 void resetConfig(void)
 {
     pgResetAll();
@@ -153,6 +153,7 @@ void resetConfig(void)
 
 static void activateConfig(void)
 {
+/*    
     schedulerOptimizeRate(systemConfig()->schedulerOptimizeRate == SCHEDULER_OPTIMIZE_RATE_ON || (systemConfig()->schedulerOptimizeRate == SCHEDULER_OPTIMIZE_RATE_AUTO && motorConfig()->dev.useDshotTelemetry));
     loadPidProfile();
     loadControlRateProfile();
@@ -176,17 +177,19 @@ static void activateConfig(void)
 #if defined(USE_LED_STRIP_STATUS_MODE)
     reevaluateLedConfig();
 #endif
+*/
 }
-
+/*
 static void adjustFilterLimit(uint16_t *parm, uint16_t resetValue)
 {
     if (*parm > FILTER_FREQUENCY_MAX) {
         *parm = resetValue;
-    }
+    }    
 }
-
+*/
 static void validateAndFixConfig(void)
 {
+/*
 #if !defined(USE_QUAD_MIXER_ONLY)
     // Reset unsupported mixer mode to default.
     // This check will be gone when motor/servo mixers are loaded dynamically
@@ -555,8 +558,9 @@ static void validateAndFixConfig(void)
 #if defined(TARGET_VALIDATECONFIG)
     targetValidateConfiguration();
 #endif
+*/
 }
-
+/*
 void validateAndFixGyroConfig(void)
 {
     // Fix gyro filter settings to handle cases where an older configurator was used that
@@ -670,7 +674,7 @@ void validateAndFixGyroConfig(void)
     }
     loadPidProfile();
 }
-
+*/
 bool readEEPROM(void)
 {
     suspendRxPwmPpmSignal();
@@ -700,14 +704,14 @@ void writeUnmodifiedConfigToEEPROM(void)
     resumeRxPwmPpmSignal();
     configIsDirty = false;
 }
-
+/*
 void writeEEPROM(void)
 {
     systemConfigMutable()->configurationState = CONFIGURATION_STATE_CONFIGURED;
 
     writeUnmodifiedConfigToEEPROM();
 }
-
+*/
 bool resetEEPROM(bool useCustomDefaults)
 {
 #if !defined(USE_CUSTOM_DEFAULTS)
@@ -735,7 +739,7 @@ void ensureEEPROMStructureIsValid(void)
     }
     resetEEPROM(false);
 }
-
+/*
 void saveConfigAndNotify(void)
 {
     writeEEPROM();
@@ -806,3 +810,4 @@ bool getRebootRequired(void)
 {
     return rebootRequired;
 }
+*/
