@@ -2,10 +2,14 @@ COMMON_SRC =   $(TARGET_DIR_SRC) \
               main.c \
               fc/init.c \
               pg/pg.c\
-              #config/config.c \
-              #config/config_eeprom.c \
-              #config/config_streamer.c\
-              #drivers/flash.c \
+              sensors/initialisation.c \
+              sensors/gyro.c \
+              drivers/flash.c \
+              config/config_eeprom.c \
+              config/config_streamer.c\
+              config/config.c \
+              common/crc.c \
+              #drivers/system.c \
               \                                                         
 #             build/build_config.c\
 #             build/debug.c \
@@ -49,7 +53,6 @@ COMMON_SRC =   $(TARGET_DIR_SRC) \
 #             drivers/serial_uart_pinconfig.c \
 #             drivers/sound_beeper.c \
 #             drivers/stack_check.c \
-#             drivers/system.c \
 #             drivers/timer_common.c \
 #             drivers/timer.c \
 #             drivers/transponder_ir_arcitimer.c \
@@ -130,8 +133,6 @@ COMMON_SRC =   $(TARGET_DIR_SRC) \
 #             sensors/acceleration.c \
 #             sensors/boardalignment.c \
 #             sensors/compass.c \
-#             sensors/gyro.c \
-#             sensors/initialisation.c \
 #             blackbox/blackbox.c \
 #             blackbox/blackbox_encoding.c \
 #             blackbox/blackbox_io.c \
