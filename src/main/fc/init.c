@@ -182,9 +182,9 @@ void targetPreInit(void);
 #ifdef SOFTSERIAL_LOOPBACK
 serialPort_t *loopbackPort;
 #endif
-
+*/
 uint8_t systemState = SYSTEM_STATE_INITIALISING;
-
+/*
 void processLoopback(void)
 {
 #ifdef SOFTSERIAL_LOOPBACK
