@@ -9,6 +9,11 @@ COMMON_SRC =   $(TARGET_DIR_SRC) \
               config/config_streamer.c\
               config/config.c \
               common/crc.c \
+              rx/rx.c \
+              config/feature.c \
+              fc/board_info.c \
+              pg/board.c\
+              build/version.c\
               #drivers/system.c \
               \                                                         
 #             build/build_config.c\
@@ -58,7 +63,6 @@ COMMON_SRC =   $(TARGET_DIR_SRC) \
 #             drivers/transponder_ir_arcitimer.c \
 #             drivers/transponder_ir_ilap.c \
 #             drivers/transponder_ir_erlt.c \
-#             fc/board_info.c \
 #             fc/dispatch.c \
 #             fc/hardfaults.c \
 #             fc/tasks.c \
