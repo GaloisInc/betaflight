@@ -27,17 +27,18 @@
 
 #include "scheduler/scheduler.h"
 
-void run(void);
+//void run(void);
 
 int main(void)
 {
     init();
 
-    run();
+    //run();
 
     return 0;
 }
 
+/*
 void FAST_CODE FAST_CODE_NOINLINE run(void)
 {
     while (true) {
@@ -47,4 +48,5 @@ void FAST_CODE FAST_CODE_NOINLINE run(void)
         delayMicroseconds_real(50); // max rate 20kHz
 #endif
     }
-}
+*/
+

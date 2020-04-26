@@ -23,6 +23,9 @@
 #include <string.h>
 #include <math.h>
 
+#include <stdio.h>
+
+#pragma message ( "inside init.c RUBEN" )
 #include "platform.h"
 
 #include "blackbox/blackbox.h"
@@ -244,6 +247,7 @@ bool requiresSpiLeadingEdge(SPIDevice device)
     return false;
 }
 
+
 static void configureSPIAndQuadSPI(void)
 {
 #ifdef USE_SPI
@@ -274,7 +278,7 @@ static void configureSPIAndQuadSPI(void)
     spiInit(SPIDEV_6, requiresSpiLeadingEdge(SPIDEV_6));
 #endif
 #endif // USE_SPI
-
+/*
 #ifdef USE_QUADSPI
     quadSpiPinConfigure(quadSpiConfig(0));
 
@@ -282,7 +286,9 @@ static void configureSPIAndQuadSPI(void)
     quadSpiInit(QUADSPIDEV_1);
 #endif
 #endif // USE_QUAD_SPI
+*/
 }
+/*
 
 #ifdef USE_SDCARD
 static void sdCardAndFSInit()
@@ -303,9 +309,10 @@ static void swdPinsInit(void)
         IOInit(io, OWNER_SWD, 0);
     }
 }
-
+*/
 void init(void)
 {
+/*
 #ifdef SERIAL_PORT_COUNT
     printfSerialInit();
 #endif
@@ -328,15 +335,14 @@ void init(void)
         detectBrushedESC(motorIoTag);
     }
 #endif
-
+*/
     enum {
         FLASH_INIT_ATTEMPTED            = (1 << 0),
         SD_INIT_ATTEMPTED               = (1 << 1),
         SPI_AND_QSPI_INIT_ATTEMPTED      = (1 << 2),
-    };
+    };    
     uint8_t initFlags = 0;
-
-
+/*
 #ifdef CONFIG_IN_SDCARD
 
     //
@@ -385,6 +391,7 @@ void init(void)
     }
 
 #endif // CONFIG_IN_SDCARD
+*/
 
 #ifdef CONFIG_IN_EXTERNAL_FLASH
     //
@@ -422,7 +429,8 @@ void init(void)
     bool haveFlash = flashInit(flashConfig());
 
     if (!haveFlash) {
-        failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
+        //failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
+        printf("From init.c, line 433: FAILURE_EXTERNAL_FLASH_INIT_FAILED");
     }
     initFlags |= FLASH_INIT_ATTEMPTED;
 
@@ -440,10 +448,11 @@ void init(void)
 
     if (!readSuccess || !isEEPROMVersionValid() || strncasecmp(systemConfig()->boardIdentifier, TARGET_BOARD_IDENTIFIER, sizeof(TARGET_BOARD_IDENTIFIER))) {
         resetEEPROM(false);
+        printf("From init.c, line 444: Config load from flash failed, resetting EEPROM to default configs\n\n");
     }
 
     systemState |= SYSTEM_STATE_CONFIG_LOADED;
-
+/*
 #ifdef USE_BRUSHED_ESC_AUTODETECT
     // Now detect again with the actually configured pin for motor 1, if it is not the default pin.
     ioTag_t configuredMotorIoTag = motorConfig()->dev.ioTags[0];
@@ -467,7 +476,8 @@ void init(void)
 #ifdef USE_EXTI
     EXTIInit();
 #endif
-
+*/
+/*
 #if defined(USE_BUTTONS)
 
     buttonsInit();
@@ -588,10 +598,12 @@ void init(void)
     if (motorConfig()->dev.motorPwmProtocol == PWM_TYPE_BRUSHED) {
         idlePulse = 0; // brushed motors
     }
+
 #ifdef USE_MOTOR
-    /* Motors needs to be initialized soon as posible because hardware initialization
-     * may send spurious pulses to esc's causing their early initialization. Also ppm
-     * receiver may share timer with motors so motors MUST be initialized here. */
+    //Motors needs to be initialized soon as posible because hardware initialization
+    //may send spurious pulses to esc's causing their early initialization. Also ppm
+    //receiver may share timer with motors so motors MUST be initialized here.
+/*    
     motorDevInit(&motorConfig()->dev, idlePulse, getMotorCount());
     systemState |= SYSTEM_STATE_MOTORS_READY;
 #else
@@ -613,7 +625,7 @@ void init(void)
 #ifdef USE_BEEPER
     beeperInit(beeperDevConfig());
 #endif
-/* temp until PGs are implemented. */
+//temp until PGs are implemented.
 #if defined(USE_INVERTER) && !defined(SIMULATOR_BUILD)
     initInverters(serialPinConfig());
 #endif
@@ -631,8 +643,8 @@ void init(void)
     }
 
 #ifdef USE_USB_MSC
-/* MSC mode will start after init, but will not allow scheduler to run,
- *  so there is no bottleneck in reading and writing data */
+//MSC mode will start after init, but will not allow scheduler to run,
+//so there is no bottleneck in reading and writing data
     mscInit();
     if (mscCheckBoot() || mscCheckButton()) {
         ledInit(statusLedConfig());
@@ -839,13 +851,14 @@ void init(void)
         systemState |= SYSTEM_STATE_TRANSPONDER_ENABLED;
     }
 #endif
-
+*/
 #ifdef USE_FLASH_CHIP
     if (!(initFlags & FLASH_INIT_ATTEMPTED)) {
         flashInit(flashConfig());
         initFlags |= FLASH_INIT_ATTEMPTED;
     }
 #endif
+/*
 #ifdef USE_FLASHFS
     flashfsInit();
 #endif
@@ -930,9 +943,8 @@ void init(void)
     mspInit();
     mspSerialInit();
 
-/*
- * CMS, display devices and OSD
- */
+//CMS, display devices and OSD
+
 #ifdef USE_CMS
     cmsInit();
 #endif
@@ -1037,4 +1049,5 @@ void init(void)
     tasksInit();
 
     systemState |= SYSTEM_STATE_READY;
+*/    
 }

@@ -25,6 +25,7 @@
 
 // Streams data out to the EEPROM, padding to the write size as
 // needed, and updating the checksum as it goes.
+#pragma message ( "inside config_streamer.h RUBEN" )
 
 #ifdef CONFIG_IN_EXTERNAL_FLASH
 #define CONFIG_STREAMER_BUFFER_SIZE 8 // Must not be greater than the smallest flash page size of all compiled-in flash devices.

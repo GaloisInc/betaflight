@@ -22,7 +22,6 @@
 #include "stdint.h"
 
 #include "platform.h"
-
 #include "build_config.h"
 
 #ifdef STM32F1
@@ -41,6 +40,8 @@ mcuTypeId_e getMcuTypeId(void)
 {
 #if defined(SIMULATOR_BUILD)
     return MCU_TYPE_SIMULATOR;
+#elif defined(MAIXBIT)
+    return MCU_TYPE_RISCV_K210;
 #elif defined(STM32F1)
     return MCU_TYPE_F103;
 #elif defined(STM32F3)

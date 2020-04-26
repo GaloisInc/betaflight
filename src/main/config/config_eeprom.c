@@ -22,6 +22,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <stdio.h>
+
 #include "platform.h"
 
 #include "build/build_config.h"
@@ -90,7 +92,7 @@ bool loadEEPROMFromExternalFlash(void)
     const flashGeometry_t *flashGeometry = flashGetGeometry();
 
     uint32_t flashStartAddress = flashPartition->startSector * flashGeometry->sectorSize;
-
+    printf("From config_eeprom.c, line 92: flashStartAddress = %X\n\n", flashStartAddress);
     uint32_t totalBytesRead = 0;
     int bytesRead = 0;
 
@@ -258,6 +260,7 @@ void initEEPROM(void)
     bool eepromLoaded = loadEEPROMFromExternalFlash();
     if (!eepromLoaded) {
         // Flash read failed - just die now
+        printf("From config_eeprom.c, line 260: Flash read failed.\n\n");
         failureMode(FAILURE_FLASH_READ_FAILED);
     }
 #elif defined(CONFIG_IN_SDCARD)
@@ -277,7 +280,7 @@ bool isEEPROMVersionValid(void)
     if (header->eepromConfigVersion != EEPROM_CONF_VERSION) {
         return false;
     }
-
+    printf("From config_eeprom.c, line 280: EEPROM version is valid\n\n");
     return true;
 }
 
@@ -389,7 +392,7 @@ bool loadEEPROM(void)
             success = false;
         }
     }
-
+    printf("From config_eeprom.c, line 393: All PGs initialized from EEPROM\n\n");
     return success;
 }
 
@@ -453,6 +456,7 @@ void writeConfigToEEPROM(void)
 #ifdef CONFIG_IN_EXTERNAL_FLASH
             // copy it back from flash to the in-memory buffer.
             success = loadEEPROMFromExternalFlash();
+            printf("From config_eeprom.c, line 458: Configs loaded from flash into EEPROM\n\n");
 #endif
 #ifdef CONFIG_IN_SDCARD
             // copy it back from flash to the in-memory buffer.
@@ -463,6 +467,7 @@ void writeConfigToEEPROM(void)
 
 
     if (success && isEEPROMVersionValid() && isEEPROMStructureValid()) {
+        printf("From config_eeprom.c, line 467: config_eeprom.c process successful\n\n");
         return;
     }
 

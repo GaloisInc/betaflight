@@ -129,7 +129,7 @@ openocd_win_clean:
 
 # Set up openocd tools
 OPENOCD_DIR       := $(TOOLS_DIR)/openocd
-OPENOCD_WIN_DIR   := $(TOOLS_DIR)/openocd_win
+OPENOCD_WIN_DIR   := $(TOOLS_DIR)/openocd_winMAIXBIT.mk
 OPENOCD_BUILD_DIR := $(DL_DIR)/openocd-build
 
 .PHONY: openocd_install
