@@ -278,6 +278,7 @@ CC_NO_OPTIMISATION      :=
                $(EXTRA_FLAGS)
 
 ASFLAGS     = $(ARCH_FLAGS) \
+		-x assembler-with-cpp -D __riscv64 \
                $(DEBUG_FLAGS) \
                -x assembler-with-cpp \
                $(addprefix -I,$(INCLUDE_DIRS)) \
