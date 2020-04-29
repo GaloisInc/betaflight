@@ -20,6 +20,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <unistd.h>
 
 #include "platform.h"
 
@@ -31,7 +33,11 @@
 
 int main(void)
 {
-    init();
+    while (true) {    
+        printf("In main.c\n");
+        sleep(1);
+    }
+    //init();
 
     //run();
 
@@ -49,4 +55,3 @@ void FAST_CODE FAST_CODE_NOINLINE run(void)
 #endif
     }
 */
-
