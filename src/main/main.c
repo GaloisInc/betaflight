@@ -32,12 +32,10 @@
 //void run(void);
 
 int main(void)
-{
-    while (true) {    
-        printf("In main.c\n");
-        sleep(1);
-    }
-    //init();
+{   
+    printf("Entering main.c\n");
+
+    init();
 
     //run();
 
