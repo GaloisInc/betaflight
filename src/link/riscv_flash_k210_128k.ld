@@ -157,6 +157,20 @@ SECTIONS
     PROVIDE_HIDDEN (__fini_array_end = .);
   } >ram AT>ram :ram_ro
 
+  .pg_registry :
+  {
+    PROVIDE_HIDDEN (__pg_registry_start = .);
+    KEEP (*(.pg_registry))
+    KEEP (*(SORT(.pg_registry.*)))
+    PROVIDE_HIDDEN (__pg_registry_end = .);
+  } >ram AT>ram :ram_ro
+  .pg_resetdata :
+  {
+    PROVIDE_HIDDEN (__pg_resetdata_start = .);
+    KEEP (*(.pg_resetdata))
+    PROVIDE_HIDDEN (__pg_resetdata_end = .);
+  } >ram AT>ram :ram_ro
+
   .ctors :
   {
     /* gcc uses crtbegin.o to find the start of
@@ -269,7 +283,7 @@ SECTIONS
     *(.gnu.linkonce.tb.*)
     KEEP( *(.tbss.end) )
   } >ram AT>ram :ram
-
+  
   /*
    * End of uninitalized data segement
    *
