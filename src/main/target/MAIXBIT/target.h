@@ -28,6 +28,14 @@
 #define CONFIG_IN_EXTERNAL_FLASH
 #define USE_FLASH_CHIP
 
+//SPI1 periph. address for STM32F10x from lib/main/STM32F1/Drivers/CMSIS/Device/ST/STM32F10x
+#define SPI1                ((SPI_TypeDef *) 0x53000000)
+
+#define USE_SPI
+#define USE_SPI_DEVICE_1
+#define FLASH_SPI_INSTANCE        SPI1
+//#define FLASH_CS_PIN G2
+
 #define SERIAL_PORT_COUNT       1
 
 #undef TARGET_BUS_INIT
@@ -208,4 +216,3 @@ typedef struct
 {
     void* test;
 } ADC_TypeDef;
-
