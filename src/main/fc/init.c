@@ -211,7 +211,7 @@ static IO_t busSwitchResetPin        = IO_NONE;
     IOLo(busSwitchResetPin);
 }
 #endif
-
+*/
 bool requiresSpiLeadingEdge(SPIDevice device)
 {
 #if defined(CONFIG_IN_SDCARD) || defined(CONFIG_IN_EXTERNAL_FLASH)
@@ -246,7 +246,6 @@ bool requiresSpiLeadingEdge(SPIDevice device)
 
     return false;
 }
-*/
 
 static void configureSPIAndQuadSPI(void)
 {
@@ -394,6 +393,7 @@ void init(void)
 */
 
 #ifdef CONFIG_IN_EXTERNAL_FLASH
+printf("Entering #ifdef CONFIG_IN_EXTERNAL_FLASH in init.c\n\n");
     //
     // Config on external flash presents an issue with pin configuration since the pin and flash configs for the
     // external flash are in the config which is on a chip which we can't read yet!
@@ -417,7 +417,6 @@ void init(void)
 #ifdef TARGET_BUS_INIT
 #error "CONFIG_IN_EXTERNAL_FLASH and TARGET_BUS_INIT are mutually exclusive"
 #endif
-
     configureSPIAndQuadSPI();
     initFlags |= SPI_AND_QSPI_INIT_ATTEMPTED;
 
@@ -427,13 +426,13 @@ void init(void)
 #endif
 
     bool haveFlash = flashInit(flashConfig());
-
+    //printf("From flash.c: flashConfig = %u\n\n", (int)flashConfig);
     if (!haveFlash) {
         //failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
-        printf("From init.c, line 433: FAILURE_EXTERNAL_FLASH_INIT_FAILED");
+        //printf("From init.c, line 433: FAILURE_EXTERNAL_FLASH_INIT_FAILED\n");
     }
     initFlags |= FLASH_INIT_ATTEMPTED;
-
+    //printf("Exiting flashConfig");
 #endif // CONFIG_IN_EXTERNAL_FLASH
 
     initEEPROM();
