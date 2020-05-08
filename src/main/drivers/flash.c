@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "platform.h"
 
@@ -90,7 +91,7 @@ static bool flashQuadSpiInit(const flashConfig_t *flashConfig)
 
 void flashPreInit(const flashConfig_t *flashConfig)
 {
-    spiPreinitRegister(flashConfig->csTag, IOCFG_IPU, 1);
+    //spiPreinitRegister(flashConfig->csTag, IOCFG_IPU, 1);
 }
 
 static bool flashSpiInit(const flashConfig_t *flashConfig)
@@ -119,7 +120,7 @@ static bool flashSpiInit(const flashConfig_t *flashConfig)
     spiBusSetInstance(busdev, instance);
 
     IOInit(busdev->busdev_u.spi.csnPin, OWNER_FLASH_CS, 0);
-    IOConfigGPIO(busdev->busdev_u.spi.csnPin, SPI_IO_CS_CFG);
+    //IOConfigGPIO(busdev->busdev_u.spi.csnPin, SPI_IO_CS_CFG);
     IOHi(busdev->busdev_u.spi.csnPin);
 
 #ifdef USE_SPI_TRANSACTION
@@ -191,6 +192,7 @@ static bool flashSpiInit(const flashConfig_t *flashConfig)
 
 bool flashDeviceInit(const flashConfig_t *flashConfig)
 {
+    //printf("Inside flashDeviceInit\n");
 #ifdef USE_SPI
     bool useSpi = (SPI_CFG_TO_DEV(flashConfig->spiDevice) != SPIINVALID);
 
@@ -202,6 +204,7 @@ bool flashDeviceInit(const flashConfig_t *flashConfig)
 #ifdef USE_QUADSPI
     bool useQuadSpi = (QUADSPI_CFG_TO_DEV(flashConfig->quadSpiDevice) != QUADSPIINVALID);
     if (useQuadSpi) {
+        printf("Inside bool useQuadSpi\n");
         return flashQuadSpiInit(flashConfig);
     }
 #endif
@@ -398,8 +401,9 @@ const char *flashPartitionGetTypeName(flashPartitionType_e type)
 
 bool flashInit(const flashConfig_t *flashConfig)
 {
+    //printf("Inside flashInit\n");
     memset(&flashPartitionTable, 0x00, sizeof(flashPartitionTable));
-
+ 
     bool haveFlash = flashDeviceInit(flashConfig);
 
     flashConfigurePartitions();
