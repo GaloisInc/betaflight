@@ -14,6 +14,12 @@ COMMON_SRC =   $(TARGET_DIR_SRC) \
               fc/board_info.c \
               pg/board.c\
               build/version.c\
+              drivers/bus_spi.c \
+              drivers/bus_spi_pinconfig.c \
+              drivers/bus_spi_config.c \
+              drivers/io.c \
+              pg/flash.c\
+              #drivers/bus_spi_hal.c
               #drivers/system.c \
               \                                                         
 #             build/build_config.c\
@@ -35,16 +41,12 @@ COMMON_SRC =   $(TARGET_DIR_SRC) \
 #             drivers/bus_i2c_config.c \
 #             drivers/bus_i2c_busdev.c \
 #             drivers/bus_i2c_soft.c \
-#             drivers/bus_quadspi.c \
 #             drivers/bus_spi.c \
-#             drivers/bus_spi_config.c \
-#             drivers/bus_spi_pinconfig.c \
 #             drivers/buttons.c \
 #             drivers/display.c \
 #             drivers/display_canvas.c \
 #             drivers/dma_reqmap.c \
 #             drivers/exti.c \
-#             drivers/io.c \
 #             drivers/light_led.c \
 #             drivers/mco.c \
 #             drivers/motor.c \
@@ -249,7 +251,6 @@ endif
 #             drivers/adc.c \
 #             drivers/buf_writer.c \
 #             drivers/bus.c \
-#             drivers/bus_quadspi.c \
 #             drivers/bus_spi.c \
 #             drivers/exti.c \
 #             drivers/io.c \
