@@ -45,7 +45,7 @@ TARGET_MCU := SITL
 SIMULATOR_BUILD = yes
 
 else ifeq ($(TARGET),$(filter $(TARGET), $(MAIXBIT_TARGETS)))
-TARGET_MCU := MAIXBIT
+TARGET_MCU := RISCV_K210
 RISCV_K210 = yes
 
 else ifeq ($(TARGET),$(filter $(TARGET), $(F1_TARGETS)))
