@@ -1,5 +1,5 @@
 # flash size is 128kb = 16MB
-TARGET_FLASH_SIZE 	:= 128
+MCU_FLASH_SIZE 		:= 128
 LINKER_DIR      	:= $(ROOT)/src/link
 RISCV_SRC         	:= $(ROOT)/lib/main/RISCV_K210
 # Object file--------------------------------------------------#
@@ -44,6 +44,7 @@ INCLUDE_DIRS    	:= \
 					$(THIRD_PARTY)\
 					$(NNCASE)\
 					$(ROOT)/src/main/target/$(TARGET) \
+					$(ROOT)/src/main/$(wildcard *.h)
 
 
 #-------------------------------------------------------------------#
