@@ -1,5 +1,5 @@
 # flash size is 128kb = 16MB
-TARGET_FLASH_SIZE 	:= 16384
+TARGET_FLASH_SIZE 	:= 128
 LINKER_DIR      	:= $(ROOT)/src/link
 RISCV_SRC         	:= $(ROOT)/lib/main/RISCV_K210
 # Object file--------------------------------------------------#
