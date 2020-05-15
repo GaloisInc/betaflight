@@ -1,5 +1,5 @@
 MAIXBIT_TARGETS  += $(TARGET)
-FEATURES         += 
+FEATURES         += ONBOARDFLASH
 
 TARGET_SRC      += \
               	#crt.S \

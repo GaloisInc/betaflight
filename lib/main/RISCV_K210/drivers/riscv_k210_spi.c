@@ -24,6 +24,7 @@
 #include "riscv_k210_utils.h"
 #include "riscv_k210_iomem.h"
 
+
 volatile spi_t *const spi[4] =
     {
         (volatile spi_t *)SPI0_BASE_ADDR,
@@ -56,6 +57,12 @@ typedef struct _spi_instance_t
 static spi_instance_t g_spi_instance[4];
 
 static spi_slave_instance_t g_instance;
+
+void ruben_spi()
+{
+    printf("%s:%s:%d - inside my spi RUBEN \n\n", __FUNCTION__,__FILE__,__LINE__);
+    return;
+}
 
 static spi_frame_format_t spi_get_frame_format(spi_device_num_t spi_num)
 {

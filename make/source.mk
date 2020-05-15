@@ -1,19 +1,26 @@
 COMMON_SRC =   $(TARGET_DIR_SRC) \
               main.c \
               fc/init.c \
-              fc/board_info.c \
               pg/pg.c\
-              pg/board.c\
               sensors/initialisation.c \
               sensors/gyro.c \
               drivers/flash.c \
+              drivers/flash_riscv_k210.c \
               config/config_eeprom.c \
               config/config_streamer.c\
               config/config.c \
-              config/feature.c \
               common/crc.c \
+              config/feature.c \
+              fc/board_info.c \
+              pg/board.c\
+              build/version.c\
+              drivers/bus_spi.c \
+              drivers/bus_spi_pinconfig.c \
+              drivers/bus_spi_config.c \
+              pg/flash.c\
               rx/rx.c \
-              build/version.c 
+              drivers/io.c \
+              #drivers/bus_spi_hal.c
               #drivers/system.c \
               \                                                         
 #             build/build_config.c\
@@ -35,16 +42,12 @@ COMMON_SRC =   $(TARGET_DIR_SRC) \
 #             drivers/bus_i2c_config.c \
 #             drivers/bus_i2c_busdev.c \
 #             drivers/bus_i2c_soft.c \
-#             drivers/bus_quadspi.c \
 #             drivers/bus_spi.c \
-#             drivers/bus_spi_config.c \
-#             drivers/bus_spi_pinconfig.c \
 #             drivers/buttons.c \
 #             drivers/display.c \
 #             drivers/display_canvas.c \
 #             drivers/dma_reqmap.c \
 #             drivers/exti.c \
-#             drivers/io.c \
 #             drivers/light_led.c \
 #             drivers/mco.c \
 #             drivers/motor.c \
@@ -119,6 +122,7 @@ COMMON_SRC =   $(TARGET_DIR_SRC) \
 #             rx/jetiexbus.c \
 #             rx/msp.c \
 #             rx/pwm.c \
+#             rx/rx.c \
 #             rx/rx_bind.c \
 #             rx/rx_spi.c \
 #             rx/rx_spi_common.c \
@@ -248,7 +252,6 @@ endif
 #             drivers/adc.c \
 #             drivers/buf_writer.c \
 #             drivers/bus.c \
-#             drivers/bus_quadspi.c \
 #             drivers/bus_spi.c \
 #             drivers/exti.c \
 #             drivers/io.c \

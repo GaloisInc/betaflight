@@ -25,14 +25,17 @@
 
 #include <stdio.h>
 
-#pragma message ( "inside init.c RUBEN" )
 #include "platform.h"
 
-#include "blackbox/blackbox.h"
+//#include "blackbox/blackbox.h"
+
+// riscv files
+#include "riscv_k210_spi.h"
+#include "drivers/flash_riscv_k210.h"
 
 #include "build/build_config.h"
 #include "build/debug.h"
-
+/*
 #include "cms/cms.h"
 #include "cms/cms_types.h"
 
@@ -40,22 +43,24 @@
 #include "common/color.h"
 #include "common/maths.h"
 #include "common/printf_serial.h"
+*/
 
 #include "config/config_eeprom.h"
 #include "config/feature.h"
+#include "drivers/bus_spi.h"
 
+#include "drivers/flash.h"
+/*
 #include "drivers/accgyro/accgyro.h"
 #include "drivers/adc.h"
 #include "drivers/bus.h"
 #include "drivers/bus_i2c.h"
 #include "drivers/bus_quadspi.h"
-#include "drivers/bus_spi.h"
 #include "drivers/buttons.h"
 #include "drivers/camera_control.h"
 #include "drivers/compass/compass.h"
 #include "drivers/dma.h"
 #include "drivers/exti.h"
-#include "drivers/flash.h"
 #include "drivers/inverter.h"
 #include "drivers/io.h"
 #include "drivers/light_led.h"
@@ -84,7 +89,7 @@
 #include "drivers/vtx_common.h"
 #include "drivers/vtx_rtc6705.h"
 #include "drivers/vtx_table.h"
-
+*/
 #include "fc/board_info.h"
 #include "config/config.h"
 #include "fc/dispatch.h"
@@ -93,7 +98,7 @@
 #include "fc/runtime_config.h"
 #include "fc/stats.h"
 #include "fc/tasks.h"
-
+/*
 #include "flight/failsafe.h"
 #include "flight/imu.h"
 #include "flight/mixer.h"
@@ -134,7 +139,7 @@
 #include "msp/msp_serial.h"
 
 #include "osd/osd.h"
-
+*/
 #include "pg/adc.h"
 #include "pg/beeper.h"
 #include "pg/beeper_dev.h"
@@ -154,7 +159,7 @@
 #include "pg/sdcard.h"
 #include "pg/vcd.h"
 #include "pg/vtx_io.h"
-
+/*
 #include "rx/rx.h"
 #include "rx/spektrum.h"
 
@@ -167,14 +172,15 @@
 #include "sensors/compass.h"
 #include "sensors/esc_sensor.h"
 #include "sensors/gyro.h"
-#include "sensors/initialisation.h"
 
 #include "telemetry/telemetry.h"
+*/
+#include "sensors/initialisation.h"
 
 #ifdef USE_HARDWARE_REVISION_DETECTION
 #include "hardware_revision.h"
 #endif
-
+/*
 #ifdef TARGET_PREINIT
 void targetPreInit(void);
 #endif
@@ -182,9 +188,9 @@ void targetPreInit(void);
 #ifdef SOFTSERIAL_LOOPBACK
 serialPort_t *loopbackPort;
 #endif
-
+*/
 uint8_t systemState = SYSTEM_STATE_INITIALISING;
-
+/*
 void processLoopback(void)
 {
 #ifdef SOFTSERIAL_LOOPBACK
@@ -211,7 +217,7 @@ static IO_t busSwitchResetPin        = IO_NONE;
     IOLo(busSwitchResetPin);
 }
 #endif
-
+*/
 bool requiresSpiLeadingEdge(SPIDevice device)
 {
 #if defined(CONFIG_IN_SDCARD) || defined(CONFIG_IN_EXTERNAL_FLASH)
@@ -247,17 +253,16 @@ bool requiresSpiLeadingEdge(SPIDevice device)
     return false;
 }
 
-
 static void configureSPIAndQuadSPI(void)
 {
 #ifdef USE_SPI
-    spiPinConfigure(spiPinConfig(0));
+    //spiPinConfigure(spiPinConfig(0));
 #endif
 
-    sensorsPreInit();
+    //sensorsPreInit();
 
 #ifdef USE_SPI
-    spiPreinit();
+    //spiPreinit();
 
 #ifdef USE_SPI_DEVICE_1
     spiInit(SPIDEV_1, requiresSpiLeadingEdge(SPIDEV_1));
@@ -265,8 +270,21 @@ static void configureSPIAndQuadSPI(void)
 #ifdef USE_SPI_DEVICE_2
     spiInit(SPIDEV_2, requiresSpiLeadingEdge(SPIDEV_2));
 #endif
+
 #ifdef USE_SPI_DEVICE_3
+#ifdef RISCV_K210
+    ruben_spi();
+    // arguments in order
+    // spi_bus_no = 3, SPI_WORK_MODE_0 = 0, SPI_FF_STANDARD = 0
+    // size_t data_bit_length, 0:little-endian 1:big-endian
+
+    spi_init(3, 0, SPI_FF_STANDARD, 8, 0);
+    printf("%s:%s:%d - after spi_init \n\n", __FUNCTION__,__FILE__,__LINE__);
+
+#else
+    printf("%s:%s:%d - WRONG spi_init \n\n", __FUNCTION__,__FILE__,__LINE__);
     spiInit(SPIDEV_3, requiresSpiLeadingEdge(SPIDEV_3));
+#endif
 #endif
 #ifdef USE_SPI_DEVICE_4
     spiInit(SPIDEV_4, requiresSpiLeadingEdge(SPIDEV_4));
@@ -394,6 +412,7 @@ void init(void)
 */
 
 #ifdef CONFIG_IN_EXTERNAL_FLASH
+printf("%s:%s:%d - Entering #ifdef CONFIG_IN_EXTERNAL_FLASH \n\n", __FUNCTION__,__FILE__,__LINE__);
     //
     // Config on external flash presents an issue with pin configuration since the pin and flash configs for the
     // external flash are in the config which is on a chip which we can't read yet!
@@ -412,15 +431,14 @@ void init(void)
     // Target designers must ensure other devices connected the same SPI/QUADSPI interface as the flash chip do not
     // cause communication issues with the flash chip.  e.g. use external pullups on SPI/QUADSPI CS lines.
     //
-    printf("From init.c, line 415: before pgResetAll\n\n");
     pgResetAll();
-    printf("From init.c, line 417: after pgResetAll\n\n");
+    printf("%s:%s:%d - after pgResetAll \n\n", __FUNCTION__,__FILE__,__LINE__);
 
 #ifdef TARGET_BUS_INIT
 #error "CONFIG_IN_EXTERNAL_FLASH and TARGET_BUS_INIT are mutually exclusive"
 #endif
-
     configureSPIAndQuadSPI();
+    printf("%s:%s:%d - after configureSPIAndQuadSPI \n\n", __FUNCTION__,__FILE__,__LINE__);
     initFlags |= SPI_AND_QSPI_INIT_ATTEMPTED;
 
 
@@ -428,24 +446,30 @@ void init(void)
 #error "CONFIG_IN_EXTERNAL_FLASH requires USE_FLASH_CHIP to be defined."
 #endif
 
-    printf("From init.c, line 431: before flashInit\n\n");
-    bool haveFlash = flashInit(flashConfig());
+    //bool haveFlash = flashInit(flashConfig());
+    ruben_flash();
 
-    printf("From init.c, line 434: after flashInit\n\n");
-    if (!haveFlash) {
+    // uint8_t spi_index = 3 , uint8_t spi_ss = 0
+    // spi_chip_select = spi_ss;
+    bool haveFlash = flash_init( 3, 0 );
+    //bool haveFlash = flashInit(flashConfig());
+
+    printf("%s:%s:%d - after flashInit \n\n", __FUNCTION__,__FILE__,__LINE__);
+
+    // flash_init returns 0 if FLASH_OK
+    if (haveFlash) {
         //failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
-        printf("From init.c, line 433: FAILURE_EXTERNAL_FLASH_INIT_FAILED");
+        printf("%s:%s:%d - inside if statement - FAILURE_EXTERNAL_FLASH_INIT_FAILED \n\n", __FUNCTION__,__FILE__,__LINE__);
     }
     initFlags |= FLASH_INIT_ATTEMPTED;
 
 #endif // CONFIG_IN_EXTERNAL_FLASH
 
-    printf("From init.c, line 443: before initEEPROM\n\n");
     initEEPROM();
-
-    printf("From init.c, line 446: after initEEPROM\n\n");
+    printf("%s:%s:%d - after initEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
 
     ensureEEPROMStructureIsValid();
+    printf("%s:%s:%d - after ensureEEPROMStructureIsValid \n\n", __FUNCTION__,__FILE__,__LINE__);
 
     bool readSuccess = readEEPROM();
 
@@ -455,10 +479,9 @@ void init(void)
 
     if (!readSuccess || !isEEPROMVersionValid() || strncasecmp(systemConfig()->boardIdentifier, TARGET_BOARD_IDENTIFIER, sizeof(TARGET_BOARD_IDENTIFIER))) {
         resetEEPROM(false);
-        printf("From init.c, line 458: Config load from flash failed, resetting EEPROM to default configs\n\n");
+        printf("%s:%s:%d - load from flash failed, resetting EEPROM to default configs \n\n", __FUNCTION__,__FILE__,__LINE__);
     }
 
-    printf("From init.c, line 461: Config load passed\n\n");
     systemState |= SYSTEM_STATE_CONFIG_LOADED;
 /*
 #ifdef USE_BRUSHED_ESC_AUTODETECT
@@ -611,7 +634,7 @@ void init(void)
     //Motors needs to be initialized soon as posible because hardware initialization
     //may send spurious pulses to esc's causing their early initialization. Also ppm
     //receiver may share timer with motors so motors MUST be initialized here.
-/*    
+
     motorDevInit(&motorConfig()->dev, idlePulse, getMotorCount());
     systemState |= SYSTEM_STATE_MOTORS_READY;
 #else

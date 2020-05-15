@@ -28,6 +28,22 @@
 #define CONFIG_IN_EXTERNAL_FLASH
 #define USE_FLASH_CHIP
 
+// spi3 starts at 0x5400 0000 per riscv_k210.platform.h
+#define SPI3                ((SPI_TypeDef *) 0x54000000)
+
+//#define USE_FLASH_W25QXX
+//#define USE_QUADSPI
+#define USE_SPI
+#define USE_SPI_DEVICE_3
+#define FLASH_SPI_INSTANCE      SPI3
+
+#define TARGET_IO_PORTA         0xffff
+#define TARGET_IO_PORTB         0xffff
+#define TARGET_IO_PORTC         0xffff
+#define TARGET_IO_PORTD         0xffff
+
+//#define FLASH_CS_PIN G2
+
 #define SERIAL_PORT_COUNT       1
 
 #undef TARGET_BUS_INIT
@@ -182,7 +198,8 @@ typedef struct
 {
     void* test;
 } I2C_TypeDef;
-
+// comment below since FLASH_BUSY enum is being used by k210 flash.c
+/*
 typedef enum
 {
   FLASH_BUSY = 1,
@@ -191,7 +208,7 @@ typedef enum
   FLASH_COMPLETE,
   FLASH_TIMEOUT
 } FLASH_Status;
-
+*/
 typedef struct {
     double timestamp;                   // in seconds
     double imu_angular_velocity_rpy[3]; // rad/s -> range: +/- 8192; +/- 2000 deg/se
@@ -208,4 +225,3 @@ typedef struct
 {
     void* test;
 } ADC_TypeDef;
-

@@ -5,7 +5,7 @@ RISCV_SRC         	:= $(ROOT)/lib/main/RISCV_K210
 # Object file--------------------------------------------------#
 OPBL = yes
 #--------------------------------------------------------------#
-#EXST = yes
+# EXST = yes
 # this flag is used for eeprom mem config
 #MAIXBIT linker
 LD_SCRIPT       	= $(LINKER_DIR)/riscv_flash_k210_128k.ld

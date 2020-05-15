@@ -65,7 +65,7 @@ PHDRS
  */
 SECTIONS
 {
-
+/*
   .pg_registry :
   {
     PROVIDE_HIDDEN (__pg_registry_start = .);
@@ -79,7 +79,7 @@ SECTIONS
     KEEP (*(.pg_resetdata))
     PROVIDE_HIDDEN (__pg_resetdata_end = .);
   } >ram
-
+*/
 /*
 .pg_registry BLOCK( DEFINED(__section_alignment__) ? __section_alignment__ : 4 ) :   SUBALIGN(4)
   {
@@ -155,6 +155,20 @@ SECTIONS
     KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
     KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
     PROVIDE_HIDDEN (__fini_array_end = .);
+  } >ram AT>ram :ram_ro
+
+  .pg_registry :
+  {
+    PROVIDE_HIDDEN (__pg_registry_start = .);
+    KEEP (*(.pg_registry))
+    KEEP (*(SORT(.pg_registry.*)))
+    PROVIDE_HIDDEN (__pg_registry_end = .);
+  } >ram AT>ram :ram_ro
+  .pg_resetdata :
+  {
+    PROVIDE_HIDDEN (__pg_resetdata_start = .);
+    KEEP (*(.pg_resetdata))
+    PROVIDE_HIDDEN (__pg_resetdata_end = .);
   } >ram AT>ram :ram_ro
 
   .ctors :
@@ -269,7 +283,7 @@ SECTIONS
     *(.gnu.linkonce.tb.*)
     KEEP( *(.tbss.end) )
   } >ram AT>ram :ram
-
+  
   /*
    * End of uninitalized data segement
    *

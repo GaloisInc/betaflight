@@ -43,6 +43,9 @@
 #include "drivers/flash.h"
 #include "drivers/system.h"
 
+// riscv files
+#include "drivers/flash_riscv_k210.h"
+
 static uint16_t eepromConfigSize;
 
 typedef enum {
@@ -86,13 +89,26 @@ typedef struct {
 } PG_PACKED packingTest_t;
 
 #if defined(CONFIG_IN_EXTERNAL_FLASH)
+#ifdef RISCV_K210
+bool loadEEPROMFromExternalFlash(void)
+{
+    // got this address from one of the example from k210...not sure if this is right
+    uint32_t flashStartAddress = 0x130000;
+    uint32_t totalBytesRead = 0;
+    int success = 0;
+
+    // flash_read_data will return FLASH_OK = 0 if successful
+    // riscv_k210_w25q_t flash_read_data ( uint32_t addr, uint8_t*data_buf, uint32_t length, flash_read_t mode );
+    success = flash_read_data ( flashStartAddress, &eepromData[totalBytesRead], EEPROM_SIZE, FLASH_STANDARD );
+
+    return !success;
+}
+#else
 bool loadEEPROMFromExternalFlash(void)
 {
     const flashPartition_t *flashPartition = flashPartitionFindByType(FLASH_PARTITION_TYPE_CONFIG);
     const flashGeometry_t *flashGeometry = flashGetGeometry();
 
-    uint32_t flashStartAddress = flashPartition->startSector * flashGeometry->sectorSize;
-    printf("From config_eeprom.c, line 92: flashStartAddress = %X\n\n", flashStartAddress);
     uint32_t totalBytesRead = 0;
     int bytesRead = 0;
 
@@ -100,6 +116,7 @@ bool loadEEPROMFromExternalFlash(void)
 
     do {
         bytesRead = flashReadBytes(flashStartAddress + totalBytesRead, &eepromData[totalBytesRead], EEPROM_SIZE - totalBytesRead);
+
         if (bytesRead > 0) {
             totalBytesRead += bytesRead;
             success = (totalBytesRead == EEPROM_SIZE);
@@ -108,6 +125,7 @@ bool loadEEPROMFromExternalFlash(void)
 
     return success;
 }
+#endif
 #elif defined(CONFIG_IN_SDCARD)
 
 enum {
@@ -258,9 +276,10 @@ void initEEPROM(void)
     loadEEPROMFromFile();
 #elif defined(CONFIG_IN_EXTERNAL_FLASH)
     bool eepromLoaded = loadEEPROMFromExternalFlash();
+    printf("%s:%s:%d - after loadEEPROMFromExternalFlash \n\n", __FUNCTION__,__FILE__,__LINE__);
     if (!eepromLoaded) {
         // Flash read failed - just die now
-        printf("From config_eeprom.c, line 260: Flash read failed.\n\n");
+        printf("%s:%s:%d - Flash read failed \n\n", __FUNCTION__,__FILE__,__LINE__);
         failureMode(FAILURE_FLASH_READ_FAILED);
     }
 #elif defined(CONFIG_IN_SDCARD)
@@ -274,13 +293,17 @@ void initEEPROM(void)
 
 bool isEEPROMVersionValid(void)
 {
+    printf("%s:%s:%d - started \n\n", __FUNCTION__,__FILE__,__LINE__);
     const uint8_t *p = &__config_start;
     const configHeader_t *header = (const configHeader_t *)p;
 
+    printf("%s:%s:%d - EEPROM_CONF_VERSION is %d \n\n", __FUNCTION__,__FILE__,__LINE__, EEPROM_CONF_VERSION);
+    printf("%s:%s:%d - header->eepromConfigVersion is %d \n\n", __FUNCTION__,__FILE__,__LINE__, header->eepromConfigVersion);
     if (header->eepromConfigVersion != EEPROM_CONF_VERSION) {
+        printf("%s:%s:%d - hit false \n\n", __FUNCTION__,__FILE__,__LINE__);
         return false;
     }
-    printf("From config_eeprom.c, line 280: EEPROM version is valid\n\n");
+    printf("%s:%s:%d - EEPROM version is valid\n\n", __FUNCTION__,__FILE__,__LINE__);
     return true;
 }
 
@@ -392,7 +415,8 @@ bool loadEEPROM(void)
             success = false;
         }
     }
-    printf("From config_eeprom.c, line 393: All PGs initialized from EEPROM\n\n");
+
+    printf("%s:%s:%d - All PGs initialized from EEPROM\n\n", __FUNCTION__,__FILE__,__LINE__);
     return success;
 }
 
@@ -453,10 +477,11 @@ void writeConfigToEEPROM(void)
         if (writeSettingsToEEPROM()) {
             success = true;
 
+    printf("%s:%s:%d - after writeSettingsToEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
 #ifdef CONFIG_IN_EXTERNAL_FLASH
             // copy it back from flash to the in-memory buffer.
             success = loadEEPROMFromExternalFlash();
-            printf("From config_eeprom.c, line 458: Configs loaded from flash into EEPROM\n\n");
+            printf("%s:%s:%d - Configs loaded from flash into EEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
 #endif
 #ifdef CONFIG_IN_SDCARD
             // copy it back from flash to the in-memory buffer.
@@ -467,7 +492,7 @@ void writeConfigToEEPROM(void)
 
 
     if (success && isEEPROMVersionValid() && isEEPROMStructureValid()) {
-        printf("From config_eeprom.c, line 467: config_eeprom.c process successful\n\n");
+        printf("%s:%s:%d - process successful \n\n", __FUNCTION__,__FILE__,__LINE__);
         return;
     }
 

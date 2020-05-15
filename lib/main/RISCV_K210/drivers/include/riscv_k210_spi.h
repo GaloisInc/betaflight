@@ -15,6 +15,7 @@
 #ifndef _DRIVER_SPI_H
 #define _DRIVER_SPI_H
 
+#pragma message ( "inside bus_spi_riscv_k210.h RUBEN" )
 #include <stddef.h>
 #include <stdint.h>
 #include "riscv_k210_dmac.h"
@@ -488,6 +489,8 @@ void spi_slave_dual_config(uint8_t int_pin,
  *
  */
 void spi_handle_data_dma(spi_device_num_t spi_num, spi_chip_select_t chip_select, spi_data_t data, plic_interrupt_t *cb);
+
+void ruben_spi();
 
 #ifdef __cplusplus
 }

@@ -18,6 +18,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <string.h>
 
 #include "platform.h"
@@ -77,7 +78,7 @@ uint8_t eepromData[EEPROM_SIZE];
 #  define FLASH_PAGE_SIZE                 ((uint32_t)0x800) // 2K page
 // RISCV_K210
 # elif defined(RISCV_K210)
-#  define FLASH_PAGE_SIZE                 ((uint32_t)0x4000) // 16k sectors
+#  define FLASH_PAGE_SIZE                 ((uint32_t)0x100) // 256 page per flash_riscv_k210.h
 // SIMULATOR
 # elif defined(SIMULATOR_BUILD)
 #  define FLASH_PAGE_SIZE                 (0x400)
@@ -356,7 +357,9 @@ static int write_word(config_streamer_t *c, config_streamer_buffer_align_type_t 
         return c->err;
     }
 #if defined(CONFIG_IN_EXTERNAL_FLASH)
-
+#if defined(RISCV_K210)
+    printf("%s:%s:%d \n\n", __FUNCTION__,__FILE__,__LINE__);
+#else
     uint32_t dataOffset = (uint32_t)(c->address - (uintptr_t)&eepromData[0]);
 
     const flashPartition_t *flashPartition = flashPartitionFindByType(FLASH_PARTITION_TYPE_CONFIG);
@@ -389,7 +392,7 @@ static int write_word(config_streamer_t *c, config_streamer_buffer_align_type_t 
     }
 
     flashPageProgramContinue((uint8_t *)buffer, CONFIG_STREAMER_BUFFER_SIZE);
-
+#endif
 #elif defined(CONFIG_IN_RAM) || defined(CONFIG_IN_SDCARD)
     if (c->address == (uintptr_t)&eepromData[0]) {
         memset(eepromData, 0, sizeof(eepromData));

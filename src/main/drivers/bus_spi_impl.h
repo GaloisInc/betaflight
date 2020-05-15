@@ -20,12 +20,14 @@
 
 #pragma once
 
-#if defined(STM32F1) || defined(STM32F3) || defined(STM32F4) || defined(STM32G4)
+#if defined(STM32F1) || defined(STM32F3) || defined(STM32F4) || defined(STM32G4) || defined(MAIXBIT)
 #define MAX_SPI_PIN_SEL 2
 #elif defined(STM32F7)
 #define MAX_SPI_PIN_SEL 4
 #elif defined(STM32H7)
 #define MAX_SPI_PIN_SEL 5
+#elif defined(MAIXBIT)
+#define MAX_SPI_PIN_SEL 4
 #else
 #error Unknown MCU family
 #endif
