@@ -45,10 +45,11 @@
 #include "common/printf_serial.h"
 */
 
+//#include "common/maths.h"
 #include "config/config_eeprom.h"
 #include "config/feature.h"
-#include "drivers/bus_spi.h"
 
+#include "drivers/bus_spi.h"
 #include "drivers/flash.h"
 /*
 #include "drivers/accgyro/accgyro.h"
@@ -78,9 +79,6 @@
 #include "drivers/sdcard.h"
 #include "drivers/sdio.h"
 #include "drivers/sound_beeper.h"
-#include "drivers/system.h"
-#include "drivers/time.h"
-#include "drivers/timer.h"
 #include "drivers/transponder_ir.h"
 #include "drivers/usb_io.h"
 #ifdef USE_USB_MSC
@@ -90,6 +88,11 @@
 #include "drivers/vtx_rtc6705.h"
 #include "drivers/vtx_table.h"
 */
+
+#include "drivers/system.h"
+#include "drivers/timer.h"
+#include "drivers/time.h"
+
 #include "fc/board_info.h"
 #include "config/config.h"
 #include "fc/dispatch.h"
@@ -159,11 +162,11 @@
 #include "pg/sdcard.h"
 #include "pg/vcd.h"
 #include "pg/vtx_io.h"
+#include "scheduler/scheduler.h"
 /*
 #include "rx/rx.h"
 #include "rx/spektrum.h"
 
-#include "scheduler/scheduler.h"
 
 #include "sensors/acceleration.h"
 #include "sensors/barometer.h"
@@ -190,7 +193,7 @@ serialPort_t *loopbackPort;
 #endif
 */
 uint8_t systemState = SYSTEM_STATE_INITIALISING;
-/*
+
 void processLoopback(void)
 {
 #ifdef SOFTSERIAL_LOOPBACK
@@ -203,7 +206,7 @@ void processLoopback(void)
     }
 #endif
 }
-
+/*
 #ifdef BUS_SWITCH_PIN
 void busSwitchInit(void)
 {
@@ -276,9 +279,9 @@ static void configureSPIAndQuadSPI(void)
     ruben_spi();
     // arguments in order
     // spi_bus_no = 3, SPI_WORK_MODE_0 = 0, SPI_FF_STANDARD = 0
-    // size_t data_bit_length, 0:little-endian 1:big-endian
+    // size_t data_bit_length = 8, 0:little-endian 1:big-endian = 0
 
-    spi_init(3, 0, SPI_FF_STANDARD, 8, 0);
+    spi_init(3, SPI_WORK_MODE_0, SPI_FF_STANDARD, 8, 0);
     printf("%s:%s:%d - after spi_init \n\n", __FUNCTION__,__FILE__,__LINE__);
 
 #else
@@ -296,7 +299,7 @@ static void configureSPIAndQuadSPI(void)
     spiInit(SPIDEV_6, requiresSpiLeadingEdge(SPIDEV_6));
 #endif
 #endif // USE_SPI
-/*
+
 #ifdef USE_QUADSPI
     quadSpiPinConfigure(quadSpiConfig(0));
 
@@ -304,7 +307,7 @@ static void configureSPIAndQuadSPI(void)
     quadSpiInit(QUADSPIDEV_1);
 #endif
 #endif // USE_QUAD_SPI
-*/
+
 }
 /*
 
@@ -360,9 +363,8 @@ void init(void)
         SPI_AND_QSPI_INIT_ATTEMPTED      = (1 << 2),
     };    
     uint8_t initFlags = 0;
-/*
-#ifdef CONFIG_IN_SDCARD
 
+#ifdef CONFIG_IN_SDCARD
     //
     // Config in sdcard presents an issue with pin configuration since the pin and sdcard configs for the
     // sdcard are in the config which is on the sdcard which we can't read yet!
@@ -407,9 +409,8 @@ void init(void)
             failureMode(FAILURE_SDCARD_INITIALISATION_FAILED);
         }
     }
-
 #endif // CONFIG_IN_SDCARD
-*/
+
 
 #ifdef CONFIG_IN_EXTERNAL_FLASH
 printf("%s:%s:%d - Entering #ifdef CONFIG_IN_EXTERNAL_FLASH \n\n", __FUNCTION__,__FILE__,__LINE__);
@@ -441,37 +442,46 @@ printf("%s:%s:%d - Entering #ifdef CONFIG_IN_EXTERNAL_FLASH \n\n", __FUNCTION__,
     printf("%s:%s:%d - after configureSPIAndQuadSPI \n\n", __FUNCTION__,__FILE__,__LINE__);
     initFlags |= SPI_AND_QSPI_INIT_ATTEMPTED;
 
-
 #ifndef USE_FLASH_CHIP
 #error "CONFIG_IN_EXTERNAL_FLASH requires USE_FLASH_CHIP to be defined."
 #endif
-
-    //bool haveFlash = flashInit(flashConfig());
-    ruben_flash();
+#ifdef RISCV_K210
+    //ruben_flash();
 
     // uint8_t spi_index = 3 , uint8_t spi_ss = 0
     // spi_chip_select = spi_ss;
-    bool haveFlash = flash_init( 3, 0 );
-    //bool haveFlash = flashInit(flashConfig());
+    bool noFlash = flash_init( 3, 0 );
 
     printf("%s:%s:%d - after flashInit \n\n", __FUNCTION__,__FILE__,__LINE__);
 
     // flash_init returns 0 if FLASH_OK
-    if (haveFlash) {
+    if (noFlash) {
         //failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
         printf("%s:%s:%d - inside if statement - FAILURE_EXTERNAL_FLASH_INIT_FAILED \n\n", __FUNCTION__,__FILE__,__LINE__);
     }
     initFlags |= FLASH_INIT_ATTEMPTED;
 
+#else
+    printf("%s:%s:%d - wrong handle of non riscv - right before flashInit \n\n", __FUNCTION__,__FILE__,__LINE__);
+
+    bool haveFlash = flashInit(flashConfig());
+    if (!haveFlash) {
+        failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
+    }
+    initFlags |= FLASH_INIT_ATTEMPTED;
+
+#endif
 #endif // CONFIG_IN_EXTERNAL_FLASH
 
     initEEPROM();
-    printf("%s:%s:%d - after initEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
+    //printf("%s:%s:%d - after initEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
 
     ensureEEPROMStructureIsValid();
     printf("%s:%s:%d - after ensureEEPROMStructureIsValid \n\n", __FUNCTION__,__FILE__,__LINE__);
 
     bool readSuccess = readEEPROM();
+
+    printf("%s:%s:%d - after readEEPROM return value %xd \n\n", __FUNCTION__,__FILE__,__LINE__, readSuccess);
 
 #if defined(USE_BOARD_INFO)
     initBoardInformation();
@@ -883,12 +893,14 @@ printf("%s:%s:%d - Entering #ifdef CONFIG_IN_EXTERNAL_FLASH \n\n", __FUNCTION__,
     }
 #endif
 */
+/*
 #ifdef USE_FLASH_CHIP
     if (!(initFlags & FLASH_INIT_ATTEMPTED)) {
         flashInit(flashConfig());
         initFlags |= FLASH_INIT_ATTEMPTED;
     }
 #endif
+*/
 /*
 #ifdef USE_FLASHFS
     flashfsInit();
@@ -1079,6 +1091,6 @@ printf("%s:%s:%d - Entering #ifdef CONFIG_IN_EXTERNAL_FLASH \n\n", __FUNCTION__,
 
     tasksInit();
 
+*/
     systemState |= SYSTEM_STATE_READY;
-*/    
 }

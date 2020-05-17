@@ -20,12 +20,14 @@ COMMON_SRC =   $(TARGET_DIR_SRC) \
               pg/flash.c\
               rx/rx.c \
               drivers/io.c \
-              #drivers/bus_spi_hal.c
-              #drivers/system.c \
-              \                                                         
-#             build/build_config.c\
-#             build/debug.c \
+#              drivers/timer.c \
+#              scheduler/scheduler.c \
+#              fc/core.c \
+
+#             drivers/bus_spi_hal.c
+#             drivers/system.c \
 #             build/debug_pin.c \
+#             build/debug.c \
 #             build/version.c 
 #             main.c \
 #             $(addprefix pg/, $(notdir $(wildcard $(SRC_DIR)/pg/*.c))) \
@@ -83,7 +85,6 @@ COMMON_SRC =   $(TARGET_DIR_SRC) \
 #             msp/msp.c \
 #             msp/msp_box.c \
 #             msp/msp_serial.c \
-#             scheduler/scheduler.c \
 #             sensors/adcinternal.c \
 #             sensors/battery.c \
 #             sensors/current.c \
@@ -98,7 +99,6 @@ COMMON_SRC =   $(TARGET_DIR_SRC) \
 #             drivers/rx/rx_xn297.c \
 #             drivers/rx/rx_pwm.c \
 #             drivers/serial_softserial.c \
-#             fc/core.c \
 #             fc/rc.c \
 #             fc/rc_adjustments.c \
 #             fc/rc_controls.c \

@@ -122,7 +122,7 @@ PG_RESET_TEMPLATE(systemConfig_t, systemConfig,
     .schedulerOptimizeRate = SCHEDULER_OPTIMIZE_RATE_AUTO,
     .enableStickArming = false,
 );
-/*
+
 uint8_t getCurrentPidProfileIndex(void)
 {
     return systemConfig()->pidProfileIndex;
@@ -142,7 +142,7 @@ uint16_t getCurrentMinthrottle(void)
 {
     return motorConfig()->minthrottle;
 }
-*/
+
 void resetConfig(void)
 {
     pgResetAll();
@@ -741,7 +741,7 @@ bool resetEEPROM(bool useCustomDefaults)
 
 void ensureEEPROMStructureIsValid(void)
 {
-    printf("%s:%s:%d - entering ensureEEPROMStructureIsValid \n\n", __FUNCTION__,__FILE__,__LINE__);
+    //printf("%s:%s:%d - entering ensureEEPROMStructureIsValid \n\n", __FUNCTION__,__FILE__,__LINE__);
     if (isEEPROMStructureValid()) {
         printf("%s:%s:%d - inside if statement isEEPROMStructureValid \n\n", __FUNCTION__,__FILE__,__LINE__);
         return;
@@ -750,7 +750,7 @@ void ensureEEPROMStructureIsValid(void)
     resetEEPROM(false);
     printf("%s:%s:%d - after resetEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
 }
-/*
+
 void saveConfigAndNotify(void)
 {
     writeEEPROM();
@@ -821,4 +821,4 @@ bool getRebootRequired(void)
 {
     return rebootRequired;
 }
-*/
+

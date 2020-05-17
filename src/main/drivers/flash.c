@@ -193,7 +193,6 @@ static bool flashSpiInit(const flashConfig_t *flashConfig)
 
 bool flashDeviceInit(const flashConfig_t *flashConfig)
 {
-    printf("Inside flashDeviceInit\n");
 #ifdef USE_SPI
     bool useSpi = (SPI_CFG_TO_DEV(flashConfig->spiDevice) != SPIINVALID);
 
@@ -205,7 +204,6 @@ bool flashDeviceInit(const flashConfig_t *flashConfig)
 #ifdef USE_QUADSPI
     bool useQuadSpi = (QUADSPI_CFG_TO_DEV(flashConfig->quadSpiDevice) != QUADSPIINVALID);
     if (useQuadSpi) {
-        printf("Inside bool useQuadSpi\n");
         return flashQuadSpiInit(flashConfig);
     }
 #endif
@@ -255,7 +253,6 @@ void flashPageProgram(uint32_t address, const uint8_t *data, int length)
 
 int flashReadBytes(uint32_t address, uint8_t *buffer, int length)
 {
-    printf("hello rube\n\n");
     return flashDevice.vTable->readBytes(&flashDevice, address, buffer, length);
 }
 

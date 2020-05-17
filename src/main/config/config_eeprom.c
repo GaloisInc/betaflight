@@ -55,7 +55,12 @@ typedef enum {
 
 #define CR_CLASSIFICATION_MASK  (0x3)
 #define CRC_START_VALUE         0xFFFF
+
+#ifdef RISCV_K210
+#define CRC_CHECK_VALUE         0xD5E2  // pre-calculated value of CRC that includes the CRC itself
+#else
 #define CRC_CHECK_VALUE         0x1D0F  // pre-calculated value of CRC that includes the CRC itself
+#endif
 
 // Header for the saved copy.
 typedef struct {
@@ -93,7 +98,8 @@ typedef struct {
 bool loadEEPROMFromExternalFlash(void)
 {
     // got this address from one of the example from k210...not sure if this is right
-    uint32_t flashStartAddress = 0x130000;
+
+    uint32_t flashStartAddress = FLASH_START_ADDR;
     uint32_t totalBytesRead = 0;
     int success = 0;
 
@@ -276,7 +282,7 @@ void initEEPROM(void)
     loadEEPROMFromFile();
 #elif defined(CONFIG_IN_EXTERNAL_FLASH)
     bool eepromLoaded = loadEEPROMFromExternalFlash();
-    printf("%s:%s:%d - after loadEEPROMFromExternalFlash \n\n", __FUNCTION__,__FILE__,__LINE__);
+    //printf("%s:%s:%d - after loadEEPROMFromExternalFlash \n\n", __FUNCTION__,__FILE__,__LINE__);
     if (!eepromLoaded) {
         // Flash read failed - just die now
         printf("%s:%s:%d - Flash read failed \n\n", __FUNCTION__,__FILE__,__LINE__);
@@ -293,12 +299,11 @@ void initEEPROM(void)
 
 bool isEEPROMVersionValid(void)
 {
-    printf("%s:%s:%d - started \n\n", __FUNCTION__,__FILE__,__LINE__);
     const uint8_t *p = &__config_start;
     const configHeader_t *header = (const configHeader_t *)p;
 
-    printf("%s:%s:%d - EEPROM_CONF_VERSION is %d \n\n", __FUNCTION__,__FILE__,__LINE__, EEPROM_CONF_VERSION);
-    printf("%s:%s:%d - header->eepromConfigVersion is %d \n\n", __FUNCTION__,__FILE__,__LINE__, header->eepromConfigVersion);
+    printf("%s:%s:%d - EEPROM_CONF_VERSION = %d and header->eepromConfigVersion = %d \n\n", __FUNCTION__,__FILE__,__LINE__, EEPROM_CONF_VERSION, header->eepromConfigVersion);
+
     if (header->eepromConfigVersion != EEPROM_CONF_VERSION) {
         printf("%s:%s:%d - hit false \n\n", __FUNCTION__,__FILE__,__LINE__);
         return false;
@@ -313,6 +318,7 @@ bool isEEPROMStructureValid(void)
     const uint8_t *p = &__config_start;
     const configHeader_t *header = (const configHeader_t *)p;
 
+    //printf("%s:%s:%d - before magic_be\n\n\n\n\n", __FUNCTION__,__FILE__,__LINE__);
     if (header->magic_be != 0xBE) {
         return false;
     }
@@ -324,13 +330,20 @@ bool isEEPROMStructureValid(void)
     for (;;) {
         const configRecord_t *record = (const configRecord_t *)p;
 
+        //printf("%s:%s:%d - __config_start is %d\n\n", __FUNCTION__,__FILE__,__LINE__, __config_start);
+        //printf("%s:%s:%d - __config_end is %X\n\n", __FUNCTION__,__FILE__,__LINE__, __config_end);
+        //printf("%s:%s:%d - record->size %d + p %d\n\n", __FUNCTION__,__FILE__,__LINE__, (record->size), *p);
+        //printf("%s:%s:%d - after sizeof(*record) %lu\n\n", __FUNCTION__,__FILE__,__LINE__, sizeof(*record));
         if (record->size == 0) {
             // Found the end.  Stop scanning.
+            //printf("%s:%s:%d - Found the end.  Stop scanning.\n\n", __FUNCTION__,__FILE__,__LINE__);
             break;
         }
+
         if (p + record->size >= &__config_end
             || record->size < sizeof(*record)) {
             // Too big or too small.
+            printf("%s:%s:%d - ERROR\n\n", __FUNCTION__,__FILE__,__LINE__);
             return false;
         }
 
@@ -362,7 +375,6 @@ uint16_t getEEPROMConfigSize(void)
 size_t getEEPROMStorageSize(void)
 {
 #if defined(CONFIG_IN_EXTERNAL_FLASH)
-
     const flashPartition_t *flashPartition = flashPartitionFindByType(FLASH_PARTITION_TYPE_CONFIG);
     return FLASH_PARTITION_SECTOR_COUNT(flashPartition) * flashGetGeometry()->sectorSize;
 #endif
@@ -425,6 +437,7 @@ static bool writeSettingsToEEPROM(void)
     config_streamer_t streamer;
     config_streamer_init(&streamer);
 
+    //config_streamer_start(&streamer, (uintptr_t)&__config_start, &__config_end);
     config_streamer_start(&streamer, (uintptr_t)&__config_start, &__config_end - &__config_start);
 
     configHeader_t header = {
@@ -477,7 +490,7 @@ void writeConfigToEEPROM(void)
         if (writeSettingsToEEPROM()) {
             success = true;
 
-    printf("%s:%s:%d - after writeSettingsToEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
+    //printf("%s:%s:%d - after writeSettingsToEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
 #ifdef CONFIG_IN_EXTERNAL_FLASH
             // copy it back from flash to the in-memory buffer.
             success = loadEEPROMFromExternalFlash();
@@ -490,9 +503,8 @@ void writeConfigToEEPROM(void)
         }
     }
 
-
     if (success && isEEPROMVersionValid() && isEEPROMStructureValid()) {
-        printf("%s:%s:%d - process successful \n\n", __FUNCTION__,__FILE__,__LINE__);
+        printf("%s:%s:%d - valid EEPROM version and valid EEPROM structure \n\n", __FUNCTION__,__FILE__,__LINE__);
         return;
     }
 

@@ -28,6 +28,9 @@
 
 #include "config/config_streamer.h"
 
+// riscv files
+#include "drivers/flash_riscv_k210.h"
+
 #if !defined(CONFIG_IN_FLASH)
 #if defined(CONFIG_IN_RAM) && defined(PERSISTENT)
 PERSISTENT uint8_t eepromData[EEPROM_SIZE];
@@ -97,6 +100,8 @@ void config_streamer_start(config_streamer_t *c, uintptr_t base, int size)
     // base must start at FLASH_PAGE_SIZE boundary when using embedded flash.
     c->address = base;
     c->size = size;
+    printf("%s:%s:%d c->address  %lx\n\n", __FUNCTION__,__FILE__,__LINE__, c->address );
+    printf("%s:%s:%d c->size  %-x\n\n", __FUNCTION__,__FILE__,__LINE__, c->size );
     if (!c->unlocked) {
 #if defined(CONFIG_IN_RAM) || defined(CONFIG_IN_EXTERNAL_FLASH) || defined(CONFIG_IN_SDCARD)
         // NOP
@@ -358,7 +363,100 @@ static int write_word(config_streamer_t *c, config_streamer_buffer_align_type_t 
     }
 #if defined(CONFIG_IN_EXTERNAL_FLASH)
 #if defined(RISCV_K210)
-    printf("%s:%s:%d \n\n", __FUNCTION__,__FILE__,__LINE__);
+
+    uint32_t dataOffset = (uint32_t)(c->address - (uintptr_t)&eepromData[0]);
+
+    //printf("%s:%s:%d dataOffset %u\n\n", __FUNCTION__,__FILE__,__LINE__, dataOffset);
+    //printf("%s:%s:%d CONFIG_STREAMER_BUFFER_SIZE %u\n\n", __FUNCTION__,__FILE__,__LINE__, CONFIG_STREAMER_BUFFER_SIZE);
+
+    uint32_t flashStartAddress = FLASH_START_ADDR;
+
+    //i need to handle this
+    //uint32_t flashOverflowAddress = ((flashPartition->endSector + 1) * flashGeometry->sectorSize); // +1 to sector for inclusive
+    uint32_t flashOverflowAddress = ((FLASH_SECTOR_SIZE + 1) * FLASH_SECTOR_SIZE); // +1 to sector for inclusive
+
+    uint32_t flashAddress = flashStartAddress + dataOffset;
+
+   // printf("%s:%s:%d before past end partition\n\n", __FUNCTION__,__FILE__,__LINE__);
+    if (flashAddress + CONFIG_STREAMER_BUFFER_SIZE > flashOverflowAddress) {
+        return -3; // address is past end of partition
+    }
+
+    //printf("%s:%s:%d after past end partition\n\n", __FUNCTION__,__FILE__,__LINE__);
+    uint32_t flashSectorSize = FLASH_SECTOR_SIZE;
+    uint32_t flashPageSize = FLASH_PAGE_SIZE;
+
+    //printf("%s:%s:%d after after past end partition\n\n", __FUNCTION__,__FILE__,__LINE__);
+    bool onPageBoundary = (flashAddress % flashPageSize == 0);
+    if (onPageBoundary) {
+
+        bool firstPage = (flashAddress == flashStartAddress);
+        if (!firstPage) {
+
+            //printf("%s:%s:%d !firstPage\n\n", __FUNCTION__,__FILE__,__LINE__);
+            //flashPageProgramFinish();
+        }
+
+        if (flashAddress % flashSectorSize == 0) {
+            //printf("%s:%s:%d !flashEraseSector\n\n", __FUNCTION__,__FILE__,__LINE__);
+            flash_sector_erase(flashAddress);
+            //flashEraseSector(flashAddress);
+        }
+
+        //printf("%s:%s:%d right before flashPageProgramBegin\n\n", __FUNCTION__,__FILE__,__LINE__);
+        //flashPageProgramBegin(flashAddress);
+        while (flash_is_busy() == FLASH_BUSY);
+        //flash_write_data_direct(flashAddress, data_buf, TEST_NUMBER);
+        //flash_write_data(uint32_t addr, uint8_t *data_buf, uint32_t length);
+        flash_write_data(flashAddress, (uint8_t *)buffer, CONFIG_STREAMER_BUFFER_SIZE);
+        //flash_page_program(flashAddress, (uint8_t *)buffer, CONFIG_STREAMER_BUFFER_SIZE);
+        /*
+        void w25n01g_pageProgramBegin(flashDevice_t *fdevice, uint32_t address)
+        {
+            if (bufferDirty) {
+                if (address != programLoadAddress) {
+                    w25n01g_waitForReady(fdevice);
+
+                    isProgramming = false;
+
+                    w25n01g_writeEnable(fdevice);
+
+                    w25n01g_programExecute(fdevice, W25N01G_LINEAR_TO_PAGE(programStartAddress));
+
+                    bufferDirty = false;
+                    isProgramming = true;
+                }
+            } else {
+                programStartAddress = programLoadAddress = address;
+            }
+        }
+        */
+    }
+    //printf("%s:%s:%d right before flashPageProgramContinue\n\n", __FUNCTION__,__FILE__,__LINE__);
+    /*
+    flashPageProgramContinue((uint8_t *)buffer, CONFIG_STREAMER_BUFFER_SIZE);
+    void w25n01g_pageProgramContinue(flashDevice_t *fdevice, const uint8_t *data, int length)
+    {
+        // Check for page boundary overrun
+
+        w25n01g_waitForReady(fdevice);
+
+        w25n01g_writeEnable(fdevice);
+
+        isProgramming = false;
+
+        if (!bufferDirty) {
+            w25n01g_programDataLoad(fdevice, W25N01G_LINEAR_TO_COLUMN(programLoadAddress), data, length);
+        } else {
+            w25n01g_randomProgramDataLoad(fdevice, W25N01G_LINEAR_TO_COLUMN(programLoadAddress), data, length);
+        }
+
+        // XXX Test if write enable is reset after each data loading.
+
+        bufferDirty = true;
+        programLoadAddress += length;
+    }
+     */
 #else
     uint32_t dataOffset = (uint32_t)(c->address - (uintptr_t)&eepromData[0]);
 

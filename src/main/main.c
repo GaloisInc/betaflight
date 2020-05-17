@@ -27,9 +27,9 @@
 
 #include "fc/init.h"
 
-#include "scheduler/scheduler.h"
+//#include "scheduler/scheduler.h"
 
-//void run(void);
+void run(void);
 
 /* *********** start of temp test *********** */
 #include "drivers/flash_riscv_k210.h"
@@ -76,6 +76,7 @@ int main(void)
     /* *********** end of temp test *********** */
 
     init();
+    printf("Board Initialized: OK\n\n");
 
     //run();
 
@@ -83,8 +84,7 @@ int main(void)
 }
 
 /*
-void FAST_CODE FAST_CODE_NOINLINE run(void)
-{
+void FAST_CODE FAST_CODE_NOINLINE run(void) {
     while (true) {
         scheduler();
         processLoopback();
@@ -92,4 +92,5 @@ void FAST_CODE FAST_CODE_NOINLINE run(void)
         delayMicroseconds_real(50); // max rate 20kHz
 #endif
     }
+}
 */

@@ -30,12 +30,23 @@
 
 // spi3 starts at 0x5400 0000 per riscv_k210.platform.h
 #define SPI3                ((SPI_TypeDef *) 0x54000000)
+#define FLASH_START_ADDR    (0x130000)
+
+//#define __config_start (0x80500000)
+//#define __config_end (0x80600000)
+
+#define EEPROM_SIZE     ( 1 * 1024 * 1024 )
+
 
 //#define USE_FLASH_W25QXX
 //#define USE_QUADSPI
 #define USE_SPI
 #define USE_SPI_DEVICE_3
 #define FLASH_SPI_INSTANCE      SPI3
+//#define FLASH_SECTOR_SIZE            4096
+//#define FLASH_PAGE_SIZE              256
+//#define FLASH_PAGE_NUM_PER_SECTOR    16
+//#define SOFTSERIAL_LOOPBACK
 
 #define TARGET_IO_PORTA         0xffff
 #define TARGET_IO_PORTB         0xffff
@@ -106,10 +117,10 @@
 #undef USE_RCDEVICE
 
 //RISCV flags
-#define __riscv64
-#define TCB_SPAN_NO_EXCEPTIONS
-#define TCB_SPAN_NO_CONTRACT_CHECKING
-
+//#define __riscv64
+//#define TCB_SPAN_NO_EXCEPTIONS
+//#define TCB_SPAN_NO_CONTRACT_CHECKING
+/*
 #define NNCASE_TARGET k210
 #define KENDRYTE_SDK_TYPE 1
 #define KENDRYTE_SDK_TYPE_STANDALONE 1
@@ -119,9 +130,14 @@
 #define LOG_KERNEL
 #define LV_CONF_INCLUDE_SIMPLE
 #define LINKER_LANGUAGE C
-
+*/
 
 // Declare typedefs needed for config storage compilation
+
+typedef struct
+{
+    void* test;
+} TIM_TypeDef;
 
 typedef enum
 {
@@ -146,12 +162,7 @@ typedef struct
   uint32_t BRR;
 } GPIO_TypeDef;
 
-#define GPIOA_BASE ((intptr_t)0x0001)
 
-typedef struct
-{
-    void* test;
-} TIM_TypeDef;
 
 typedef struct
 {
@@ -180,6 +191,8 @@ typedef struct
     void* test;
 } USART_TypeDef;
 
+
+#define GPIOA_BASE ((intptr_t)0x0001)
 #define USART1 ((USART_TypeDef *)0x0001)
 #define USART2 ((USART_TypeDef *)0x0002)
 #define USART3 ((USART_TypeDef *)0x0003)

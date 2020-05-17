@@ -5,6 +5,9 @@
  */
 MEMORY
 {
+
+  FLASH_CONFIG (wxa!ri)  : ORIGIN = 0x80500000, LENGTH = (1 * 1024 * 1024)
+
   /*
    * Memory with CPU cache.
    *6M CPU SRAM
@@ -37,6 +40,10 @@ OUTPUT_ARCH( "riscv" )
  * execute). The symbol _start is defined in crt0.S
  */
 ENTRY(_start)
+
+/* Base address where the config is stored. */
+__config_start = ORIGIN(FLASH_CONFIG);
+__config_end = ORIGIN(FLASH_CONFIG) + LENGTH(FLASH_CONFIG);
 
 /*
  * The GROUP command is special since the listed archives will be

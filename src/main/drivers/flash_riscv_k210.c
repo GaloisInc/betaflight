@@ -63,7 +63,7 @@ riscv_k210_w25q_t flash_init (uint8_t spi_index, uint8_t spi_ss)
 	spi_chip_select = spi_ss;
 	spi_init (spi_bus_no, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0);
 	uint32_t ret = spi_set_clk_rate (spi_bus_no, 10000000);
-	printf ("spi clk is %d\n", ret);
+	printf ("SPI_%d CLK is %d\n", spi_bus_no, ret);
 	flash_page_program_fun = flash_page_program;
 	flash_read_fun = flash_stand_read_data;
 	return FLASH_OK;
