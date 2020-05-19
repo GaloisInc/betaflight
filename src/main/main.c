@@ -18,6 +18,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+// temp for debugging
+//#include "capstone_print.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -32,22 +35,27 @@
 void run(void);
 
 /* *********** start of temp test *********** */
-#include "drivers/flash_riscv_k210.h"
-#define TEST_NUMBER (256 + 128)
-#define DATA_ADDRESS 0x130000
-uint8_t data_buf[TEST_NUMBER];
+//#include "drivers/flash_riscv_k210.h"
+//#define TEST_NUMBER (256 + 128)
+//#define DATA_ADDRESS 0x130000
+//uint8_t data_buf[TEST_NUMBER];
 /* *********** end of temp test *********** */
 
 int main(void)
 {
+    // this is temp..to allow minicom to boot up
+    sleep(2);
+
     /* *********** start of temp test *********** */
+    /*
     printf("========= Pinche Corona-19 ====\n\n");
     uint32_t index;
     flash_init(3, 0);
 
     flash_enable_quad_mode();
-
+    */
     /*write data*/
+    /*
     for (index = 0; index < TEST_NUMBER; index++)
         data_buf[index] = (uint8_t)(index);
     printf("Erase Sector\n");
@@ -56,8 +64,9 @@ int main(void)
         ;
     printf("Write Data\n");
     flash_write_data_direct(DATA_ADDRESS, data_buf, TEST_NUMBER);
-
+    */
     /* standard read test*/
+    /*
     for (index = 0; index < TEST_NUMBER; index++)
         data_buf[index] = 0;
     printf("Standard Read Test Start\n");
@@ -71,8 +80,9 @@ int main(void)
         }
     }
 
-    printf("SPI3 Master Test OK\n");
+    printf("\nSPI3 Master Test OK\n");
     printf("\n=============\n\n\n");
+     */
     /* *********** end of temp test *********** */
 
     init();

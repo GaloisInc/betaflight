@@ -58,12 +58,6 @@ static spi_instance_t g_spi_instance[4];
 
 static spi_slave_instance_t g_instance;
 
-void ruben_spi()
-{
-    printf("%s:%s:%d - inside my spi RUBEN \n\n", __FUNCTION__,__FILE__,__LINE__);
-    return;
-}
-
 static spi_frame_format_t spi_get_frame_format(spi_device_num_t spi_num)
 {
     uint8_t frf_offset;

@@ -1,5 +1,6 @@
 COMMON_SRC =   $(TARGET_DIR_SRC) \
               main.c \
+              capstone_print.c \
               fc/init.c \
               pg/pg.c\
               sensors/initialisation.c \
@@ -20,7 +21,6 @@ COMMON_SRC =   $(TARGET_DIR_SRC) \
               pg/flash.c\
               rx/rx.c \
               drivers/io.c \
-#              drivers/timer.c \
 #              scheduler/scheduler.c \
 #              fc/core.c \
 

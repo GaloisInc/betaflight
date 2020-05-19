@@ -24,6 +24,10 @@
 #define TARGET_BOARD_IDENTIFIER "MAIXBIT"
 #define USBD_PRODUCT_STRING "Minimal MAIXBIT"
 
+#define U_ID_0 0
+#define U_ID_1 1
+#define U_ID_2 2
+
 // these flags are used for config mem
 #define CONFIG_IN_EXTERNAL_FLASH
 #define USE_FLASH_CHIP
@@ -193,6 +197,7 @@ typedef struct
 
 
 #define GPIOA_BASE ((intptr_t)0x0001)
+/*
 #define USART1 ((USART_TypeDef *)0x0001)
 #define USART2 ((USART_TypeDef *)0x0002)
 #define USART3 ((USART_TypeDef *)0x0003)
@@ -206,7 +211,7 @@ typedef struct
 #define UART5 ((USART_TypeDef *)0x0005)
 #define UART7 ((USART_TypeDef *)0x0007)
 #define UART8 ((USART_TypeDef *)0x0008)
-
+*/
 typedef struct
 {
     void* test;

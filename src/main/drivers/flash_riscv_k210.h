@@ -15,7 +15,6 @@
 #pragma once
 #define USE_FLASH_RISCV_K210
 
-#pragma message ( "inside flash_riscv_k210.h RUBEN" )
 #include <stdint.h>
 /* clang-format off */
 #define DATALENGTH                          8

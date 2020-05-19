@@ -18,6 +18,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+// temp for debugging
+#include "capstone_print.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -193,7 +196,7 @@ serialPort_t *loopbackPort;
 #endif
 */
 uint8_t systemState = SYSTEM_STATE_INITIALISING;
-
+/*
 void processLoopback(void)
 {
 #ifdef SOFTSERIAL_LOOPBACK
@@ -206,6 +209,7 @@ void processLoopback(void)
     }
 #endif
 }
+*/
 /*
 #ifdef BUS_SWITCH_PIN
 void busSwitchInit(void)
@@ -276,16 +280,15 @@ static void configureSPIAndQuadSPI(void)
 
 #ifdef USE_SPI_DEVICE_3
 #ifdef RISCV_K210
-    ruben_spi();
     // arguments in order
     // spi_bus_no = 3, SPI_WORK_MODE_0 = 0, SPI_FF_STANDARD = 0
     // size_t data_bit_length = 8, 0:little-endian 1:big-endian = 0
 
     spi_init(3, SPI_WORK_MODE_0, SPI_FF_STANDARD, 8, 0);
-    printf("%s:%s:%d - after spi_init \n\n", __FUNCTION__,__FILE__,__LINE__);
+    //printf("%s:%s:%d - after spi_init \n\n", __FUNCTION__,__FILE__,__LINE__);
+    print_my_msg("SPI Initialized", __FUNCTION__,__FILE__,__LINE__);
 
 #else
-    printf("%s:%s:%d - WRONG spi_init \n\n", __FUNCTION__,__FILE__,__LINE__);
     spiInit(SPIDEV_3, requiresSpiLeadingEdge(SPIDEV_3));
 #endif
 #endif
@@ -413,7 +416,6 @@ void init(void)
 
 
 #ifdef CONFIG_IN_EXTERNAL_FLASH
-printf("%s:%s:%d - Entering #ifdef CONFIG_IN_EXTERNAL_FLASH \n\n", __FUNCTION__,__FILE__,__LINE__);
     //
     // Config on external flash presents an issue with pin configuration since the pin and flash configs for the
     // external flash are in the config which is on a chip which we can't read yet!
@@ -433,55 +435,51 @@ printf("%s:%s:%d - Entering #ifdef CONFIG_IN_EXTERNAL_FLASH \n\n", __FUNCTION__,
     // cause communication issues with the flash chip.  e.g. use external pullups on SPI/QUADSPI CS lines.
     //
     pgResetAll();
-    printf("%s:%s:%d - after pgResetAll \n\n", __FUNCTION__,__FILE__,__LINE__);
+    print_my_msg("Reset all configurations", __FUNCTION__,__FILE__,__LINE__);
 
 #ifdef TARGET_BUS_INIT
 #error "CONFIG_IN_EXTERNAL_FLASH and TARGET_BUS_INIT are mutually exclusive"
 #endif
     configureSPIAndQuadSPI();
-    printf("%s:%s:%d - after configureSPIAndQuadSPI \n\n", __FUNCTION__,__FILE__,__LINE__);
+    //printf("%s:%s:%d - after configureSPIAndQuadSPI \n\n", __FUNCTION__,__FILE__,__LINE__);
     initFlags |= SPI_AND_QSPI_INIT_ATTEMPTED;
 
 #ifndef USE_FLASH_CHIP
 #error "CONFIG_IN_EXTERNAL_FLASH requires USE_FLASH_CHIP to be defined."
 #endif
 #ifdef RISCV_K210
-    //ruben_flash();
 
     // uint8_t spi_index = 3 , uint8_t spi_ss = 0
     // spi_chip_select = spi_ss;
     bool noFlash = flash_init( 3, 0 );
-
-    printf("%s:%s:%d - after flashInit \n\n", __FUNCTION__,__FILE__,__LINE__);
+    print_my_msg("Flash Initialized - successful", __FUNCTION__,__FILE__,__LINE__);
 
     // flash_init returns 0 if FLASH_OK
     if (noFlash) {
-        //failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
-        printf("%s:%s:%d - inside if statement - FAILURE_EXTERNAL_FLASH_INIT_FAILED \n\n", __FUNCTION__,__FILE__,__LINE__);
+        print_my_msg("Flash Initialized - unsuccessful", __FUNCTION__,__FILE__,__LINE__);
+        failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
     }
-    initFlags |= FLASH_INIT_ATTEMPTED;
-
 #else
-    printf("%s:%s:%d - wrong handle of non riscv - right before flashInit \n\n", __FUNCTION__,__FILE__,__LINE__);
-
     bool haveFlash = flashInit(flashConfig());
     if (!haveFlash) {
         failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
     }
+#endif
+
     initFlags |= FLASH_INIT_ATTEMPTED;
 
-#endif
 #endif // CONFIG_IN_EXTERNAL_FLASH
 
     initEEPROM();
     //printf("%s:%s:%d - after initEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
 
     ensureEEPROMStructureIsValid();
-    printf("%s:%s:%d - after ensureEEPROMStructureIsValid \n\n", __FUNCTION__,__FILE__,__LINE__);
+    //printf("%s:%s:%d - after ensureEEPROMStructureIsValid \n\n", __FUNCTION__,__FILE__,__LINE__);
 
     bool readSuccess = readEEPROM();
 
-    printf("%s:%s:%d - after readEEPROM return value %xd \n\n", __FUNCTION__,__FILE__,__LINE__, readSuccess);
+    printf("Read EEPROM from Flash - %s\n\n", readSuccess ? "successful": "unsuccessful");
+    //print_my_msg("Read EEPROM from Flash - successful", __FUNCTION__,__FILE__,__LINE__);
 
 #if defined(USE_BOARD_INFO)
     initBoardInformation();
@@ -493,6 +491,7 @@ printf("%s:%s:%d - Entering #ifdef CONFIG_IN_EXTERNAL_FLASH \n\n", __FUNCTION__,
     }
 
     systemState |= SYSTEM_STATE_CONFIG_LOADED;
+
 /*
 #ifdef USE_BRUSHED_ESC_AUTODETECT
     // Now detect again with the actually configured pin for motor 1, if it is not the default pin.

@@ -18,6 +18,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+// temp for debugging
+#include "capstone_print.h"
+
 #include <stdio.h>
 
 #include <stddef.h>
@@ -98,8 +101,8 @@ int pgStore(const pgRegistry_t* reg, void *to, int size)
 void pgResetAll(void)
 {
     PG_FOREACH(reg) {
-        printf("pg Reset: The PG number %u | addr of the grpup in RAM %x | # of elements in PG %x\n\n", (reg->pgn), *(reg->address), (reg->length));
+        //printf("pg Reset: The PG number %u | addr of the grpup in RAM %x | # of elements in PG %x\n\n", (reg->pgn), *(reg->address), (reg->length));
         pgReset(reg);
     }
-
+    print_my_msg("Reset all configs", __FUNCTION__, __FILE__, __LINE__);
 }
