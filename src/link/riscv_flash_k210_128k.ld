@@ -5,6 +5,9 @@
  */
 MEMORY
 {
+
+  FLASH_CONFIG (wxa!ri)  : ORIGIN = 0x80500000, LENGTH = (1 * 1024 * 1024)
+
   /*
    * Memory with CPU cache.
    *6M CPU SRAM
@@ -38,6 +41,10 @@ OUTPUT_ARCH( "riscv" )
  */
 ENTRY(_start)
 
+/* Base address where the config is stored. */
+__config_start = ORIGIN(FLASH_CONFIG);
+__config_end = ORIGIN(FLASH_CONFIG) + LENGTH(FLASH_CONFIG);
+
 /*
  * The GROUP command is special since the listed archives will be
  * searched repeatedly until there are no new undefined references. We
@@ -65,6 +72,38 @@ PHDRS
  */
 SECTIONS
 {
+/*
+  .pg_registry :
+  {
+    PROVIDE_HIDDEN (__pg_registry_start = .);
+    KEEP (*(.pg_registry))
+    KEEP (*(SORT(.pg_registry.*)))
+    PROVIDE_HIDDEN (__pg_registry_end = .);
+  } >ram
+  .pg_resetdata :
+  {
+    PROVIDE_HIDDEN (__pg_resetdata_start = .);
+    KEEP (*(.pg_resetdata))
+    PROVIDE_HIDDEN (__pg_resetdata_end = .);
+  } >ram
+*/
+/*
+.pg_registry BLOCK( DEFINED(__section_alignment__) ? __section_alignment__ : 4 ) :   SUBALIGN(4)
+  {
+    PROVIDE_HIDDEN (__pg_registry_start = . );
+    PROVIDE_HIDDEN (___pg_registry_start = . );
+    KEEP (*(.pg_registry))
+    KEEP (*(SORT(.pg_registry.*)))
+    PROVIDE_HIDDEN (__pg_registry_end = . );
+    PROVIDE_HIDDEN (___pg_registry_end = . );
+
+    PROVIDE_HIDDEN (__pg_resetdata_start = . );
+    PROVIDE_HIDDEN (___pg_resetdata_start = . );
+    KEEP (*(.pg_resetdata))
+    PROVIDE_HIDDEN (__pg_resetdata_end = . );
+    PROVIDE_HIDDEN (___pg_resetdata_end = . );
+  }
+  */
   /* Program code segment, also known as a text segment */
   .text :
   {
@@ -123,6 +162,20 @@ SECTIONS
     KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
     KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
     PROVIDE_HIDDEN (__fini_array_end = .);
+  } >ram AT>ram :ram_ro
+
+  .pg_registry :
+  {
+    PROVIDE_HIDDEN (__pg_registry_start = .);
+    KEEP (*(.pg_registry))
+    KEEP (*(SORT(.pg_registry.*)))
+    PROVIDE_HIDDEN (__pg_registry_end = .);
+  } >ram AT>ram :ram_ro
+  .pg_resetdata :
+  {
+    PROVIDE_HIDDEN (__pg_resetdata_start = .);
+    KEEP (*(.pg_resetdata))
+    PROVIDE_HIDDEN (__pg_resetdata_end = .);
   } >ram AT>ram :ram_ro
 
   .ctors :
@@ -237,7 +290,7 @@ SECTIONS
     *(.gnu.linkonce.tb.*)
     KEEP( *(.tbss.end) )
   } >ram AT>ram :ram
-
+  
   /*
    * End of uninitalized data segement
    *
@@ -258,4 +311,3 @@ SECTIONS
   /* Heap end is at the end of memory, the memory size can set in kconfig */
   PROVIDE( _heap_end = _ram_end );
 }
-

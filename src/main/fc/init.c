@@ -18,18 +18,27 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+// temp for debugging
+#include "capstone_print.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
 
+#include <stdio.h>
+
 #include "platform.h"
 
-#include "blackbox/blackbox.h"
+//#include "blackbox/blackbox.h"
+
+// riscv files
+#include "riscv_k210_spi.h"
+#include "drivers/flash_riscv_k210.h"
 
 #include "build/build_config.h"
 #include "build/debug.h"
-
+/*
 #include "cms/cms.h"
 #include "cms/cms_types.h"
 
@@ -37,22 +46,25 @@
 #include "common/color.h"
 #include "common/maths.h"
 #include "common/printf_serial.h"
+*/
 
+//#include "common/maths.h"
 #include "config/config_eeprom.h"
 #include "config/feature.h"
 
+#include "drivers/bus_spi.h"
+#include "drivers/flash.h"
+/*
 #include "drivers/accgyro/accgyro.h"
 #include "drivers/adc.h"
 #include "drivers/bus.h"
 #include "drivers/bus_i2c.h"
 #include "drivers/bus_quadspi.h"
-#include "drivers/bus_spi.h"
 #include "drivers/buttons.h"
 #include "drivers/camera_control.h"
 #include "drivers/compass/compass.h"
 #include "drivers/dma.h"
 #include "drivers/exti.h"
-#include "drivers/flash.h"
 #include "drivers/inverter.h"
 #include "drivers/io.h"
 #include "drivers/light_led.h"
@@ -70,9 +82,6 @@
 #include "drivers/sdcard.h"
 #include "drivers/sdio.h"
 #include "drivers/sound_beeper.h"
-#include "drivers/system.h"
-#include "drivers/time.h"
-#include "drivers/timer.h"
 #include "drivers/transponder_ir.h"
 #include "drivers/usb_io.h"
 #ifdef USE_USB_MSC
@@ -81,6 +90,11 @@
 #include "drivers/vtx_common.h"
 #include "drivers/vtx_rtc6705.h"
 #include "drivers/vtx_table.h"
+*/
+
+#include "drivers/system.h"
+#include "drivers/timer.h"
+#include "drivers/time.h"
 
 #include "fc/board_info.h"
 #include "config/config.h"
@@ -90,7 +104,7 @@
 #include "fc/runtime_config.h"
 #include "fc/stats.h"
 #include "fc/tasks.h"
-
+/*
 #include "flight/failsafe.h"
 #include "flight/imu.h"
 #include "flight/mixer.h"
@@ -131,7 +145,7 @@
 #include "msp/msp_serial.h"
 
 #include "osd/osd.h"
-
+*/
 #include "pg/adc.h"
 #include "pg/beeper.h"
 #include "pg/beeper_dev.h"
@@ -151,11 +165,11 @@
 #include "pg/sdcard.h"
 #include "pg/vcd.h"
 #include "pg/vtx_io.h"
-
+#include "scheduler/scheduler.h"
+/*
 #include "rx/rx.h"
 #include "rx/spektrum.h"
 
-#include "scheduler/scheduler.h"
 
 #include "sensors/acceleration.h"
 #include "sensors/barometer.h"
@@ -164,14 +178,15 @@
 #include "sensors/compass.h"
 #include "sensors/esc_sensor.h"
 #include "sensors/gyro.h"
-#include "sensors/initialisation.h"
 
 #include "telemetry/telemetry.h"
+*/
+#include "sensors/initialisation.h"
 
 #ifdef USE_HARDWARE_REVISION_DETECTION
 #include "hardware_revision.h"
 #endif
-
+/*
 #ifdef TARGET_PREINIT
 void targetPreInit(void);
 #endif
@@ -179,9 +194,9 @@ void targetPreInit(void);
 #ifdef SOFTSERIAL_LOOPBACK
 serialPort_t *loopbackPort;
 #endif
-
+*/
 uint8_t systemState = SYSTEM_STATE_INITIALISING;
-
+/*
 void processLoopback(void)
 {
 #ifdef SOFTSERIAL_LOOPBACK
@@ -194,7 +209,8 @@ void processLoopback(void)
     }
 #endif
 }
-
+*/
+/*
 #ifdef BUS_SWITCH_PIN
 void busSwitchInit(void)
 {
@@ -208,7 +224,7 @@ static IO_t busSwitchResetPin        = IO_NONE;
     IOLo(busSwitchResetPin);
 }
 #endif
-
+*/
 bool requiresSpiLeadingEdge(SPIDevice device)
 {
 #if defined(CONFIG_IN_SDCARD) || defined(CONFIG_IN_EXTERNAL_FLASH)
@@ -247,13 +263,13 @@ bool requiresSpiLeadingEdge(SPIDevice device)
 static void configureSPIAndQuadSPI(void)
 {
 #ifdef USE_SPI
-    spiPinConfigure(spiPinConfig(0));
+    //spiPinConfigure(spiPinConfig(0));
 #endif
 
-    sensorsPreInit();
+    //sensorsPreInit();
 
 #ifdef USE_SPI
-    spiPreinit();
+    //spiPreinit();
 
 #ifdef USE_SPI_DEVICE_1
     spiInit(SPIDEV_1, requiresSpiLeadingEdge(SPIDEV_1));
@@ -261,8 +277,20 @@ static void configureSPIAndQuadSPI(void)
 #ifdef USE_SPI_DEVICE_2
     spiInit(SPIDEV_2, requiresSpiLeadingEdge(SPIDEV_2));
 #endif
+
 #ifdef USE_SPI_DEVICE_3
+#ifdef RISCV_K210
+    // arguments in order
+    // spi_bus_no = 3, SPI_WORK_MODE_0 = 0, SPI_FF_STANDARD = 0
+    // size_t data_bit_length = 8, 0:little-endian 1:big-endian = 0
+
+    spi_init(3, SPI_WORK_MODE_0, SPI_FF_STANDARD, 8, 0);
+    //printf("%s:%s:%d - after spi_init \n\n", __FUNCTION__,__FILE__,__LINE__);
+    print_my_msg("SPI Initialized", __FUNCTION__,__FILE__,__LINE__);
+
+#else
     spiInit(SPIDEV_3, requiresSpiLeadingEdge(SPIDEV_3));
+#endif
 #endif
 #ifdef USE_SPI_DEVICE_4
     spiInit(SPIDEV_4, requiresSpiLeadingEdge(SPIDEV_4));
@@ -282,7 +310,9 @@ static void configureSPIAndQuadSPI(void)
     quadSpiInit(QUADSPIDEV_1);
 #endif
 #endif // USE_QUAD_SPI
+
 }
+/*
 
 #ifdef USE_SDCARD
 static void sdCardAndFSInit()
@@ -303,9 +333,10 @@ static void swdPinsInit(void)
         IOInit(io, OWNER_SWD, 0);
     }
 }
-
+*/
 void init(void)
 {
+/*
 #ifdef SERIAL_PORT_COUNT
     printfSerialInit();
 #endif
@@ -328,17 +359,15 @@ void init(void)
         detectBrushedESC(motorIoTag);
     }
 #endif
-
+*/
     enum {
         FLASH_INIT_ATTEMPTED            = (1 << 0),
         SD_INIT_ATTEMPTED               = (1 << 1),
         SPI_AND_QSPI_INIT_ATTEMPTED      = (1 << 2),
-    };
+    };    
     uint8_t initFlags = 0;
 
-
 #ifdef CONFIG_IN_SDCARD
-
     //
     // Config in sdcard presents an issue with pin configuration since the pin and sdcard configs for the
     // sdcard are in the config which is on the sdcard which we can't read yet!
@@ -383,8 +412,8 @@ void init(void)
             failureMode(FAILURE_SDCARD_INITIALISATION_FAILED);
         }
     }
-
 #endif // CONFIG_IN_SDCARD
+
 
 #ifdef CONFIG_IN_EXTERNAL_FLASH
     //
@@ -406,33 +435,51 @@ void init(void)
     // cause communication issues with the flash chip.  e.g. use external pullups on SPI/QUADSPI CS lines.
     //
     pgResetAll();
+    print_my_msg("Reset all configurations", __FUNCTION__,__FILE__,__LINE__);
 
 #ifdef TARGET_BUS_INIT
 #error "CONFIG_IN_EXTERNAL_FLASH and TARGET_BUS_INIT are mutually exclusive"
 #endif
-
     configureSPIAndQuadSPI();
+    //printf("%s:%s:%d - after configureSPIAndQuadSPI \n\n", __FUNCTION__,__FILE__,__LINE__);
     initFlags |= SPI_AND_QSPI_INIT_ATTEMPTED;
-
 
 #ifndef USE_FLASH_CHIP
 #error "CONFIG_IN_EXTERNAL_FLASH requires USE_FLASH_CHIP to be defined."
 #endif
+#ifdef RISCV_K210
 
+    // uint8_t spi_index = 3 , uint8_t spi_ss = 0
+    // spi_chip_select = spi_ss;
+    bool noFlash = flash_init( 3, 0 );
+    print_my_msg("Flash Initialized - successful", __FUNCTION__,__FILE__,__LINE__);
+
+    // flash_init returns 0 if FLASH_OK
+    if (noFlash) {
+        print_my_msg("Flash Initialized - unsuccessful", __FUNCTION__,__FILE__,__LINE__);
+        failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
+    }
+#else
     bool haveFlash = flashInit(flashConfig());
-
     if (!haveFlash) {
         failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
     }
+#endif
+
     initFlags |= FLASH_INIT_ATTEMPTED;
 
 #endif // CONFIG_IN_EXTERNAL_FLASH
 
     initEEPROM();
+    //printf("%s:%s:%d - after initEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
 
     ensureEEPROMStructureIsValid();
+    //printf("%s:%s:%d - after ensureEEPROMStructureIsValid \n\n", __FUNCTION__,__FILE__,__LINE__);
 
     bool readSuccess = readEEPROM();
+
+    printf("Read EEPROM from Flash - %s\n\n", readSuccess ? "successful": "unsuccessful");
+    //print_my_msg("Read EEPROM from Flash - successful", __FUNCTION__,__FILE__,__LINE__);
 
 #if defined(USE_BOARD_INFO)
     initBoardInformation();
@@ -440,10 +487,12 @@ void init(void)
 
     if (!readSuccess || !isEEPROMVersionValid() || strncasecmp(systemConfig()->boardIdentifier, TARGET_BOARD_IDENTIFIER, sizeof(TARGET_BOARD_IDENTIFIER))) {
         resetEEPROM(false);
+        printf("%s:%s:%d - load from flash failed, resetting EEPROM to default configs \n\n", __FUNCTION__,__FILE__,__LINE__);
     }
 
     systemState |= SYSTEM_STATE_CONFIG_LOADED;
 
+/*
 #ifdef USE_BRUSHED_ESC_AUTODETECT
     // Now detect again with the actually configured pin for motor 1, if it is not the default pin.
     ioTag_t configuredMotorIoTag = motorConfig()->dev.ioTags[0];
@@ -467,7 +516,8 @@ void init(void)
 #ifdef USE_EXTI
     EXTIInit();
 #endif
-
+*/
+/*
 #if defined(USE_BUTTONS)
 
     buttonsInit();
@@ -588,10 +638,12 @@ void init(void)
     if (motorConfig()->dev.motorPwmProtocol == PWM_TYPE_BRUSHED) {
         idlePulse = 0; // brushed motors
     }
+
 #ifdef USE_MOTOR
-    /* Motors needs to be initialized soon as posible because hardware initialization
-     * may send spurious pulses to esc's causing their early initialization. Also ppm
-     * receiver may share timer with motors so motors MUST be initialized here. */
+    //Motors needs to be initialized soon as posible because hardware initialization
+    //may send spurious pulses to esc's causing their early initialization. Also ppm
+    //receiver may share timer with motors so motors MUST be initialized here.
+
     motorDevInit(&motorConfig()->dev, idlePulse, getMotorCount());
     systemState |= SYSTEM_STATE_MOTORS_READY;
 #else
@@ -613,7 +665,7 @@ void init(void)
 #ifdef USE_BEEPER
     beeperInit(beeperDevConfig());
 #endif
-/* temp until PGs are implemented. */
+//temp until PGs are implemented.
 #if defined(USE_INVERTER) && !defined(SIMULATOR_BUILD)
     initInverters(serialPinConfig());
 #endif
@@ -631,8 +683,8 @@ void init(void)
     }
 
 #ifdef USE_USB_MSC
-/* MSC mode will start after init, but will not allow scheduler to run,
- *  so there is no bottleneck in reading and writing data */
+//MSC mode will start after init, but will not allow scheduler to run,
+//so there is no bottleneck in reading and writing data
     mscInit();
     if (mscCheckBoot() || mscCheckButton()) {
         ledInit(statusLedConfig());
@@ -839,13 +891,16 @@ void init(void)
         systemState |= SYSTEM_STATE_TRANSPONDER_ENABLED;
     }
 #endif
-
+*/
+/*
 #ifdef USE_FLASH_CHIP
     if (!(initFlags & FLASH_INIT_ATTEMPTED)) {
         flashInit(flashConfig());
         initFlags |= FLASH_INIT_ATTEMPTED;
     }
 #endif
+*/
+/*
 #ifdef USE_FLASHFS
     flashfsInit();
 #endif
@@ -930,9 +985,8 @@ void init(void)
     mspInit();
     mspSerialInit();
 
-/*
- * CMS, display devices and OSD
- */
+//CMS, display devices and OSD
+
 #ifdef USE_CMS
     cmsInit();
 #endif
@@ -1036,5 +1090,6 @@ void init(void)
 
     tasksInit();
 
+*/
     systemState |= SYSTEM_STATE_READY;
 }

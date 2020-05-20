@@ -1,16 +1,40 @@
- COMMON_SRC = main.c \
-#             build/build_config.c \
-#             build/debug.c \
+COMMON_SRC =   $(TARGET_DIR_SRC) \
+              main.c \
+              capstone_print.c \
+              fc/init.c \
+              pg/pg.c\
+              sensors/initialisation.c \
+              sensors/gyro.c \
+              drivers/flash.c \
+              drivers/flash_riscv_k210.c \
+              config/config_eeprom.c \
+              config/config_streamer.c\
+              config/config.c \
+              common/crc.c \
+              config/feature.c \
+              fc/board_info.c \
+              pg/board.c\
+              build/version.c\
+              drivers/bus_spi.c \
+              drivers/bus_spi_pinconfig.c \
+              drivers/bus_spi_config.c \
+              pg/flash.c\
+              rx/rx.c \
+              drivers/io.c \
+#              scheduler/scheduler.c \
+#              fc/core.c \
+
+#             drivers/bus_spi_hal.c
+#             drivers/system.c \
 #             build/debug_pin.c \
-#             build/version.c \
-#             $(TARGET_DIR_SRC) \
+#             build/debug.c \
+#             build/version.c 
 #             main.c \
 #             $(addprefix pg/, $(notdir $(wildcard $(SRC_DIR)/pg/*.c))) \
 #             $(addprefix common/,$(notdir $(wildcard $(SRC_DIR)/common/*.c))) \
 #             $(addprefix config/,$(notdir $(wildcard $(SRC_DIR)/config/*.c))) \
 #             cli/cli.c \
 #             cli/settings.c \
-#             config/config.c \
 #             drivers/adc.c \
 #             drivers/dshot.c \
 #             drivers/dshot_dpwm.c \
@@ -20,16 +44,12 @@
 #             drivers/bus_i2c_config.c \
 #             drivers/bus_i2c_busdev.c \
 #             drivers/bus_i2c_soft.c \
-#             drivers/bus_quadspi.c \
 #             drivers/bus_spi.c \
-#             drivers/bus_spi_config.c \
-#             drivers/bus_spi_pinconfig.c \
 #             drivers/buttons.c \
 #             drivers/display.c \
 #             drivers/display_canvas.c \
 #             drivers/dma_reqmap.c \
 #             drivers/exti.c \
-#             drivers/io.c \
 #             drivers/light_led.c \
 #             drivers/mco.c \
 #             drivers/motor.c \
@@ -43,13 +63,11 @@
 #             drivers/serial_uart_pinconfig.c \
 #             drivers/sound_beeper.c \
 #             drivers/stack_check.c \
-#             drivers/system.c \
 #             drivers/timer_common.c \
 #             drivers/timer.c \
 #             drivers/transponder_ir_arcitimer.c \
 #             drivers/transponder_ir_ilap.c \
 #             drivers/transponder_ir_erlt.c \
-#             fc/board_info.c \
 #             fc/dispatch.c \
 #             fc/hardfaults.c \
 #             fc/tasks.c \
@@ -67,13 +85,11 @@
 #             msp/msp.c \
 #             msp/msp_box.c \
 #             msp/msp_serial.c \
-#             scheduler/scheduler.c \
 #             sensors/adcinternal.c \
 #             sensors/battery.c \
 #             sensors/current.c \
 #             sensors/voltage.c \
 #             target/config_helper.c \
-#             fc/init.c \
 #             fc/controlrate_profile.c \
 #             drivers/camera_control.c \
 #             drivers/accgyro/gyro_sync.c \
@@ -83,7 +99,6 @@
 #             drivers/rx/rx_xn297.c \
 #             drivers/rx/rx_pwm.c \
 #             drivers/serial_softserial.c \
-#             fc/core.c \
 #             fc/rc.c \
 #             fc/rc_adjustments.c \
 #             fc/rc_controls.c \
@@ -125,8 +140,6 @@
 #             sensors/acceleration.c \
 #             sensors/boardalignment.c \
 #             sensors/compass.c \
-#             sensors/gyro.c \
-#             sensors/initialisation.c \
 #             blackbox/blackbox.c \
 #             blackbox/blackbox_encoding.c \
 #             blackbox/blackbox_io.c \
@@ -190,23 +203,26 @@
 #             io/vtx_tramp.c \
 #             io/vtx_control.c
 
-# COMMON_DEVICE_SRC = \
-#             $(CMSIS_SRC) \
-#             $(DEVICE_STDPERIPH_SRC)
+# check if target.mk supplied
+SRC := $(STARTUP_SRC) $(MCU_COMMON_SRC) $(TARGET_SRC) $(VARIANT_SRC)
+
+COMMON_DEVICE_SRC = \
+             $(DEVICE_STDPERIPH_SRC)\
+#            $(CMSIS_SRC)
 
 COMMON_SRC := $(COMMON_SRC) $(COMMON_DEVICE_SRC)
 
-ifeq ($(EXST),yes)
-TARGET_FLAGS := -DUSE_EXST $(TARGET_FLAGS)
-endif
+# ifeq ($(EXST),yes)
+# TARGET_FLAGS := -DUSE_EXST $(TARGET_FLAGS)
+# endif
 
 ifeq ($(RAM_BASED),yes)
 TARGET_FLAGS := -DUSE_EXST -DCONFIG_IN_RAM -DRAMBASED $(TARGET_FLAGS)
 endif
 
-ifeq ($(SIMULATOR_BUILD),yes)
-TARGET_FLAGS := -DSIMULATOR_BUILD $(TARGET_FLAGS)
-endif
+# ifeq ($(SIMULATOR_BUILD),yes)
+# TARGET_FLAGS := -DSIMULATOR_BUILD $(TARGET_FLAGS)
+# endif
 
 # SPEED_OPTIMISED_SRC := ""
 # SIZE_OPTIMISED_SRC  := ""
@@ -236,7 +252,6 @@ endif
 #             drivers/adc.c \
 #             drivers/buf_writer.c \
 #             drivers/bus.c \
-#             drivers/bus_quadspi.c \
 #             drivers/bus_spi.c \
 #             drivers/exti.c \
 #             drivers/io.c \
@@ -361,8 +376,7 @@ endif
 # endif #!F3
 # endif #!F1
 
-# # check if target.mk supplied
-# SRC := $(STARTUP_SRC) $(MCU_COMMON_SRC) $(TARGET_SRC) $(VARIANT_SRC)
+
 
 # # Files that should not be optimized, useful for debugging IMPRECISE cpu faults.
 # # Specify FULL PATH, e.g. "./lib/main/STM32F7/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c"
@@ -395,9 +409,9 @@ endif
 #             $(MSC_SRC)
 # endif
 
- SRC += $(COMMON_SRC)
+SRC += $(COMMON_SRC)
 
-# #excludes
+#excludes
 # SRC   := $(filter-out $(MCU_EXCLUDES), $(SRC))
 
 # ifneq ($(filter SDCARD_SPI,$(FEATURES)),)

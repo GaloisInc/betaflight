@@ -18,28 +18,83 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+// temp for debugging
+//#include "capstone_print.h"
+
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <unistd.h>
 
 #include "platform.h"
 
 #include "fc/init.h"
 
-#include "scheduler/scheduler.h"
+//#include "scheduler/scheduler.h"
 
 void run(void);
 
+/* *********** start of temp test *********** */
+//#include "drivers/flash_riscv_k210.h"
+//#define TEST_NUMBER (256 + 128)
+//#define DATA_ADDRESS 0x130000
+//uint8_t data_buf[TEST_NUMBER];
+/* *********** end of temp test *********** */
+
 int main(void)
 {
-    init();
+    // this is temp..to allow minicom to boot up
+    sleep(2);
 
-    run();
+    /* *********** start of temp test *********** */
+    /*
+    printf("========= Pinche Corona-19 ====\n\n");
+    uint32_t index;
+    flash_init(3, 0);
+
+    flash_enable_quad_mode();
+    */
+    /*write data*/
+    /*
+    for (index = 0; index < TEST_NUMBER; index++)
+        data_buf[index] = (uint8_t)(index);
+    printf("Erase Sector\n");
+    flash_sector_erase(DATA_ADDRESS);
+    while (flash_is_busy() == FLASH_BUSY)
+        ;
+    printf("Write Data\n");
+    flash_write_data_direct(DATA_ADDRESS, data_buf, TEST_NUMBER);
+    */
+    /* standard read test*/
+    /*
+    for (index = 0; index < TEST_NUMBER; index++)
+        data_buf[index] = 0;
+    printf("Standard Read Test Start\n");
+    flash_read_data(DATA_ADDRESS, data_buf, TEST_NUMBER, FLASH_STANDARD);
+    for (index = 0; index < TEST_NUMBER; index++)
+    {
+        if (data_buf[index] != (uint8_t)(index))
+        {
+            printf("Standard Read Test Error\n");
+            return 0;
+        }
+    }
+
+    printf("\nSPI3 Master Test OK\n");
+    printf("\n=============\n\n\n");
+     */
+    /* *********** end of temp test *********** */
+
+    init();
+    printf("Board Initialized: OK\n\n");
+
+    //run();
 
     return 0;
 }
 
-void FAST_CODE FAST_CODE_NOINLINE run(void)
-{
+/*
+void FAST_CODE FAST_CODE_NOINLINE run(void) {
     while (true) {
         scheduler();
         processLoopback();
@@ -48,3 +103,4 @@ void FAST_CODE FAST_CODE_NOINLINE run(void)
 #endif
     }
 }
+*/

@@ -23,7 +23,7 @@
 #define NOINLINE __attribute__((noinline))
 
 #if !defined(UNIT_TEST) && !defined(SIMULATOR_BUILD) && !(USBD_DEBUG_LEVEL > 0)
-#pragma GCC poison sprintf snprintf
+//#pragma GCC poison sprintf snprintf
 #endif
 
 #if defined(STM32H743xx) || defined(STM32H750xx)
@@ -119,7 +119,20 @@
 
 //NOP
 
-#elif defined(MAIXBIT)
+#elif defined(RISCV_K210)
+#include "riscv_k210_platform.h"
+// #include "riscv_k210_entry.h"
+// #include "riscv_k210_interrupt.h"
+// #include "riscv_k210_printf.h"  
+// #include "riscv_k210_syscalls.h"
+// #include "riscv_k210_entry_user.h"
+// #include "riscv_k210_locks.h" 
+// #include "riscv_k210_sleep.h"
+// #include "riscv_k210_fpioa.h"
+
+#ifndef MAIXBIT
+#define MAIXBIT
+#endif
 
 //NOP
 
