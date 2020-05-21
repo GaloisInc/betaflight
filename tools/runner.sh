@@ -8,9 +8,6 @@ KENDRYTE_TAR=kendryte-toolchain.tar.gz
 PATH_KENDRYTE_TC=https://s3.cn-north-1.amazonaws.com.cn/dl.kendryte.com/documents/kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
 REQUIRED_PKG="minicom"
 PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
-
-UNITY_DIR=~/betaflight/unit_testing_k210/Unity
-UNITY_REPO=https://github.com/ThrowTheSwitch/Unity
 # ==========
 
 # make sure you're running as sudo since kflash and minicom requires
@@ -34,14 +31,6 @@ if [ ! -d "$DIR" ]; then
   tar -xvf $KENDRYTE_TAR -C /opt
   # clean up
   rm $KENDRYTE_TAR
-fi
-
-# clone Unity Repo
-# if $UNITY_DIR doesn't exist then go out and clone Unity repo
-if [ ! -d "$UNITY_DIR" ]; then
-    echo "\n\nINFO: ${UNITY_DIR} not found - pulling Unity source code from\n\n$UNITY_REPO\n\n"
-    cd betaflight/unit_testing_k210 && git clone https://github.com/ThrowTheSwitch/Unity.git
-    cd
 fi
 
 # kill any minicom sessions to allow comm to port
