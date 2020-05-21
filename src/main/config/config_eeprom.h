@@ -30,6 +30,6 @@ bool isEEPROMVersionValid(void);
 bool isEEPROMStructureValid(void);
 bool loadEEPROM(void);
 void writeConfigToEEPROM(void);
-
+bool loadEEPROMFromExternalFlash(void);
 uint16_t getEEPROMConfigSize(void);
 size_t getEEPROMStorageSize(void);
