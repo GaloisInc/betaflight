@@ -8,11 +8,12 @@
 #include "../../../src/main/drivers/flash_riscv_k210.h"
 #include "../../../src/main/config/config_eeprom.h"
 
-//#include "../../../src/main/config/config.h"
-//#include "../../../src/main/rx/rx.h"
-//#include "../../../src/main/pg/pg.h"
-//#include "../../../src/main/config/feature.h"
-//#include "../../../src/main/pg/pg_ids.h"
+#include "../../../src/main/target/MAIXBIT/target.h"
+#include "../../../src/main/config/config.h"
+#include "../../../src/main/rx/rx.h"
+#include "../../../src/main/pg/pg.h"
+#include "../../../src/main/config/feature.h"
+#include "../../../src/main/pg/pg_ids.h"
 
 
 
@@ -49,12 +50,12 @@ void test_writeConfigToEEPROM (void) {
 void test_loadEEPROMFromExternalFlash (void) {
 	TEST_ASSERT_EQUAL_MESSAGE(1, loadEEPROMFromExternalFlash(), "Load EEPROM failed");
 }
-/*
+
 //Check if 
 void test_readEEPROM (void) {
-	TEST_ASSERT_EQUAL_MESSAGE(1, readEEPROM(), "Read from EEPROM failed");
+	TEST_ASSERT_EQUAL_MESSAGE(0, readEEPROM(), "Read from EEPROM failed");
 }
-*/
+
 /*
 int main(void) {
     UNITY_BEGIN();
