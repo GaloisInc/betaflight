@@ -7,12 +7,16 @@ KENDRYTE_TAR=kendryte-toolchain.tar.gz
 PATH_KENDRYTE_TC=https://s3.cn-north-1.amazonaws.com.cn/dl.kendryte.com/documents/kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
 REQUIRED_PKG="minicom"
 PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
+
+UNITY_ROOT=betaflight/unit_testing_k210
+UNITY_DIR=$UNITY_ROOT/Unity
+UNITY_REPO=https://github.com/ThrowTheSwitch/Unity.git
 # ==========
 
 # make sure you're running as sudo since kflash and minicom requires
 if [[ $EUID -ne 0 ]]; then
-   echo "\n\nThis script must be run as root\n\n" 
-   exit 1
+  echo "\n\nThis script must be run as root\n\n" 
+  exit 1
 fi
 
 # install minicom if not installed
@@ -38,6 +42,14 @@ if [ ! -d "$DIR" ]; then
   rm $KENDRYTE_TAR
 fi
 
+# clone Unity Repo
+# if $UNITY_DIR doesn't exist then go out and clone Unity repo
+if [ ! -d "$UNITY_DIR" ]; then
+  echo "\n\nINFO: $UNITY_DIR not found - pulling Unity source code from\n\n$UNITY_REPO\n\n"
+  #mkdir if it doesn't exist
+  mkdir -p $UNITY_ROOT && cd $UNITY_ROOT && git clone $UNITY_REPO
+fi
+
 # kill any minicom sessions to allow comm to port
 pkill -f minicom
 # clean up previous make
@@ -53,17 +65,17 @@ BIN_FILE=obj/$BIN_FILENAME
 
 # make sure make completes successful before continuing
 if [ -f "$BIN_FILE" ]; then
-	echo "$BIN_FILE exist"
+  echo "$BIN_FILE exist"
 else 
-	echo "\n\n$BIN_FILE does not exist\n\n"
-	exit 1
+  echo "\n\n$BIN_FILE does not exist\n\n"
+  exit 1
 fi
 
 # if input is 'no' then no flashing
 if [ "$1" != "no" ]; then
-	cp $BIN_FILE $KFLASH_PATH
-	cd $KFLASH_PATH && python3 kflash.py -p $PORT $BIN_FILENAME
-	# allow bin to runs once then we can restart again
-	sleep 1
-	gnome-terminal -- sh -c 'sudo minicom -b $BAUD -D $PORT'
+  cp $BIN_FILE $KFLASH_PATH
+  cd $KFLASH_PATH && python3 kflash.py -p $PORT $BIN_FILENAME
+  # allow bin to runs once then we can restart again
+  sleep 1
+  gnome-terminal -- sh -c 'sudo minicom -b $BAUD -D $PORT'
 fi
