@@ -387,10 +387,13 @@ size_t getEEPROMStorageSize(void)
 static const configRecord_t *findEEPROM(const pgRegistry_t *reg, configRecordFlags_e classification)
 {
     const uint8_t *p = &__config_start;
+    //printf("Reading from __config_start %x\n\n", __config_start);
     p += sizeof(configHeader_t);             // skip header
     while (true) {
         const configRecord_t *record = (const configRecord_t *)p;
+        //printf("NOTHING at record size %d\n\n", (record->size));
         if (record->size == 0) {
+            //printf("NOTHING - record size %d | pgn %d\n\n", (record->size), (pgN(reg)));
             //print_my_msg("NOTHING", __FUNCTION__, __FILE__, __LINE__);
             break;
         }
@@ -411,7 +414,7 @@ static const configRecord_t *findEEPROM(const pgRegistry_t *reg, configRecordFla
 
         if (pgN(reg) == record->pgn
             && (record->flags & CR_CLASSIFICATION_MASK) == classification) {
-            //print_my_msg("inside right", __FUNCTION__, __FILE__, __LINE__);
+            //printf("PEFECT - record size %d | pgn %d\n\n", (record->size), (record->pgn));
             return record;
         }
         p += record->size;

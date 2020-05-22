@@ -478,8 +478,11 @@ void init(void)
 
     bool readSuccess = readEEPROM();
 
-    printf("Read EEPROM from Flash - %s\n\n", readSuccess ? "successful": "unsuccessful");
-    //print_my_msg("Read EEPROM from Flash - successful", __FUNCTION__,__FILE__,__LINE__);
+    //char buffercc[200];
+    //sprintf(buffercc, "Read EEPROM from Flash - %s", readSuccess ? "succ" : "unsc");
+    //print_my_msg(buffercc, __FUNCTION__, __FILE__, __LINE__);
+
+    printf("*** Read EEPROM from Flash - %s ***\n\n", readSuccess ? "successful": "unsuccessful");
 
 #if defined(USE_BOARD_INFO)
     initBoardInformation();
@@ -487,7 +490,7 @@ void init(void)
 
     if (!readSuccess || !isEEPROMVersionValid() || strncasecmp(systemConfig()->boardIdentifier, TARGET_BOARD_IDENTIFIER, sizeof(TARGET_BOARD_IDENTIFIER))) {
         resetEEPROM(false);
-        printf("%s:%s:%d - load from flash failed, resetting EEPROM to default configs \n\n", __FUNCTION__,__FILE__,__LINE__);
+        print_my_msg("Reset EEPROM - successful", __FUNCTION__,__FILE__,__LINE__);
     }
 
     systemState |= SYSTEM_STATE_CONFIG_LOADED;

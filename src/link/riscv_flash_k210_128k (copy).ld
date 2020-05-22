@@ -3,15 +3,10 @@
  * in the target. You can use it to describe which memory regions may be
  * used by the linker, and which memory regions it must avoid.
  */
-
-    /*FLASH_CONFIG (wxa!ri)  : ORIGIN = 0x80500000, LENGTH = (1 * 1024 * 1024)
-    FLASH (rx)   : ORIGIN = 0x80500000, LENGTH = (1 * 1024 * 1024)
-    */
 MEMORY
 {
 
-    FLASH (wxa!ri)        : ORIGIN = 0x08040000, LENGTH = (1 * 1024 * 1024)
-    FLASH_CONFIG (wxa!ri)  : ORIGIN = 0x08050000, LENGTH = (1 * 1024 * 1024)
+  FLASH_CONFIG (wxa!ri)  : ORIGIN = 0x80500000, LENGTH = (1 * 1024 * 1024)
 
   /*
    * Memory with CPU cache.
@@ -49,9 +44,6 @@ ENTRY(_start)
 /* Base address where the config is stored. */
 __config_start = ORIGIN(FLASH_CONFIG);
 __config_end = ORIGIN(FLASH_CONFIG) + LENGTH(FLASH_CONFIG);
-
-//__pg_registry_start = ORIGIN(FLASH);
-//__pg_registry_end = ORIGIN(FLASH) + LENGTH(FLASH);
 
 /*
  * The GROUP command is special since the listed archives will be
@@ -95,7 +87,6 @@ SECTIONS
     PROVIDE_HIDDEN (__pg_resetdata_end = .);
   } >ram
 */
-
 /*
 .pg_registry BLOCK( DEFINED(__section_alignment__) ? __section_alignment__ : 4 ) :   SUBALIGN(4)
   {
@@ -113,7 +104,6 @@ SECTIONS
     PROVIDE_HIDDEN (___pg_resetdata_end = . );
   }
   */
-
   /* Program code segment, also known as a text segment */
   .text :
   {
@@ -187,24 +177,6 @@ SECTIONS
     KEEP (*(.pg_resetdata))
     PROVIDE_HIDDEN (__pg_resetdata_end = .);
   } >ram AT>ram :ram_ro
-
-
-/*
-  .pg_registry :
-  {
-    PROVIDE_HIDDEN (__pg_registry_start = .);
-    KEEP (*(.pg_registry))
-    KEEP (*(SORT(.pg_registry.*)))
-    PROVIDE_HIDDEN (__pg_registry_end = .);
-  } >FLASH_CONFIG
-
-  .pg_resetdata :
-  {
-    PROVIDE_HIDDEN (__pg_resetdata_start = .);
-    KEEP (*(.pg_resetdata))
-    PROVIDE_HIDDEN (__pg_resetdata_end = .);
-  } >FLASH_CONFIG
-*/
 
   .ctors :
   {

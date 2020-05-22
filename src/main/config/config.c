@@ -18,6 +18,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+// temp for debugging
+#include "capstone_print.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -697,16 +700,16 @@ bool readEEPROM(void)
 void writeUnmodifiedConfigToEEPROM(void)
 {
     validateAndFixConfig();
-    printf("%s:%s:%d - after validateAndFixConfig \n\n", __FUNCTION__,__FILE__,__LINE__);
+    print_my_msg("Validate and Fix Config - successful", __FUNCTION__,__FILE__,__LINE__);
 
     suspendRxPwmPpmSignal();
-    printf("%s:%s:%d - after suspendRxPwmPpmSignal \n\n", __FUNCTION__,__FILE__,__LINE__);
+    print_my_msg("Suspended PWM/PPM Signals", __FUNCTION__,__FILE__,__LINE__);
 
     writeConfigToEEPROM();
-    printf("%s:%s:%d - after writeConfigToEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
+    print_my_msg("Write Config to EEPROM - successful", __FUNCTION__,__FILE__,__LINE__);
 
     resumeRxPwmPpmSignal();
-    printf("%s:%s:%d - after resumeRxPwmPpmSignal \n\n", __FUNCTION__,__FILE__,__LINE__);
+    print_my_msg("Resumed PWM/PPM Signals - successful", __FUNCTION__,__FILE__,__LINE__);
     configIsDirty = false;
 }
 /*
@@ -730,11 +733,11 @@ bool resetEEPROM(bool useCustomDefaults)
 #endif
     {
         resetConfig();
-        printf("%s:%s:%d - after resetConfig \n\n", __FUNCTION__,__FILE__,__LINE__);
+        print_my_msg("Reset Config - successful", __FUNCTION__,__FILE__,__LINE__);
     }
 
     writeUnmodifiedConfigToEEPROM();
-    printf("%s:%s:%d - after writeUnmodifiedConfigToEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
+    print_my_msg("Wrote Unmodified Config to EEPROM - successful", __FUNCTION__,__FILE__,__LINE__);
 
     return true;
 }
@@ -743,12 +746,11 @@ void ensureEEPROMStructureIsValid(void)
 {
     //printf("%s:%s:%d - entering ensureEEPROMStructureIsValid \n\n", __FUNCTION__,__FILE__,__LINE__);
     if (isEEPROMStructureValid()) {
-        printf("%s:%s:%d - inside if statement isEEPROMStructureValid \n\n", __FUNCTION__,__FILE__,__LINE__);
+        print_my_msg("EEPROM Structure Valid - successful", __FUNCTION__,__FILE__,__LINE__);
         return;
     }
-    printf("%s:%s:%d - not inside if statement isEEPROMStructureValid \n\n", __FUNCTION__,__FILE__,__LINE__);
     resetEEPROM(false);
-    printf("%s:%s:%d - after resetEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
+    print_my_msg("Reset EEPROM - successful", __FUNCTION__,__FILE__,__LINE__);
 }
 
 void saveConfigAndNotify(void)

@@ -35,10 +35,10 @@
 void run(void);
 
 /* *********** start of temp test *********** */
-//#include "drivers/flash_riscv_k210.h"
-//#define TEST_NUMBER (256 + 128)
-//#define DATA_ADDRESS 0x130000
-//uint8_t data_buf[TEST_NUMBER];
+#include "drivers/flash_riscv_k210.h"
+#define TEST_NUMBER (256 + 128)
+#define DATA_ADDRESS 0x80100000
+uint8_t data_buf[TEST_NUMBER];
 /* *********** end of temp test *********** */
 
 int main(void)
@@ -47,26 +47,24 @@ int main(void)
     sleep(2);
 
     /* *********** start of temp test *********** */
-    /*
+
     printf("========= Pinche Corona-19 ====\n\n");
     uint32_t index;
     flash_init(3, 0);
 
     flash_enable_quad_mode();
-    */
+
     /*write data*/
-    /*
+
     for (index = 0; index < TEST_NUMBER; index++)
         data_buf[index] = (uint8_t)(index);
-    printf("Erase Sector\n");
+    printf("Erase Sector at Flash Address %x\n", DATA_ADDRESS);
     flash_sector_erase(DATA_ADDRESS);
-    while (flash_is_busy() == FLASH_BUSY)
-        ;
-    printf("Write Data\n");
+    while (flash_is_busy() == FLASH_BUSY);
+    printf("Write Data to Flash Address %x\n", DATA_ADDRESS);
     flash_write_data_direct(DATA_ADDRESS, data_buf, TEST_NUMBER);
-    */
+
     /* standard read test*/
-    /*
     for (index = 0; index < TEST_NUMBER; index++)
         data_buf[index] = 0;
     printf("Standard Read Test Start\n");
@@ -82,7 +80,7 @@ int main(void)
 
     printf("\nSPI3 Master Test OK\n");
     printf("\n=============\n\n\n");
-     */
+
     /* *********** end of temp test *********** */
 
     init();

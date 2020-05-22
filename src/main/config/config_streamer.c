@@ -105,7 +105,7 @@ void config_streamer_start(config_streamer_t *c, uintptr_t base, int size)
     c->size = size;
 
     char buffer[200];
-    sprintf(buffer, "Config file in RAM at starting address %lx total size reserved (%d) MB", c->address, (int)(c->size) / (1024 * 1024));
+    sprintf(buffer, "Config file in RAM at address %lx total size reserved (%d) MB", c->address, (int)(c->size) / (1024 * 1024));
     print_my_msg(buffer, __FUNCTION__, __FILE__, __LINE__);
 
     if (!c->unlocked) {
@@ -387,16 +387,13 @@ static int write_word(config_streamer_t *c, config_streamer_buffer_align_type_t 
 
     bool onPageBoundary = (flashAddress % flashPageSize == 0);
     if (onPageBoundary) {
-
-        bool firstPage = (flashAddress == flashStartAddress);
-
         if (flashAddress % flashSectorSize == 0) {
             flash_sector_erase(flashAddress);
         }
 
         while (flash_is_busy() == FLASH_BUSY);
 
-        flash_write_data(flashAddress, (uint8_t *)buffer, CONFIG_STREAMER_BUFFER_SIZE);
+        flash_write_data(flashAddress, (uint8_t *)buffer, 8);
     }
 
 #else

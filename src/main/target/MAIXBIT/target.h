@@ -36,6 +36,7 @@
 #define SPI3                ((SPI_TypeDef *) 0x54000000)
 #define FLASH_START_ADDR    (0x130000)
 
+//#define __config_start    (0x800088e0)
 //#define __config_start (0x80500000)
 //#define __config_end (0x80600000)
 

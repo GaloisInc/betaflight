@@ -1,8 +1,7 @@
 # ========== vars
-BIN_FILENAME=$(ls betaflight/obj | grep .bin) # requires BF to have been made at least once before
-BIN_FILE=obj/$BIN_FILENAME
 KFLASH_PATH=../kflash
 PORT=/dev/ttyUSB0
+BAUD=115200
 DIR=/opt/kendryte-toolchain
 KENDRYTE_TAR=kendryte-toolchain.tar.gz
 PATH_KENDRYTE_TC=https://s3.cn-north-1.amazonaws.com.cn/dl.kendryte.com/documents/kendryte-toolchain-ubuntu-amd64-8.2.0-20190213.tar.gz
@@ -23,10 +22,16 @@ if [ "" = "$PKG_OK" ]; then
   sudo apt-get --yes install $REQUIRED_PKG 
 fi
 
+# check if klash is installed
+if [ ! -d "kflash" ]; then
+  echo "\nERROR: kflash.py not found at /kflash - install kflash or update path\n\n"
+  exit 1
+fi
+
 # get kendryte toolchain
 # if $DIR doesn't exist then pull toolchain
 if [ ! -d "$DIR" ]; then
-  echo "\nINFO: ${DIR} not found - pulling kendryte toolchain from\n\n$PATH_KENDRYTE_TC\n\n"
+  echo "\nINFO: $DIR not found - pulling kendryte toolchain from\n\n$PATH_KENDRYTE_TC\n\n"
   curl $PATH_KENDRYTE_TC > $KENDRYTE_TAR
   tar -xvf $KENDRYTE_TAR -C /opt
   # clean up
@@ -39,6 +44,13 @@ pkill -f minicom
 rm -rf betaflight/obj
 
 cd betaflight && make
+
+# wait to allow file to become avaliable
+sleep 1
+
+BIN_FILENAME=$(ls obj | grep .bin)
+BIN_FILE=obj/$BIN_FILENAME
+
 # make sure make completes successful before continuing
 if [ -f "$BIN_FILE" ]; then
 	echo "$BIN_FILE exist"
@@ -53,5 +65,5 @@ if [ "$1" != "no" ]; then
 	cd $KFLASH_PATH && python3 kflash.py -p $PORT $BIN_FILENAME
 	# allow bin to runs once then we can restart again
 	sleep 1
-	gnome-terminal -- sh -c 'sudo minicom'
+	gnome-terminal -- sh -c 'sudo minicom -b $BAUD -D $PORT'
 fi

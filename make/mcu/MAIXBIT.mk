@@ -1,5 +1,5 @@
-# flash size is 128kb = 16MB
-TARGET_FLASH_SIZE 	:= 16384
+# flash size is 1024kB = 1MB
+TARGET_FLASH_SIZE 	:= 1024
 LINKER_DIR      	:= $(ROOT)/src/link
 RISCV_SRC         	:= $(ROOT)/lib/main/RISCV_K210
 # Object file--------------------------------------------------#
@@ -22,6 +22,9 @@ STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/bsp/*.c))\
 EXCLUDES        = 
 STDPERIPH_SRC   := $(filter-out ${EXCLUDES}, $(STDPERIPH_SRC))
 DEVICE_STDPERIPH_SRC = $(STDPERIPH_SRC)
+TARGET_SRC			= \
+					drivers/flash_riscv_k210.c \
+					capstone_print.c
 #-----------------------------------------------------------------#
 #Includes
 DRIVER_INCLUDES 	= $(RISCV_SRC)/drivers/include

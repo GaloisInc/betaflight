@@ -229,7 +229,8 @@ OBJDUMP     := $(ARM_SDK_PREFIX)objdump
 SIZE        := $(ARM_SDK_PREFIX)size
 DFUSE-PACK  := src/utils/dfuse-pack.py
 
-ifneq ($(RISCV_K210),)
+
+ifneq ($(TARGET),$(filter $(TARGET),$(MAIXBIT)))
 RISCV64_SDK_PREFIX = /opt/kendryte-toolchain/bin/riscv64-unknown-elf-
 
 CROSS_CC    := $(RISCV64_SDK_PREFIX)gcc #$(CCACHE) $(ARM_SDK_PREFIX)gcc

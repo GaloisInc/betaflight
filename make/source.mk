@@ -1,12 +1,10 @@
 COMMON_SRC =   $(TARGET_DIR_SRC) \
               main.c \
-              capstone_print.c \
               fc/init.c \
               pg/pg.c\
               sensors/initialisation.c \
               sensors/gyro.c \
               drivers/flash.c \
-              drivers/flash_riscv_k210.c \
               config/config_eeprom.c \
               config/config_streamer.c\
               config/config.c \

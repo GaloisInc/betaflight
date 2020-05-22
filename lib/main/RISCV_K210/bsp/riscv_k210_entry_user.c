@@ -59,15 +59,18 @@ int register_core1(core_function func, void *ctx)
     return 0;
 }
 
-int __attribute__((weak)) os_entry(int core_id, int number_of_cores, int (*user_main)(int, char **))
+//int __attribute__((weak)) os_entry(int core_id, int number_of_cores, int (*user_main)(int, char **))
+int __attribute__((weak)) os_entry(int core_id, int number_of_cores, int (*user_main)(void))
 {
     /* Call main if there is no OS */
-    return user_main(0, 0);
+    return user_main();
+    //return user_main(0, 0);
 }
 
 void _init_bsp(int core_id, int number_of_cores)
 {
-    extern int main(int argc, char *argv[]);
+    //extern int main(int argc, char *argv[]);
+    extern int main(void);
     extern void __libc_init_array(void);
     extern void __libc_fini_array(void);
 
