@@ -26,7 +26,6 @@
 #include <string.h>
 #include <math.h>
 
-#include <stdio.h>
 #include "platform.h"
 
 #include "blackbox/blackbox.h"
@@ -744,7 +743,6 @@ bool resetEEPROM(bool useCustomDefaults)
 
 void ensureEEPROMStructureIsValid(void)
 {
-    //printf("%s:%s:%d - entering ensureEEPROMStructureIsValid \n\n", __FUNCTION__,__FILE__,__LINE__);
     if (isEEPROMStructureValid()) {
         print_my_msg("EEPROM Structure Valid - successful", __FUNCTION__,__FILE__,__LINE__);
         return;

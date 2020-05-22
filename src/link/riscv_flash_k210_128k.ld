@@ -9,9 +9,10 @@
     */
 MEMORY
 {
-
+    /*
     FLASH (wxa!ri)        : ORIGIN = 0x08040000, LENGTH = (1 * 1024 * 1024)
     FLASH_CONFIG (wxa!ri)  : ORIGIN = 0x08050000, LENGTH = (1 * 1024 * 1024)
+    */
 
   /*
    * Memory with CPU cache.
@@ -33,7 +34,6 @@ PROVIDE( _io_start   = 0x40000000 );
 PROVIDE( _io_end     = _io_start + LENGTH(ram) );
 PROVIDE( _stack_size = 1 << 15 );
 
-
 /*
  * The OUTPUT_ARCH command specifies the machine architecture where the
  * argument is one of the names used in the Kendryte library.
@@ -47,11 +47,10 @@ OUTPUT_ARCH( "riscv" )
 ENTRY(_start)
 
 /* Base address where the config is stored. */
+/*
 __config_start = ORIGIN(FLASH_CONFIG);
 __config_end = ORIGIN(FLASH_CONFIG) + LENGTH(FLASH_CONFIG);
-
-//__pg_registry_start = ORIGIN(FLASH);
-//__pg_registry_end = ORIGIN(FLASH) + LENGTH(FLASH);
+*/
 
 /*
  * The GROUP command is special since the listed archives will be
@@ -80,40 +79,6 @@ PHDRS
  */
 SECTIONS
 {
-/*
-  .pg_registry :
-  {
-    PROVIDE_HIDDEN (__pg_registry_start = .);
-    KEEP (*(.pg_registry))
-    KEEP (*(SORT(.pg_registry.*)))
-    PROVIDE_HIDDEN (__pg_registry_end = .);
-  } >ram
-  .pg_resetdata :
-  {
-    PROVIDE_HIDDEN (__pg_resetdata_start = .);
-    KEEP (*(.pg_resetdata))
-    PROVIDE_HIDDEN (__pg_resetdata_end = .);
-  } >ram
-*/
-
-/*
-.pg_registry BLOCK( DEFINED(__section_alignment__) ? __section_alignment__ : 4 ) :   SUBALIGN(4)
-  {
-    PROVIDE_HIDDEN (__pg_registry_start = . );
-    PROVIDE_HIDDEN (___pg_registry_start = . );
-    KEEP (*(.pg_registry))
-    KEEP (*(SORT(.pg_registry.*)))
-    PROVIDE_HIDDEN (__pg_registry_end = . );
-    PROVIDE_HIDDEN (___pg_registry_end = . );
-
-    PROVIDE_HIDDEN (__pg_resetdata_start = . );
-    PROVIDE_HIDDEN (___pg_resetdata_start = . );
-    KEEP (*(.pg_resetdata))
-    PROVIDE_HIDDEN (__pg_resetdata_end = . );
-    PROVIDE_HIDDEN (___pg_resetdata_end = . );
-  }
-  */
-
   /* Program code segment, also known as a text segment */
   .text :
   {
@@ -187,7 +152,6 @@ SECTIONS
     KEEP (*(.pg_resetdata))
     PROVIDE_HIDDEN (__pg_resetdata_end = .);
   } >ram AT>ram :ram_ro
-
 
 /*
   .pg_registry :

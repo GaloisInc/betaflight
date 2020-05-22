@@ -55,7 +55,6 @@ int main(void)
     flash_enable_quad_mode();
 
     /*write data*/
-
     for (index = 0; index < TEST_NUMBER; index++)
         data_buf[index] = (uint8_t)(index);
     printf("Erase Sector at Flash Address %x\n", DATA_ADDRESS);
@@ -82,6 +81,10 @@ int main(void)
     printf("\n=============\n\n\n");
 
     /* *********** end of temp test *********** */
+
+    // need to erase previous config or else it
+    // will read it again so you won't see it write again---for dev
+    //flash_sector_erase(FLASH_START_ADDR);
 
     init();
     printf("Board Initialized: OK\n\n");

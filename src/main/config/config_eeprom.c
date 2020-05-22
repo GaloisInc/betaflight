@@ -18,11 +18,12 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+// temp for debugging
+#include "capstone_print.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-
-#include <stdio.h>
 
 #include "platform.h"
 
@@ -35,9 +36,6 @@
 #include "config/config_streamer.h"
 #include "pg/pg.h"
 #include "config/config.h"
-
-// temp for debugging
-#include "capstone_print.h"
 
 #ifdef CONFIG_IN_SDCARD
 #include "io/asyncfatfs/asyncfatfs.h"
@@ -59,11 +57,11 @@ typedef enum {
 #define CR_CLASSIFICATION_MASK  (0x3)
 #define CRC_START_VALUE         0xFFFF
 
-#ifdef RISCV_K210
-#define CRC_CHECK_VALUE         0xD5E2  // pre-calculated value of CRC that includes the CRC itself
-#else
+//#ifdef RISCV_K210
+//#define CRC_CHECK_VALUE         0xD5E2  // pre-calculated value of CRC that includes the CRC itself
+//#else
 #define CRC_CHECK_VALUE         0x1D0F  // pre-calculated value of CRC that includes the CRC itself
-#endif
+//#endif
 
 // Header for the saved copy.
 typedef struct {
@@ -334,11 +332,13 @@ bool isEEPROMStructureValid(void)
 
         if (record->size == 0) {
             // Found the end.  Stop scanning.
+            //print_my_msg("END", __FUNCTION__, __FILE__, __LINE__);
             break;
         }
 
         if (p + record->size >= &__config_end
             || record->size < sizeof(*record)) {
+            //print_my_msg("TOO BIG OR TOO SMALL", __FUNCTION__, __FILE__, __LINE__);
             // Too big or too small.
             return false;
         }
@@ -358,7 +358,7 @@ bool isEEPROMStructureValid(void)
     p += sizeof(storedCrc);
 
     eepromConfigSize = p - &__config_start;
-
+    //printf("\ncrc %x CRC_CHECK_VALUE %x\n", crc, CRC_CHECK_VALUE);
     // CRC has the property that if the CRC itself is included in the calculation the resulting CRC will have constant value
     return crc == CRC_CHECK_VALUE;
 }
@@ -386,7 +386,9 @@ size_t getEEPROMStorageSize(void)
 // this function assumes that EEPROM content is valid
 static const configRecord_t *findEEPROM(const pgRegistry_t *reg, configRecordFlags_e classification)
 {
+    //const uint32_t &__config_start = 0x08003FFF;
     const uint8_t *p = &__config_start;
+    //const uint32_t *p = FLASH_START_ADDR;
     //printf("Reading from __config_start %x\n\n", __config_start);
     p += sizeof(configHeader_t);             // skip header
     while (true) {
@@ -414,7 +416,7 @@ static const configRecord_t *findEEPROM(const pgRegistry_t *reg, configRecordFla
 
         if (pgN(reg) == record->pgn
             && (record->flags & CR_CLASSIFICATION_MASK) == classification) {
-            //printf("PEFECT - record size %d | pgn %d\n\n", (record->size), (record->pgn));
+            //printf("PERFECT - record size %d | pgn %d\n\n", (record->size), (record->pgn));
             return record;
         }
         p += record->size;
@@ -535,6 +537,7 @@ void writeConfigToEEPROM(void)
     if (success && isEEPROMVersionValid() && isEEPROMStructureValid()) {
         return;
     }
+    print_my_msg("RUBBBBE", __FUNCTION__, __FILE__, __LINE__);
 
     // Flash write failed - just die now
     failureMode(FAILURE_CONFIG_STORE_FAILURE);

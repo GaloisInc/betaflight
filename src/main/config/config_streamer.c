@@ -21,7 +21,6 @@
 // temp for debugging
 #include "capstone_print.h"
 
-#include <stdio.h>
 #include <string.h>
 
 #include "platform.h"
@@ -370,6 +369,8 @@ static int write_word(config_streamer_t *c, config_streamer_buffer_align_type_t 
 #if defined(CONFIG_IN_EXTERNAL_FLASH)
 #if defined(RISCV_K210)
 
+    char buffer_str[200];
+
     uint32_t dataOffset = (uint32_t)(c->address - (uintptr_t)&eepromData[0]);
     uint32_t flashStartAddress = FLASH_START_ADDR;
 
@@ -382,9 +383,14 @@ static int write_word(config_streamer_t *c, config_streamer_buffer_align_type_t 
         return -3; // address is past end of partition
     }
 
-    uint32_t flashSectorSize = FLASH_SECTOR_SIZE;
-    uint32_t flashPageSize = FLASH_PAGE_SIZE;
+    //uint32_t flashSectorSize = FLASH_SECTOR_SIZE;
+    //uint32_t flashPageSize = FLASH_PAGE_SIZE;
 
+    //while (flash_is_busy() == FLASH_BUSY);
+    sprintf(buffer_str, "Writing to Flash address - %x", flashAddress);
+    print_my_msg(buffer_str, __FUNCTION__, __FILE__, __LINE__);
+    flash_write_data(flashAddress, (uint8_t *)buffer, CONFIG_STREAMER_BUFFER_SIZE);
+    /*
     bool onPageBoundary = (flashAddress % flashPageSize == 0);
     if (onPageBoundary) {
         if (flashAddress % flashSectorSize == 0) {
@@ -395,6 +401,7 @@ static int write_word(config_streamer_t *c, config_streamer_buffer_align_type_t 
 
         flash_write_data(flashAddress, (uint8_t *)buffer, 8);
     }
+     */
 
 #else
     uint32_t dataOffset = (uint32_t)(c->address - (uintptr_t)&eepromData[0]);

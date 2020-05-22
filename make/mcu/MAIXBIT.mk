@@ -24,7 +24,8 @@ STDPERIPH_SRC   := $(filter-out ${EXCLUDES}, $(STDPERIPH_SRC))
 DEVICE_STDPERIPH_SRC = $(STDPERIPH_SRC)
 TARGET_SRC			= \
 					drivers/flash_riscv_k210.c \
-					capstone_print.c
+					capstone_print.c \
+					pg/flash_riscv_k210.c
 #-----------------------------------------------------------------#
 #Includes
 DRIVER_INCLUDES 	= $(RISCV_SRC)/drivers/include

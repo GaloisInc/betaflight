@@ -285,7 +285,6 @@ static void configureSPIAndQuadSPI(void)
     // size_t data_bit_length = 8, 0:little-endian 1:big-endian = 0
 
     spi_init(3, SPI_WORK_MODE_0, SPI_FF_STANDARD, 8, 0);
-    //printf("%s:%s:%d - after spi_init \n\n", __FUNCTION__,__FILE__,__LINE__);
     print_my_msg("SPI Initialized", __FUNCTION__,__FILE__,__LINE__);
 
 #else
@@ -435,13 +434,12 @@ void init(void)
     // cause communication issues with the flash chip.  e.g. use external pullups on SPI/QUADSPI CS lines.
     //
     pgResetAll();
-    print_my_msg("Reset all configurations", __FUNCTION__,__FILE__,__LINE__);
 
 #ifdef TARGET_BUS_INIT
 #error "CONFIG_IN_EXTERNAL_FLASH and TARGET_BUS_INIT are mutually exclusive"
 #endif
     configureSPIAndQuadSPI();
-    //printf("%s:%s:%d - after configureSPIAndQuadSPI \n\n", __FUNCTION__,__FILE__,__LINE__);
+
     initFlags |= SPI_AND_QSPI_INIT_ATTEMPTED;
 
 #ifndef USE_FLASH_CHIP
@@ -449,14 +447,17 @@ void init(void)
 #endif
 #ifdef RISCV_K210
 
+    char buffer_init[200];
     // uint8_t spi_index = 3 , uint8_t spi_ss = 0
     // spi_chip_select = spi_ss;
     bool noFlash = flash_init( 3, 0 );
-    print_my_msg("Flash Initialized - successful", __FUNCTION__,__FILE__,__LINE__);
+
+    sprintf(buffer_init, "Flash Initialized - %s", !noFlash ? "successful" : "unsuccessful");
+    print_my_msg(buffer_init, __FUNCTION__, __FILE__, __LINE__);
 
     // flash_init returns 0 if FLASH_OK
     if (noFlash) {
-        print_my_msg("Flash Initialized - unsuccessful", __FUNCTION__,__FILE__,__LINE__);
+        print_my_msg(buffer_init, __FUNCTION__, __FILE__, __LINE__);
         failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
     }
 #else
@@ -471,18 +472,13 @@ void init(void)
 #endif // CONFIG_IN_EXTERNAL_FLASH
 
     initEEPROM();
-    //printf("%s:%s:%d - after initEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
 
     ensureEEPROMStructureIsValid();
-    //printf("%s:%s:%d - after ensureEEPROMStructureIsValid \n\n", __FUNCTION__,__FILE__,__LINE__);
 
     bool readSuccess = readEEPROM();
 
-    //char buffercc[200];
-    //sprintf(buffercc, "Read EEPROM from Flash - %s", readSuccess ? "succ" : "unsc");
-    //print_my_msg(buffercc, __FUNCTION__, __FILE__, __LINE__);
-
-    printf("*** Read EEPROM from Flash - %s ***\n\n", readSuccess ? "successful": "unsuccessful");
+    sprintf(buffer_init, "Read EEPROM from Flash - %s", readSuccess ? "successful" : "unsuccessful");
+    print_my_msg(buffer_init, __FUNCTION__, __FILE__, __LINE__);
 
 #if defined(USE_BOARD_INFO)
     initBoardInformation();

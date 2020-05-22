@@ -34,13 +34,13 @@
 
 // spi3 starts at 0x5400 0000 per riscv_k210.platform.h
 #define SPI3                ((SPI_TypeDef *) 0x54000000)
-#define FLASH_START_ADDR    (0x130000)
+#define FLASH_START_ADDR    (0x00130000)
 
 //#define __config_start    (0x800088e0)
 //#define __config_start (0x80500000)
 //#define __config_end (0x80600000)
 
-#define EEPROM_SIZE     ( 1 * 1024 * 1024 )
+//#define EEPROM_SIZE     ( 1 * 1024 * 1024 )
 
 
 //#define USE_FLASH_W25QXX
@@ -61,6 +61,9 @@
 //#define FLASH_CS_PIN G2
 
 #define SERIAL_PORT_COUNT       1
+
+//#define USE_FLASH_RISCV_K210
+#define K210SPIDEV_COUNT    1
 
 #undef TARGET_BUS_INIT
 #undef USE_VCP
