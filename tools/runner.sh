@@ -1,5 +1,8 @@
 # ========== vars
-KFLASH_PATH=../kflash
+# place this script anywhere but just update path to BT
+# and script will look for tools on same level as script
+BT_PATH=../../betaflight
+
 PORT=/dev/ttyUSB0
 BAUD=115200
 DIR=/opt/kendryte-toolchain
@@ -8,7 +11,10 @@ PATH_KENDRYTE_TC=https://s3.cn-north-1.amazonaws.com.cn/dl.kendryte.com/document
 REQUIRED_PKG="minicom"
 PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $REQUIRED_PKG|grep "install ok installed")
 
-UNITY_ROOT=betaflight/unit_testing_k210
+KFLASH_REPO=https://github.com/kendryte/kflash.py.git
+KFLASH_DIR=kflash
+
+UNITY_ROOT=unit_testing_k210
 UNITY_DIR=$UNITY_ROOT/Unity
 UNITY_REPO=https://github.com/ThrowTheSwitch/Unity.git
 # ==========
@@ -26,12 +32,6 @@ if [ "" = "$PKG_OK" ]; then
   sudo apt-get --yes install $REQUIRED_PKG 
 fi
 
-# check if klash is installed
-if [ ! -d "kflash" ]; then
-  echo "\nERROR: kflash.py not found at /kflash - install kflash or update path\n\n"
-  exit 1
-fi
-
 # get kendryte toolchain
 # if $DIR doesn't exist then pull toolchain
 if [ ! -d "$DIR" ]; then
@@ -42,26 +42,33 @@ if [ ! -d "$DIR" ]; then
   rm $KENDRYTE_TAR
 fi
 
-# clone Unity Repo
-# if $UNITY_DIR doesn't exist then go out and clone Unity repo
+# if $KFLASH_DIR doesn't exist then clone repo
+if [ ! -d "$KFLASH_DIR" ]; then
+  echo "\nINFO: $KFLASH_DIR not found - pulling kflash from\n\n$KFLASH_REPO\n\n"
+  mkdir -p $KFLASH_DIR && git clone $KFLASH_REPO $KFLASH_DIR
+fi
+
+# if $UNITY_DIR doesn't exist then clone repo
 if [ ! -d "$UNITY_DIR" ]; then
   echo "\n\nINFO: $UNITY_DIR not found - pulling Unity source code from\n\n$UNITY_REPO\n\n"
   #mkdir if it doesn't exist
-  mkdir -p $UNITY_ROOT && cd $UNITY_ROOT && git clone $UNITY_REPO
+  mkdir -p $UNITY_ROOT && git clone $UNITY_REPO $UNITY_DIR
 fi
 
 # kill any minicom sessions to allow comm to port
 pkill -f minicom
-# clean up previous make
-rm -rf betaflight/obj
 
-cd betaflight && make
+# clean up previous make
+rm -rf ../obj
+
+#cd $BT_PATH && make
+make -C $BT_PATH
 
 # wait to allow file to become avaliable
 sleep 1
 
-BIN_FILENAME=$(ls obj | grep .bin)
-BIN_FILE=obj/$BIN_FILENAME
+BIN_FILENAME=$(ls ../obj | grep .bin)
+BIN_FILE=../obj/$BIN_FILENAME
 
 # make sure make completes successful before continuing
 if [ -f "$BIN_FILE" ]; then
@@ -73,8 +80,8 @@ fi
 
 # if input is 'no' then no flashing
 if [ "$1" != "no" ]; then
-  cp $BIN_FILE $KFLASH_PATH
-  cd $KFLASH_PATH && python3 kflash.py -p $PORT $BIN_FILENAME
+  cp $BIN_FILE $KFLASH_DIR
+  python3 $KFLASH_DIR/kflash.py -p $PORT $KFLASH_DIR/$BIN_FILENAME
   # allow bin to runs once then we can restart again
   sleep 1
   gnome-terminal -- sh -c 'sudo minicom -b $BAUD -D $PORT'
