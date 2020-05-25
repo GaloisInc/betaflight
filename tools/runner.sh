@@ -2,6 +2,7 @@
 # place this script anywhere but just update path to BT
 # and script will look for tools on same level as script
 BT_PATH=../../betaflight
+OBJ_PATH=../obj
 
 PORT=/dev/ttyUSB0
 BAUD=115200
@@ -59,7 +60,7 @@ fi
 pkill -f minicom
 
 # clean up previous make
-rm -rf ../obj
+rm -rf $OBJ_PATH
 
 #cd $BT_PATH && make
 make -C $BT_PATH
@@ -67,8 +68,8 @@ make -C $BT_PATH
 # wait to allow file to become avaliable
 sleep 1
 
-BIN_FILENAME=$(ls ../obj | grep .bin)
-BIN_FILE=../obj/$BIN_FILENAME
+BIN_FILENAME=$(ls $OBJ_PATH | grep .bin)
+BIN_FILE=$OBJ_PATH/$BIN_FILENAME
 
 # make sure make completes successful before continuing
 if [ -f "$BIN_FILE" ]; then
