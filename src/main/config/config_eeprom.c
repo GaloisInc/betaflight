@@ -432,7 +432,7 @@ bool loadEEPROM(void)
     return success;
 }
 
-static bool writeSettingsToEEPROM(void)
+/*static*/ bool writeSettingsToEEPROM(void)
 {
     config_streamer_t streamer;
     config_streamer_init(&streamer);
