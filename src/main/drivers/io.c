@@ -168,7 +168,7 @@ uint32_t IO_EXTI_Line(IO_t io)
     return 1 << IO_GPIOPinIdx(io);
 #elif defined(STM32F3)
     return IO_GPIOPinIdx(io);
-#elif defined(SIMULATOR_BUILD) || defined(MAIXBIT)
+#elif defined(SIMULATOR_BUILD) || defined(RISCV_K210)
     return 0;
 #else
 # error "Unknown target type"
@@ -428,7 +428,7 @@ void IOConfigGPIOAF(IO_t io, ioConfig_t cfg, uint8_t af)
     GPIO_Init(IO_GPIO(io), &init);
 }
 
-#elif defined(MAIXBIT)
+#elif defined(RISCV_K210)
 
 void IOConfigGPIO(IO_t io, ioConfig_t cfg)
 {

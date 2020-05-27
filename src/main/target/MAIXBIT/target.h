@@ -33,33 +33,22 @@
 #define USE_FLASH_CHIP
 
 // spi3 starts at 0x5400 0000 per riscv_k210.platform.h
-#define SPI3                ((SPI_TypeDef *) 0x54000000)
-#define FLASH_START_ADDR    (0x130000)
+//#define SPI3                ((SPI_TypeDef *) 0x54000000)
+#define FLASH_START_ADDR    (0x00130000)
 
-//#define __config_start (0x80500000)
-//#define __config_end (0x80600000)
-
-#define EEPROM_SIZE     ( 1 * 1024 * 1024 )
-
-
-//#define USE_FLASH_W25QXX
-//#define USE_QUADSPI
 #define USE_SPI
-#define USE_SPI_DEVICE_3
-#define FLASH_SPI_INSTANCE      SPI3
-//#define FLASH_SECTOR_SIZE            4096
-//#define FLASH_PAGE_SIZE              256
-//#define FLASH_PAGE_NUM_PER_SECTOR    16
-//#define SOFTSERIAL_LOOPBACK
+//#define USE_SPI_DEVICE_3
+//#define FLASH_SPI_INSTANCE      SPI3
 
 #define TARGET_IO_PORTA         0xffff
 #define TARGET_IO_PORTB         0xffff
 #define TARGET_IO_PORTC         0xffff
 #define TARGET_IO_PORTD         0xffff
 
-//#define FLASH_CS_PIN G2
-
 #define SERIAL_PORT_COUNT       1
+
+//#define USE_FLASH_RISCV_K210
+#define K210SPIDEV_COUNT    1
 
 #undef TARGET_BUS_INIT
 #undef USE_VCP

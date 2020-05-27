@@ -38,7 +38,7 @@ spiDevice_t spiDevice[SPIDEV_COUNT];
 
 SPIDevice spiDeviceByInstance(SPI_TypeDef *instance)
 {
-    printf("%s:%s:%d - Entering bus_spi.c \n\n", __FUNCTION__,__FILE__,__LINE__);
+    //printf("%s:%s:%d - Entering bus_spi.c \n\n", __FUNCTION__,__FILE__,__LINE__);
 #ifdef USE_SPI_DEVICE_1
     if (instance == SPI1)
         return SPIDEV_1;
@@ -50,7 +50,7 @@ SPIDevice spiDeviceByInstance(SPI_TypeDef *instance)
 #endif
 
 #ifdef USE_SPI_DEVICE_3
-    printf("%s:%s:%d - USE_SPI_DEVICE_3 \n\n", __FUNCTION__,__FILE__,__LINE__);
+    //printf("%s:%s:%d - USE_SPI_DEVICE_3 \n\n", __FUNCTION__,__FILE__,__LINE__);
     if (instance == SPI3)
         return SPIDEV_3;
 #endif

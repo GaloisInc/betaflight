@@ -20,7 +20,7 @@
 
 #pragma once
 
-#if defined(STM32F1) || defined(STM32F3) || defined(STM32F4) || defined(STM32G4) || defined(MAIXBIT)
+#if defined(STM32F1) || defined(STM32F3) || defined(STM32F4) || defined(STM32G4)
 #define MAX_SPI_PIN_SEL 2
 #elif defined(STM32F7)
 #define MAX_SPI_PIN_SEL 4

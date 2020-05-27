@@ -118,7 +118,6 @@ FC_VER := $(FC_VER_MAJOR).$(FC_VER_MINOR).$(FC_VER_PATCH)
 # ------------------------------------------------- //
 include $(ROOT)/make/testing_source.mk
 include test_src/test_source.mk
-#vpath %.mk ../make/testing_source.mk
 #vpath %.c test_src/test_config
 #vpath %.c test_src/test_build
 #vpath %.c test_src/test_runners

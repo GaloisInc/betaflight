@@ -21,7 +21,6 @@
 // temp for debugging
 #include "capstone_print.h"
 
-#include <stdio.h>
 #include <string.h>
 
 #include "platform.h"
@@ -105,7 +104,7 @@ void config_streamer_start(config_streamer_t *c, uintptr_t base, int size)
     c->size = size;
 
     char buffer[200];
-    sprintf(buffer, "Config file in RAM at starting address %lx total size reserved (%d) MB", c->address, (int)(c->size) / (1024 * 1024));
+    sprintf(buffer, "Config File at RAM Address 0x%lx | Total Size Reserved (%d) kB", c->address, (int)(c->size));
     print_my_msg(buffer, __FUNCTION__, __FILE__, __LINE__);
 
     if (!c->unlocked) {
@@ -369,35 +368,12 @@ static int write_word(config_streamer_t *c, config_streamer_buffer_align_type_t 
     }
 #if defined(CONFIG_IN_EXTERNAL_FLASH)
 #if defined(RISCV_K210)
-
-    uint32_t dataOffset = (uint32_t)(c->address - (uintptr_t)&eepromData[0]);
     uint32_t flashStartAddress = FLASH_START_ADDR;
-
-    //i need to handle this
-    uint32_t flashOverflowAddress = ((FLASH_SECTOR_SIZE + 1) * FLASH_SECTOR_SIZE); // +1 to sector for inclusive
-
+    uint32_t dataOffset = (uint32_t)(c->address - (uintptr_t)&eepromData[0]);
     uint32_t flashAddress = flashStartAddress + dataOffset;
 
-    if (flashAddress + CONFIG_STREAMER_BUFFER_SIZE > flashOverflowAddress) {
-        return -3; // address is past end of partition
-    }
-
-    uint32_t flashSectorSize = FLASH_SECTOR_SIZE;
-    uint32_t flashPageSize = FLASH_PAGE_SIZE;
-
-    bool onPageBoundary = (flashAddress % flashPageSize == 0);
-    if (onPageBoundary) {
-
-        bool firstPage = (flashAddress == flashStartAddress);
-
-        if (flashAddress % flashSectorSize == 0) {
-            flash_sector_erase(flashAddress);
-        }
-
-        while (flash_is_busy() == FLASH_BUSY);
-
-        flash_write_data(flashAddress, (uint8_t *)buffer, CONFIG_STREAMER_BUFFER_SIZE);
-    }
+    printf("Writing to Flash Address 0x%02x\n", flashAddress);
+    flash_write_data(flashAddress, (uint8_t *)buffer, CONFIG_STREAMER_BUFFER_SIZE);
 
 #else
     uint32_t dataOffset = (uint32_t)(c->address - (uintptr_t)&eepromData[0]);

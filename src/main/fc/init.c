@@ -279,18 +279,7 @@ static void configureSPIAndQuadSPI(void)
 #endif
 
 #ifdef USE_SPI_DEVICE_3
-#ifdef RISCV_K210
-    // arguments in order
-    // spi_bus_no = 3, SPI_WORK_MODE_0 = 0, SPI_FF_STANDARD = 0
-    // size_t data_bit_length = 8, 0:little-endian 1:big-endian = 0
-
-    spi_init(3, SPI_WORK_MODE_0, SPI_FF_STANDARD, 8, 0);
-    //printf("%s:%s:%d - after spi_init \n\n", __FUNCTION__,__FILE__,__LINE__);
-    print_my_msg("SPI Initialized", __FUNCTION__,__FILE__,__LINE__);
-
-#else
     spiInit(SPIDEV_3, requiresSpiLeadingEdge(SPIDEV_3));
-#endif
 #endif
 #ifdef USE_SPI_DEVICE_4
     spiInit(SPIDEV_4, requiresSpiLeadingEdge(SPIDEV_4));
@@ -336,6 +325,7 @@ static void swdPinsInit(void)
 */
 void init(void)
 {
+
 /*
 #ifdef SERIAL_PORT_COUNT
     printfSerialInit();
@@ -435,31 +425,41 @@ void init(void)
     // cause communication issues with the flash chip.  e.g. use external pullups on SPI/QUADSPI CS lines.
     //
     pgResetAll();
-    print_my_msg("Reset all configurations", __FUNCTION__,__FILE__,__LINE__);
 
 #ifdef TARGET_BUS_INIT
 #error "CONFIG_IN_EXTERNAL_FLASH and TARGET_BUS_INIT are mutually exclusive"
 #endif
-    configureSPIAndQuadSPI();
-    //printf("%s:%s:%d - after configureSPIAndQuadSPI \n\n", __FUNCTION__,__FILE__,__LINE__);
-    initFlags |= SPI_AND_QSPI_INIT_ATTEMPTED;
 
 #ifndef USE_FLASH_CHIP
 #error "CONFIG_IN_EXTERNAL_FLASH requires USE_FLASH_CHIP to be defined."
 #endif
+
 #ifdef RISCV_K210
+
+    char buffer_init[200];
+
+    // arguments in order
+    // spi_bus_no = 3, SPI_WORK_MODE_0 = 0, SPI_FF_STANDARD = 0
+    // size_t data_bit_length = 8, 0:little-endian 1:big-endian = 0
+
+    spi_init(3, SPI_WORK_MODE_0, SPI_FF_STANDARD, 8, 0);
+    print_my_msg("SPI_3 Initialized - successful", __FUNCTION__,__FILE__,__LINE__);
 
     // uint8_t spi_index = 3 , uint8_t spi_ss = 0
     // spi_chip_select = spi_ss;
     bool noFlash = flash_init( 3, 0 );
-    print_my_msg("Flash Initialized - successful", __FUNCTION__,__FILE__,__LINE__);
+
+    sprintf(buffer_init, "Flash Initialized - %s", !noFlash ? "successful" : "unsuccessful");
+    print_my_msg(buffer_init, __FUNCTION__, __FILE__, __LINE__);
 
     // flash_init returns 0 if FLASH_OK
     if (noFlash) {
-        print_my_msg("Flash Initialized - unsuccessful", __FUNCTION__,__FILE__,__LINE__);
+        print_my_msg(buffer_init, __FUNCTION__, __FILE__, __LINE__);
         failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
     }
 #else
+    configureSPIAndQuadSPI();
+    initFlags |= SPI_AND_QSPI_INIT_ATTEMPTED;
     bool haveFlash = flashInit(flashConfig());
     if (!haveFlash) {
         failureMode(FAILURE_EXTERNAL_FLASH_INIT_FAILED);
@@ -471,15 +471,10 @@ void init(void)
 #endif // CONFIG_IN_EXTERNAL_FLASH
 
     initEEPROM();
-    //printf("%s:%s:%d - after initEEPROM \n\n", __FUNCTION__,__FILE__,__LINE__);
 
     ensureEEPROMStructureIsValid();
-    //printf("%s:%s:%d - after ensureEEPROMStructureIsValid \n\n", __FUNCTION__,__FILE__,__LINE__);
 
     bool readSuccess = readEEPROM();
-
-    printf("Read EEPROM from Flash - %s\n\n", readSuccess ? "successful": "unsuccessful");
-    //print_my_msg("Read EEPROM from Flash - successful", __FUNCTION__,__FILE__,__LINE__);
 
 #if defined(USE_BOARD_INFO)
     initBoardInformation();
@@ -487,9 +482,11 @@ void init(void)
 
     if (!readSuccess || !isEEPROMVersionValid() || strncasecmp(systemConfig()->boardIdentifier, TARGET_BOARD_IDENTIFIER, sizeof(TARGET_BOARD_IDENTIFIER))) {
         resetEEPROM(false);
-        printf("%s:%s:%d - load from flash failed, resetting EEPROM to default configs \n\n", __FUNCTION__,__FILE__,__LINE__);
+        print_my_msg("Had to Reset EEPROM - successful", __FUNCTION__,__FILE__,__LINE__);
     }
 
+    sprintf(buffer_init, "System Configuration Ready - %s", readSuccess ? "successful" : "unsuccessful");
+    print_my_msg(buffer_init, __FUNCTION__, __FILE__, __LINE__);
     systemState |= SYSTEM_STATE_CONFIG_LOADED;
 
 /*

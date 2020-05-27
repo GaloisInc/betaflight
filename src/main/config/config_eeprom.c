@@ -18,11 +18,12 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+// temp for debugging
+#include "capstone_print.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-
-#include <stdio.h>
 
 #include "platform.h"
 
@@ -35,9 +36,6 @@
 #include "config/config_streamer.h"
 #include "pg/pg.h"
 #include "config/config.h"
-
-// temp for debugging
-#include "capstone_print.h"
 
 #ifdef CONFIG_IN_SDCARD
 #include "io/asyncfatfs/asyncfatfs.h"
@@ -59,11 +57,11 @@ typedef enum {
 #define CR_CLASSIFICATION_MASK  (0x3)
 #define CRC_START_VALUE         0xFFFF
 
-#ifdef RISCV_K210
-#define CRC_CHECK_VALUE         0xD5E2  // pre-calculated value of CRC that includes the CRC itself
-#else
+//#ifdef RISCV_K210
+//#define CRC_CHECK_VALUE         0xD5E2  // pre-calculated value of CRC that includes the CRC itself
+//#else
 #define CRC_CHECK_VALUE         0x1D0F  // pre-calculated value of CRC that includes the CRC itself
-#endif
+//#endif
 
 // Header for the saved copy.
 typedef struct {
@@ -284,7 +282,7 @@ void initEEPROM(void)
 #elif defined(CONFIG_IN_EXTERNAL_FLASH)
     bool eepromLoaded = loadEEPROMFromExternalFlash();
     char buffer[200];
-    sprintf(buffer, "Loaded EEPROM from flash - %s", eepromLoaded ? "successful" : "unsuccessful");
+    sprintf(buffer, "Loaded EEPROM from Flash - %s", eepromLoaded ? "successful" : "unsuccessful");
     print_my_msg(buffer, __FUNCTION__, __FILE__, __LINE__);
     if (!eepromLoaded) {
         // Flash read failed - just die now
@@ -306,11 +304,11 @@ bool isEEPROMVersionValid(void)
     const configHeader_t *header = (const configHeader_t *)p;
 
     if (header->eepromConfigVersion != EEPROM_CONF_VERSION) {
-        print_my_msg("EEPROM version valid - unsuccessful", __FUNCTION__, __FILE__, __LINE__);
+        print_my_msg("EEPROM Version Valid - unsuccessful", __FUNCTION__, __FILE__, __LINE__);
         return false;
     }
 
-    print_my_msg("EEPROM version valid - successful", __FUNCTION__, __FILE__, __LINE__);
+    print_my_msg("EEPROM Version Valid - successful", __FUNCTION__, __FILE__, __LINE__);
     return true;
 }
 
@@ -321,7 +319,7 @@ bool isEEPROMStructureValid(void)
     const configHeader_t *header = (const configHeader_t *)p;
 
     if (header->magic_be != 0xBE) {
-        print_my_msg("No magic_be (0xBE) in header file", __FUNCTION__, __FILE__, __LINE__);
+        print_my_msg("EEPROM Structure Not Valid - magic_be (0xBE) in Header File Missing", __FUNCTION__, __FILE__, __LINE__);
         return false;
     }
 
@@ -358,7 +356,6 @@ bool isEEPROMStructureValid(void)
     p += sizeof(storedCrc);
 
     eepromConfigSize = p - &__config_start;
-
     // CRC has the property that if the CRC itself is included in the calculation the resulting CRC will have constant value
     return crc == CRC_CHECK_VALUE;
 }
@@ -390,19 +387,6 @@ static const configRecord_t *findEEPROM(const pgRegistry_t *reg, configRecordFla
     p += sizeof(configHeader_t);             // skip header
     while (true) {
         const configRecord_t *record = (const configRecord_t *)p;
-        if (record->size == 0) {
-            //print_my_msg("NOTHING", __FUNCTION__, __FILE__, __LINE__);
-            break;
-        }
-        if( p + record->size >= &__config_end) {
-            //print_my_msg("too BIG", __FUNCTION__, __FILE__, __LINE__);
-            break;
-        }
-
-        if(record->size < sizeof(*record)) {
-            //print_my_msg("too small", __FUNCTION__, __FILE__, __LINE__);
-            break;
-        }
 
         if (record->size == 0
             || p + record->size >= &__config_end
@@ -411,7 +395,6 @@ static const configRecord_t *findEEPROM(const pgRegistry_t *reg, configRecordFla
 
         if (pgN(reg) == record->pgn
             && (record->flags & CR_CLASSIFICATION_MASK) == classification) {
-            //print_my_msg("inside right", __FUNCTION__, __FILE__, __LINE__);
             return record;
         }
         p += record->size;
@@ -427,6 +410,7 @@ bool loadEEPROM(void)
 {
     bool success = true;
 
+    char buffer[200];
     PG_FOREACH(reg) {
         const configRecord_t *rec = findEEPROM(reg, CR_CLASSICATION_SYSTEM);
         if (rec) {
@@ -438,19 +422,17 @@ bool loadEEPROM(void)
             }
         } else {
             pgReset(reg);
-            printf("Config unavailable from EEPROM - pgn %d initialized\n", (reg->pgn));
-            //printf("Writing to Flash - PG - pgn %d | size %d | version %d | addr of group in RAM %x\n", record.pgn, record.size, record.version, *(reg->address));
+
+            sprintf(buffer, "Config Unavailable from EEPROM - PGn %d Initialized", (reg->pgn));
+            print_my_msg(buffer, __FUNCTION__, __FILE__, __LINE__);
             success = false;
         }
     }
 
-    char buffer[200];
-    sprintf(buffer, "Loading EEPROM complete - %s", success ? "successful" : "unsuccessful");
-    print_my_msg(buffer, __FUNCTION__, __FILE__, __LINE__);
     return success;
 }
 
-static bool writeSettingsToEEPROM(void)
+/*static*/ bool writeSettingsToEEPROM(void)
 {
     config_streamer_t streamer;
     config_streamer_init(&streamer);
@@ -480,7 +462,7 @@ static bool writeSettingsToEEPROM(void)
         crc = crc16_ccitt_update(crc, (uint8_t *)&record, sizeof(record));
         config_streamer_write(&streamer, reg->address, regSize);
         crc = crc16_ccitt_update(crc, reg->address, regSize);
-        printf("Writing to Flash - PG - pgn %d | size %d | version %d | addr of group in RAM %x\n", record.pgn, record.size, record.version, *(reg->address));
+        printf("Writing PGn %d | Size 0x%x | Version %d | Address of Group in RAM 0x%x\n", record.pgn, record.size, record.version, *(reg->address));
     }
 
     configFooter_t footer = {
@@ -505,21 +487,21 @@ void writeConfigToEEPROM(void)
 {
     bool success = false;
     char buffer_k210[200];
-    sprintf(buffer_k210, "Writing to flash at starting address %x", FLASH_START_ADDR);
+    sprintf(buffer_k210, "Writing to Flash at Starting Address 0x%02x", FLASH_START_ADDR);
     print_my_msg(buffer_k210, __FUNCTION__, __FILE__, __LINE__);
     // write it
     for (int attempt = 0; attempt < 3 && !success; attempt++) {
         if (writeSettingsToEEPROM()) {
             success = true;
 
-    sprintf(buffer_k210, "Flash write complete - %s", success ? "successful" : "unsuccessful");
+    sprintf(buffer_k210, "Flash Write Complete - %s", success ? "successful" : "unsuccessful");
     print_my_msg(buffer_k210, __FUNCTION__, __FILE__, __LINE__);
 
 #ifdef CONFIG_IN_EXTERNAL_FLASH
             // copy it back from flash to the in-memory buffer.
             success = loadEEPROMFromExternalFlash();
             char buffer[200];
-            sprintf(buffer, "Loaded EEPROM from flash - %s", success ? "successful" : "unsuccessful");
+            sprintf(buffer, "Loaded EEPROM from Flash - %s", success ? "successful" : "unsuccessful");
             print_my_msg(buffer, __FUNCTION__, __FILE__, __LINE__);
 #endif
 #ifdef CONFIG_IN_SDCARD

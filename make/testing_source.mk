@@ -1,17 +1,16 @@
 #main.c \
 #$(TARGET_DIR_SRC)
 COMMON_SRC =  target/MAIXBIT/target.c  \
-              capstone_print.c \
               fc/init.c \
               pg/pg.c\
               sensors/initialisation.c \
               sensors/gyro.c \
               drivers/flash.c \
-              drivers/flash_riscv_k210.c \
               config/config_eeprom.c \
               config/config_streamer.c\
               config/config.c \
               common/crc.c \
+              rx/rx.c \
               config/feature.c \
               fc/board_info.c \
               pg/board.c\
@@ -19,9 +18,8 @@ COMMON_SRC =  target/MAIXBIT/target.c  \
               drivers/bus_spi.c \
               drivers/bus_spi_pinconfig.c \
               drivers/bus_spi_config.c \
-              pg/flash.c\
-              rx/rx.c \
               drivers/io.c \
+              pg/flash.c\
               \
               #drivers/bus_spi_hal.c
               #drivers/system.c \                                                         
