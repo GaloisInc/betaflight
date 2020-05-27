@@ -196,6 +196,7 @@
 //#define UART8_TX_DMA_OPT        7
 #define ADC1_DMA_OPT 8
 #define ADC3_DMA_OPT 9
+
 //#define ADC2_DMA_OPT 10 // ADC2 not used.
 #else
 #define ADC1_DMA_STREAM DMA2_Stream0
