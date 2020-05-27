@@ -24,6 +24,7 @@
 #include "riscv_k210_utils.h"
 #include "riscv_k210_iomem.h"
 
+
 volatile spi_t *const spi[4] =
     {
         (volatile spi_t *)SPI0_BASE_ADDR,

@@ -121,20 +121,19 @@
 
 #elif defined(RISCV_K210)
 #include "riscv_k210_platform.h"
-// #include "riscv_k210_entry.h"
-// #include "riscv_k210_interrupt.h"
-// #include "riscv_k210_printf.h"  
-// #include "riscv_k210_syscalls.h"
-// #include "riscv_k210_entry_user.h"
-// #include "riscv_k210_locks.h" 
-// #include "riscv_k210_sleep.h"
-// #include "riscv_k210_fpioa.h"
-
+/*
+#include "riscv_k210_entry.h"
+#include "riscv_k210_interrupt.h"
+#include "riscv_k210_printf.h"
+#include "riscv_k210_syscalls.h"
+#include "riscv_k210_entry_user.h"
+#include "riscv_k210_locks.h"
+#include "riscv_k210_sleep.h"
+#include "riscv_k210_fpioa.h"
+*/
 #ifndef MAIXBIT
 #define MAIXBIT
 #endif
-
-//NOP
 
 #else // STM32F10X
 #error "Invalid chipset specified. Update platform.h"

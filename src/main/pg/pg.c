@@ -18,6 +18,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+// temp for debugging
+#include "capstone_print.h"
+
 #include <stddef.h>
 #include <string.h>
 #include <stdint.h>
@@ -98,4 +101,5 @@ void pgResetAll(void)
     PG_FOREACH(reg) {
         pgReset(reg);
     }
+    print_my_msg("Reset All Configs - successful", __FUNCTION__, __FILE__, __LINE__);
 }

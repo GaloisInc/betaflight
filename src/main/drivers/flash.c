@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "platform.h"
 
@@ -90,7 +91,8 @@ static bool flashQuadSpiInit(const flashConfig_t *flashConfig)
 
 void flashPreInit(const flashConfig_t *flashConfig)
 {
-    spiPreinitRegister(flashConfig->csTag, IOCFG_IPU, 1);
+    //spiPreinitRegister(flashConfig->csTag, IOCFG_IPU, 1);
+    spiPreinitRegister(0, 0, 1);
 }
 
 static bool flashSpiInit(const flashConfig_t *flashConfig)
@@ -119,7 +121,7 @@ static bool flashSpiInit(const flashConfig_t *flashConfig)
     spiBusSetInstance(busdev, instance);
 
     IOInit(busdev->busdev_u.spi.csnPin, OWNER_FLASH_CS, 0);
-    IOConfigGPIO(busdev->busdev_u.spi.csnPin, SPI_IO_CS_CFG);
+    //IOConfigGPIO(busdev->busdev_u.spi.csnPin, SPI_IO_CS_CFG);
     IOHi(busdev->busdev_u.spi.csnPin);
 
 #ifdef USE_SPI_TRANSACTION
@@ -340,7 +342,7 @@ static void flashConfigurePartitions(void)
 #endif
 }
 
-flashPartition_t *flashPartitionFindByType(uint8_t type)
+flashPartition_t *flashPartitionFindByType(flashPartitionType_e type)
 {
     for (int index = 0; index < FLASH_MAX_PARTITIONS; index++) {
         flashPartition_t *candidate = &flashPartitionTable.partitions[index];
@@ -398,8 +400,9 @@ const char *flashPartitionGetTypeName(flashPartitionType_e type)
 
 bool flashInit(const flashConfig_t *flashConfig)
 {
+    //printf("Inside flashInit\n");
     memset(&flashPartitionTable, 0x00, sizeof(flashPartitionTable));
-
+ 
     bool haveFlash = flashDeviceInit(flashConfig);
 
     flashConfigurePartitions();

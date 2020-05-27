@@ -19,4 +19,12 @@
  */
 
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "platform.h"
+#include "drivers/system.h"
+
+void failureMode(failureMode_e mode) {
+    printf("[failureMode]!!! %d\n", mode);
+    while (1);
+}

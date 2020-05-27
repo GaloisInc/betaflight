@@ -40,7 +40,7 @@ mcuTypeId_e getMcuTypeId(void)
 {
 #if defined(SIMULATOR_BUILD)
     return MCU_TYPE_SIMULATOR;
-#elif defined(MAIXBIT)
+#elif defined(RISCV_K210)
     return MCU_TYPE_RISCV_K210;
 #elif defined(STM32F1)
     return MCU_TYPE_F103;

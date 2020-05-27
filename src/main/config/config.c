@@ -18,6 +18,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+// temp for debugging
+#include "capstone_print.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -153,6 +156,7 @@ void resetConfig(void)
 
 static void activateConfig(void)
 {
+/*    
     schedulerOptimizeRate(systemConfig()->schedulerOptimizeRate == SCHEDULER_OPTIMIZE_RATE_ON || (systemConfig()->schedulerOptimizeRate == SCHEDULER_OPTIMIZE_RATE_AUTO && motorConfig()->dev.useDshotTelemetry));
     loadPidProfile();
     loadControlRateProfile();
@@ -176,17 +180,19 @@ static void activateConfig(void)
 #if defined(USE_LED_STRIP_STATUS_MODE)
     reevaluateLedConfig();
 #endif
+*/
 }
-
+/*
 static void adjustFilterLimit(uint16_t *parm, uint16_t resetValue)
 {
     if (*parm > FILTER_FREQUENCY_MAX) {
         *parm = resetValue;
-    }
+    }    
 }
-
+*/
 static void validateAndFixConfig(void)
 {
+/*
 #if !defined(USE_QUAD_MIXER_ONLY)
     // Reset unsupported mixer mode to default.
     // This check will be gone when motor/servo mixers are loaded dynamically
@@ -555,8 +561,9 @@ static void validateAndFixConfig(void)
 #if defined(TARGET_VALIDATECONFIG)
     targetValidateConfiguration();
 #endif
+*/
 }
-
+/*
 void validateAndFixGyroConfig(void)
 {
     // Fix gyro filter settings to handle cases where an older configurator was used that
@@ -670,7 +677,7 @@ void validateAndFixGyroConfig(void)
     }
     loadPidProfile();
 }
-
+*/
 bool readEEPROM(void)
 {
     suspendRxPwmPpmSignal();
@@ -692,12 +699,16 @@ bool readEEPROM(void)
 void writeUnmodifiedConfigToEEPROM(void)
 {
     validateAndFixConfig();
+    print_my_msg("Validate and Fix Config - successful", __FUNCTION__,__FILE__,__LINE__);
 
     suspendRxPwmPpmSignal();
+    print_my_msg("Suspended PWM/PPM Signals - successful", __FUNCTION__,__FILE__,__LINE__);
 
     writeConfigToEEPROM();
+    print_my_msg("Write Unmodified Config to EEPROM - successful", __FUNCTION__,__FILE__,__LINE__);
 
     resumeRxPwmPpmSignal();
+    print_my_msg("Resumed PWM/PPM Signals - successful", __FUNCTION__,__FILE__,__LINE__);
     configIsDirty = false;
 }
 
@@ -731,9 +742,11 @@ bool resetEEPROM(bool useCustomDefaults)
 void ensureEEPROMStructureIsValid(void)
 {
     if (isEEPROMStructureValid()) {
+        print_my_msg("EEPROM Structure Valid - successful", __FUNCTION__,__FILE__,__LINE__);
         return;
     }
     resetEEPROM(false);
+    print_my_msg("Reset EEPROM Complete - successful", __FUNCTION__,__FILE__,__LINE__);
 }
 
 void saveConfigAndNotify(void)
@@ -806,3 +819,4 @@ bool getRebootRequired(void)
 {
     return rebootRequired;
 }
+

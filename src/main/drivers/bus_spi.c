@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "platform.h"
 
@@ -37,6 +38,7 @@ spiDevice_t spiDevice[SPIDEV_COUNT];
 
 SPIDevice spiDeviceByInstance(SPI_TypeDef *instance)
 {
+    //printf("%s:%s:%d - Entering bus_spi.c \n\n", __FUNCTION__,__FILE__,__LINE__);
 #ifdef USE_SPI_DEVICE_1
     if (instance == SPI1)
         return SPIDEV_1;
@@ -48,6 +50,7 @@ SPIDevice spiDeviceByInstance(SPI_TypeDef *instance)
 #endif
 
 #ifdef USE_SPI_DEVICE_3
+    //printf("%s:%s:%d - USE_SPI_DEVICE_3 \n\n", __FUNCTION__,__FILE__,__LINE__);
     if (instance == SPI3)
         return SPIDEV_3;
 #endif
@@ -238,7 +241,7 @@ void spiBusSetInstance(busDevice_t *bus, SPI_TypeDef *instance)
     bus->busdev_u.spi.instance = instance;
 }
 
-void spiBusSetDivisor(busDevice_t *bus, uint16_t divisor)
+void spiBusSetDivisor(busDevice_t *bus, SPIClockDivider_e divisor)
 {
     spiSetDivisor(bus->busdev_u.spi.instance, divisor);
     // bus->busdev_u.spi.modeCache = bus->busdev_u.spi.instance->CR1;
@@ -283,3 +286,9 @@ bool spiBusTransactionReadRegisterBuffer(const busDevice_t *bus, uint8_t reg, ui
 }
 #endif // USE_SPI_TRANSACTION
 #endif
+
+
+void spiInitDevice(SPIDevice device, bool leadingEdge)
+{
+
+}

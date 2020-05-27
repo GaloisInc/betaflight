@@ -18,6 +18,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
+// temp for debugging
+#include "capstone_print.h"
+
 #include <string.h>
 
 #include "platform.h"
@@ -26,6 +29,9 @@
 #include "drivers/flash.h"
 
 #include "config/config_streamer.h"
+
+// riscv files
+#include "drivers/flash_riscv_k210.h"
 
 #if !defined(CONFIG_IN_FLASH)
 #if defined(CONFIG_IN_RAM) && defined(PERSISTENT)
@@ -76,8 +82,8 @@ uint8_t eepromData[EEPROM_SIZE];
 # elif defined(STM32G4)
 #  define FLASH_PAGE_SIZE                 ((uint32_t)0x800) // 2K page
 // RISCV_K210
-# elif defined(RISCVK210)
-#  define FLASH_PAGE_SIZE                 ((uint32_t)0x4000) // 16k sectors
+# elif defined(RISCV_K210)
+#  define FLASH_PAGE_SIZE                 ((uint32_t)0x100) // 256 page per flash_riscv_k210.h
 // SIMULATOR
 # elif defined(SIMULATOR_BUILD)
 #  define FLASH_PAGE_SIZE                 (0x400)
@@ -96,6 +102,11 @@ void config_streamer_start(config_streamer_t *c, uintptr_t base, int size)
     // base must start at FLASH_PAGE_SIZE boundary when using embedded flash.
     c->address = base;
     c->size = size;
+
+    char buffer[200];
+    sprintf(buffer, "Config File at RAM Address 0x%lx | Total Size Reserved (%d) kB", c->address, (int)(c->size));
+    print_my_msg(buffer, __FUNCTION__, __FILE__, __LINE__);
+
     if (!c->unlocked) {
 #if defined(CONFIG_IN_RAM) || defined(CONFIG_IN_EXTERNAL_FLASH) || defined(CONFIG_IN_SDCARD)
         // NOP
@@ -356,7 +367,15 @@ static int write_word(config_streamer_t *c, config_streamer_buffer_align_type_t 
         return c->err;
     }
 #if defined(CONFIG_IN_EXTERNAL_FLASH)
+#if defined(RISCV_K210)
+    uint32_t flashStartAddress = FLASH_START_ADDR;
+    uint32_t dataOffset = (uint32_t)(c->address - (uintptr_t)&eepromData[0]);
+    uint32_t flashAddress = flashStartAddress + dataOffset;
 
+    printf("Writing to Flash Address 0x%02x\n", flashAddress);
+    flash_write_data(flashAddress, (uint8_t *)buffer, CONFIG_STREAMER_BUFFER_SIZE);
+
+#else
     uint32_t dataOffset = (uint32_t)(c->address - (uintptr_t)&eepromData[0]);
 
     const flashPartition_t *flashPartition = flashPartitionFindByType(FLASH_PARTITION_TYPE_CONFIG);
@@ -389,7 +408,7 @@ static int write_word(config_streamer_t *c, config_streamer_buffer_align_type_t 
     }
 
     flashPageProgramContinue((uint8_t *)buffer, CONFIG_STREAMER_BUFFER_SIZE);
-
+#endif
 #elif defined(CONFIG_IN_RAM) || defined(CONFIG_IN_SDCARD)
     if (c->address == (uintptr_t)&eepromData[0]) {
         memset(eepromData, 0, sizeof(eepromData));
@@ -511,6 +530,7 @@ int config_streamer_write(config_streamer_t *c, const uint8_t *p, uint32_t size)
             c->at = 0;
         }
     }
+
     return c->err;
 }
 
