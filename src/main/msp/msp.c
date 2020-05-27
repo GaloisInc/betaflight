@@ -133,6 +133,7 @@
 #include "sensors/compass.h"
 #include "sensors/esc_sensor.h"
 #include "sensors/gyro.h"
+#include "sensors/gyro_init.h"
 #include "sensors/rangefinder.h"
 
 #include "telemetry/telemetry.h"
@@ -594,36 +595,39 @@ static bool mspCommonProcessOutCommand(int16_t cmdMSP, sbuf_t *dst, mspPostProce
 #else
         sbufWriteU8(dst, 0);  // 0 == FC
 #endif
+
         // Target capabilities (uint8)
-#define TARGET_HAS_VCP_BIT 0
-#define TARGET_HAS_SOFTSERIAL_BIT 1
-#define TARGET_IS_UNIFIED_BIT 2
-#define TARGET_HAS_FLASH_BOOTLOADER_BIT 3
-#define TARGET_SUPPORTS_CUSTOM_DEFAULTS_BIT 4
-#define TARGET_HAS_CUSTOM_DEFAULTS_BIT 5
-#define TARGET_SUPPORTS_RX_BIND_BIT 6
+#define TARGET_HAS_VCP 0
+#define TARGET_HAS_SOFTSERIAL 1
+#define TARGET_IS_UNIFIED 2
+#define TARGET_HAS_FLASH_BOOTLOADER 3
+#define TARGET_SUPPORTS_CUSTOM_DEFAULTS 4
+#define TARGET_HAS_CUSTOM_DEFAULTS 5
+#define TARGET_SUPPORTS_RX_BIND 6
 
         uint8_t targetCapabilities = 0;
 #ifdef USE_VCP
-        targetCapabilities |= 1 << TARGET_HAS_VCP_BIT;
+        targetCapabilities |= BIT(TARGET_HAS_VCP);
 #endif
 #if defined(USE_SOFTSERIAL1) || defined(USE_SOFTSERIAL2)
-        targetCapabilities |= 1 << TARGET_HAS_SOFTSERIAL_BIT;
+        targetCapabilities |= BIT(TARGET_HAS_SOFTSERIAL);
 #endif
 #if defined(USE_UNIFIED_TARGET)
-        targetCapabilities |= 1 << TARGET_IS_UNIFIED_BIT;
+        targetCapabilities |= BIT(TARGET_IS_UNIFIED);
 #endif
 #if defined(USE_FLASH_BOOT_LOADER)
-        targetCapabilities |= 1 << TARGET_HAS_FLASH_BOOTLOADER_BIT;
+        targetCapabilities |= BIT(TARGET_HAS_FLASH_BOOTLOADER);
 #endif
 #if defined(USE_CUSTOM_DEFAULTS)
-        targetCapabilities |= 1 << TARGET_SUPPORTS_CUSTOM_DEFAULTS_BIT;
+        targetCapabilities |= BIT(TARGET_SUPPORTS_CUSTOM_DEFAULTS);
         if (hasCustomDefaults()) {
-            targetCapabilities |= 1 << TARGET_HAS_CUSTOM_DEFAULTS_BIT;
+            targetCapabilities |= BIT(TARGET_HAS_CUSTOM_DEFAULTS);
         }
 #endif
 #if defined(USE_RX_BIND)
-        targetCapabilities |= (getRxBindSupported() << TARGET_SUPPORTS_RX_BIND_BIT);
+        if (getRxBindSupported()) {
+            targetCapabilities |= BIT(TARGET_SUPPORTS_RX_BIND);
+        }
 #endif
 
         sbufWriteU8(dst, targetCapabilities);
@@ -661,8 +665,26 @@ static bool mspCommonProcessOutCommand(int16_t cmdMSP, sbuf_t *dst, mspPostProce
         // Added in API version 1.42
         sbufWriteU8(dst, systemConfig()->configurationState);
 
-        //Added in API version 1.43
+        // Added in API version 1.43
         sbufWriteU16(dst, gyro.sampleRateHz); // informational so the configurator can display the correct gyro/pid frequencies in the drop-down
+
+        // Configuration warnings / problems (uint32_t)
+#define PROBLEM_ACC_NEEDS_CALIBRATION 0
+#define PROBLEM_MOTOR_PROTOCOL_DISABLED 1
+
+        uint32_t configurationProblems = 0;
+
+#if defined(USE_ACC)
+        if (!accHasBeenCalibrated()) {
+            configurationProblems |= BIT(PROBLEM_ACC_NEEDS_CALIBRATION);
+        }
+#endif
+
+        if (!checkMotorProtocolEnabled(&motorConfig()->dev, NULL)) {
+            configurationProblems |= BIT(PROBLEM_MOTOR_PROTOCOL_DISABLED);
+        }
+
+        sbufWriteU32(dst, configurationProblems);
 
         break;
     }
@@ -736,7 +758,7 @@ static bool mspCommonProcessOutCommand(int16_t cmdMSP, sbuf_t *dst, mspPostProce
             voltageMeterRead(id, &meter);
 
             sbufWriteU8(dst, id);
-            sbufWriteU8(dst, (uint8_t)constrain((meter.filtered + 5) / 10, 0, 255));
+            sbufWriteU8(dst, (uint8_t)constrain((meter.displayFiltered + 5) / 10, 0, 255));
         }
         break;
     }
@@ -864,27 +886,25 @@ static bool mspCommonProcessOutCommand(int16_t cmdMSP, sbuf_t *dst, mspPostProce
 #if defined(USE_OSD)
         osdFlags |= OSD_FLAGS_OSD_FEATURE;
 
-        osdDisplayPortDevice_e device = OSD_DISPLAYPORT_DEVICE_NONE;
-        displayPort_t *osdDisplayPort = osdGetDisplayPort(&device);
-        if (osdDisplayPort) {
-            switch (device) {
-                case OSD_DISPLAYPORT_DEVICE_NONE:
-                case OSD_DISPLAYPORT_DEVICE_AUTO:
-                    break;
-                case OSD_DISPLAYPORT_DEVICE_MAX7456:
-                    osdFlags |= OSD_FLAGS_OSD_HARDWARE_MAX_7456;
-                    break;
-                case OSD_DISPLAYPORT_DEVICE_MSP:
-                    break;
-                case OSD_DISPLAYPORT_DEVICE_FRSKYOSD:
-                    osdFlags |= OSD_FLAGS_OSD_HARDWARE_FRSKYOSD;
-                    break;
+        osdDisplayPortDevice_e deviceType;
+        displayPort_t *osdDisplayPort = osdGetDisplayPort(&deviceType);
+        switch (deviceType) {
+        case OSD_DISPLAYPORT_DEVICE_MAX7456:
+            osdFlags |= OSD_FLAGS_OSD_HARDWARE_MAX_7456;
+            if (osdDisplayPort && displayIsReady(osdDisplayPort)) {
+                osdFlags |= OSD_FLAGS_OSD_DEVICE_DETECTED;
             }
-            if (osdFlags | (OSD_FLAGS_OSD_HARDWARE_MAX_7456 | OSD_FLAGS_OSD_HARDWARE_FRSKYOSD)) {
-                if (displayIsReady(osdDisplayPort)) {
-                    osdFlags |= OSD_FLAGS_OSD_DEVICE_DETECTED;
-                }
+
+            break;
+        case OSD_DISPLAYPORT_DEVICE_FRSKYOSD:
+            osdFlags |= OSD_FLAGS_OSD_HARDWARE_FRSKYOSD;
+            if (osdDisplayPort && displayIsReady(osdDisplayPort)) {
+                osdFlags |= OSD_FLAGS_OSD_DEVICE_DETECTED;
             }
+
+            break;
+        default:
+            break;
         }
 #endif
         sbufWriteU8(dst, osdFlags);
@@ -980,7 +1000,7 @@ static bool mspProcessOutCommand(int16_t cmdMSP, sbuf_t *dst)
             boxBitmask_t flightModeFlags;
             const int flagBits = packFlightModeFlags(&flightModeFlags);
 
-            sbufWriteU16(dst, getTaskDeltaTime(TASK_PID));
+            sbufWriteU16(dst, getTaskDeltaTimeUs(TASK_PID));
 #ifdef USE_I2C
             sbufWriteU16(dst, i2cGetErrorCounter());
 #else
@@ -989,7 +1009,7 @@ static bool mspProcessOutCommand(int16_t cmdMSP, sbuf_t *dst)
             sbufWriteU16(dst, sensors(SENSOR_ACC) | sensors(SENSOR_BARO) << 1 | sensors(SENSOR_MAG) << 2 | sensors(SENSOR_GPS) << 3 | sensors(SENSOR_RANGEFINDER) << 4 | sensors(SENSOR_GYRO) << 5);
             sbufWriteData(dst, &flightModeFlags, 4);        // unconditional part of flags, first 32 bits
             sbufWriteU8(dst, getCurrentPidProfileIndex());
-            sbufWriteU16(dst, constrain(averageSystemLoadPercent, 0, 100));
+            sbufWriteU16(dst, constrain(getAverageSystemLoadPercent(), 0, LOAD_PERCENTAGE_ONE));
             if (cmdMSP == MSP_STATUS_EX) {
                 sbufWriteU8(dst, PID_PROFILE_COUNT);
                 sbufWriteU8(dst, getCurrentControlRateProfileIndex());
@@ -1799,6 +1819,7 @@ static bool mspProcessOutCommand(int16_t cmdMSP, sbuf_t *dst)
         // Added in MSP API 1.43
         sbufWriteU8(dst, currentPidProfile->motor_output_limit);
         sbufWriteU8(dst, currentPidProfile->auto_profile_cell_count);
+        sbufWriteU8(dst, currentPidProfile->idle_min_rpm);
 
         break;
     case MSP_SENSOR_CONFIG:
@@ -2447,11 +2468,7 @@ static mspResult_e mspProcessInCommand(mspDescriptor_t srcDesc, int16_t cmdMSP, 
         sbufReadU8(src); // was gyroConfigMutable()->gyro_sync_denom - removed in API 1.43
         pidConfigMutable()->pid_process_denom = sbufReadU8(src);
         motorConfigMutable()->dev.useUnsyncedPwm = sbufReadU8(src);
-#ifdef USE_DSHOT
-        motorConfigMutable()->dev.motorPwmProtocol = constrain(sbufReadU8(src), 0, PWM_TYPE_MAX - 1);
-#else
-        motorConfigMutable()->dev.motorPwmProtocol = constrain(sbufReadU8(src), 0, PWM_TYPE_BRUSHED);
-#endif
+        motorConfigMutable()->dev.motorPwmProtocol = sbufReadU8(src);
         motorConfigMutable()->dev.motorPwmRate = sbufReadU16(src);
         if (sbufBytesRemaining(src) >= 2) {
             motorConfigMutable()->digitalIdleOffsetValue = sbufReadU16(src);
@@ -2645,10 +2662,11 @@ static mspResult_e mspProcessInCommand(mspDescriptor_t srcDesc, int16_t cmdMSP, 
             sbufReadU8(src);
 #endif
         }
-        if(sbufBytesRemaining(src) >= 2) {
+        if(sbufBytesRemaining(src) >= 3) {
             // Added in MSP API 1.43
             currentPidProfile->motor_output_limit = sbufReadU8(src);
             currentPidProfile->auto_profile_cell_count = sbufReadU8(src);
+            currentPidProfile->idle_min_rpm = sbufReadU8(src);
         }
         pidInitConfig(currentPidProfile);
 
@@ -3044,7 +3062,11 @@ static mspResult_e mspProcessInCommand(mspDescriptor_t srcDesc, int16_t cmdMSP, 
         if (sbufBytesRemaining(src) >= 1) {
             // Added in MSP API 1.42
 #if defined(USE_RC_SMOOTHING_FILTER)
-            configRebootUpdateCheckU8(&rxConfigMutable()->rc_smoothing_auto_factor, sbufReadU8(src));
+            // Added extra validation/range constraint for rc_smoothing_auto_factor as a workaround for a bug in
+            // the 10.6 configurator where it was possible to submit an invalid out-of-range value. We might be
+            // able to remove the constraint at some point in the future once the affected versions are deprecated
+            // enough that the risk is low.
+            configRebootUpdateCheckU8(&rxConfigMutable()->rc_smoothing_auto_factor, constrain(sbufReadU8(src), RC_SMOOTHING_AUTO_FACTOR_MIN, RC_SMOOTHING_AUTO_FACTOR_MAX));
 #else
             sbufReadU8(src);
 #endif

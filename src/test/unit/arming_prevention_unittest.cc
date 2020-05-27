@@ -22,6 +22,7 @@ extern "C" {
     #include "build/debug.h"
     #include "common/maths.h"
     #include "config/feature.h"
+    #include "pg/motor.h"
     #include "pg/pg.h"
     #include "pg/pg_ids.h"
     #include "pg/rx.h"
@@ -55,6 +56,7 @@ extern "C" {
     PG_REGISTER(systemConfig_t, systemConfig, PG_SYSTEM_CONFIG, 0);
     PG_REGISTER(telemetryConfig_t, telemetryConfig, PG_TELEMETRY_CONFIG, 0);
     PG_REGISTER(failsafeConfig_t, failsafeConfig, PG_FAILSAFE_CONFIG, 0);
+    PG_REGISTER(motorConfig_t, motorConfig, PG_MOTOR_CONFIG, 0);
 
     float rcCommand[4];
     int16_t rcData[MAX_SUPPORTED_RC_CHANNEL_COUNT];
@@ -1051,7 +1053,7 @@ extern "C" {
     bool calculateRxChannelsAndUpdateFailsafe(timeUs_t) { return true; }
     bool isMixerUsingServos(void) { return false; }
     void gyroUpdate(void) {}
-    timeDelta_t getTaskDeltaTime(cfTaskId_e) { return 0; }
+    timeDelta_t getTaskDeltaTimeUs(taskId_e) { return 0; }
     void updateRSSI(timeUs_t) {}
     bool failsafeIsMonitoring(void) { return false; }
     void failsafeStartMonitoring(void) {}
@@ -1082,7 +1084,7 @@ extern "C" {
     void dashboardEnablePageCycling(void) {}
     void dashboardDisablePageCycling(void) {}
     bool imuQuaternionHeadfreeOffsetSet(void) { return true; }
-    void rescheduleTask(cfTaskId_e, uint32_t) {}
+    void rescheduleTask(taskId_e, timeDelta_t) {}
     bool usbCableIsInserted(void) { return false; }
     bool usbVcpIsConnected(void) { return false; }
     void pidSetAntiGravityState(bool) {}
@@ -1101,4 +1103,8 @@ extern "C" {
     bool isUpright(void) { return mockIsUpright; }
     void blackboxLogEvent(FlightLogEvent, union flightLogEventData_u *) {};
     void gyroFiltering(timeUs_t) {};
+    timeDelta_t rxGetFrameDelta(timeDelta_t *) { return 0; }
+    void updateRcRefreshRate(timeUs_t) {};
+    uint16_t getAverageSystemLoadPercent(void) { return 0; }
+    bool isMotorProtocolEnabled(void) { return true; }
 }

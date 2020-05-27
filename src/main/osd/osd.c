@@ -53,6 +53,7 @@
 #include "config/feature.h"
 
 #include "drivers/display.h"
+#include "drivers/dshot.h"
 #include "drivers/flash.h"
 #include "drivers/osd_symbols.h"
 #include "drivers/sdcard.h"
@@ -66,6 +67,7 @@
 #include "flight/gyroanalyse.h"
 #endif
 #include "flight/imu.h"
+#include "flight/mixer.h"
 #include "flight/position.h"
 
 #include "io/asyncfatfs/asyncfatfs.h"
@@ -76,10 +78,12 @@
 #include "osd/osd.h"
 #include "osd/osd_elements.h"
 
+#include "pg/motor.h"
 #include "pg/pg.h"
 #include "pg/pg_ids.h"
 #include "pg/stats.h"
 
+#include "rx/crsf.h"
 #include "rx/rx.h"
 
 #include "sensors/acceleration.h"
@@ -126,7 +130,7 @@ static uint8_t armState;
 static uint8_t osdProfile = 1;
 #endif
 static displayPort_t *osdDisplayPort;
-static osdDisplayPortDevice_e osdDisplayPortDevice;
+static osdDisplayPortDevice_e osdDisplayPortDeviceType;
 static bool osdIsReady;
 
 static bool suppressStatsDisplay = false;
@@ -140,7 +144,7 @@ escSensorData_t *osdEscDataCombined;
 
 STATIC_ASSERT(OSD_POS_MAX == OSD_POS(31,31), OSD_POS_MAX_incorrect);
 
-PG_REGISTER_WITH_RESET_FN(osdConfig_t, osdConfig, PG_OSD_CONFIG, 7);
+PG_REGISTER_WITH_RESET_FN(osdConfig_t, osdConfig, PG_OSD_CONFIG, 8);
 
 PG_REGISTER_WITH_RESET_FN(osdElementConfig_t, osdElementConfig, PG_OSD_ELEMENT_CONFIG, 0);
 
@@ -319,7 +323,7 @@ void pgResetFn_osdConfig(osdConfig_t *osdConfig)
     for (int i=0; i < OSD_PROFILE_COUNT; i++) {
         osdConfig->profile[i][0] = '\0';
     }
-    osdConfig->rssi_dbm_alarm = 60;
+    osdConfig->rssi_dbm_alarm = -60;
     osdConfig->gps_sats_show_hdop = false;
 
     for (int i = 0; i < OSD_RCCHANNELS_COUNT; i++) {
@@ -411,14 +415,15 @@ static void osdCompleteInitialization(void)
     osdIsReady = true;
 }
 
-void osdInit(displayPort_t *osdDisplayPortToUse, osdDisplayPortDevice_e displayPortDeviceToUse)
+void osdInit(displayPort_t *osdDisplayPortToUse, osdDisplayPortDevice_e displayPortDeviceType)
 {
+    osdDisplayPortDeviceType = displayPortDeviceType;
+
     if (!osdDisplayPortToUse) {
         return;
     }
 
     osdDisplayPort = osdDisplayPortToUse;
-    osdDisplayPortDevice = displayPortDeviceToUse;
 #ifdef USE_CMS
     cmsDisplayPortRegister(osdDisplayPort);
 #endif
@@ -446,9 +451,31 @@ static void osdResetStats(void)
     stats.max_g_force  = 0;
     stats.max_esc_temp = 0;
     stats.max_esc_rpm  = 0;
-    stats.min_link_quality =  (linkQualitySource == LQ_SOURCE_RX_PROTOCOL_CRSF) ? 300 : 99; // CRSF  : percent
-    stats.min_rssi_dbm = 0;
+    stats.min_link_quality =  (linkQualitySource == LQ_SOURCE_RX_PROTOCOL_CRSF) ? 100 : 99; // percent
+    stats.min_rssi_dbm = CRSF_SNR_MAX;
 }
+
+#if defined(USE_ESC_SENSOR) || defined(USE_DSHOT_TELEMETRY)
+static int32_t getAverageEscRpm(void)
+{
+#ifdef USE_DSHOT_TELEMETRY
+    if (motorConfig()->dev.useDshotTelemetry) {
+        uint32_t rpm = 0;
+        for (int i = 0; i < getMotorCount(); i++) {
+            rpm += getDshotTelemetry(i);
+        }
+        rpm = rpm / getMotorCount();
+        return rpm * 100 * 2 / motorConfig()->motorPoleCount;
+    }
+#endif
+#ifdef USE_ESC_SENSOR
+    if (featureIsEnabled(FEATURE_ESC_SENSOR)) {
+        return calcEscRpm(osdEscDataCombined->rpm);
+    }
+#endif
+    return 0;
+}
+#endif
 
 static void osdUpdateStats(void)
 {
@@ -500,7 +527,7 @@ static void osdUpdateStats(void)
 
 #ifdef USE_RX_RSSI_DBM
     value = getRssiDbm();
-    if (stats.min_rssi_dbm < value) {
+    if (stats.min_rssi_dbm > value) {
         stats.min_rssi_dbm = value;
     }
 #endif
@@ -512,16 +539,20 @@ static void osdUpdateStats(void)
         }
     }
 #endif
+
 #ifdef USE_ESC_SENSOR
     if (featureIsEnabled(FEATURE_ESC_SENSOR)) {
         value = osdEscDataCombined->temperature;
         if (stats.max_esc_temp < value) {
             stats.max_esc_temp = value;
         }
-        value = calcEscRpm(osdEscDataCombined->rpm);
-        if (stats.max_esc_rpm < value) {
-            stats.max_esc_rpm = value;
-        }
+    }
+#endif
+
+#if defined(USE_ESC_SENSOR) || defined(USE_DSHOT_TELEMETRY)
+    int32_t rpm = getAverageEscRpm();
+    if (stats.max_esc_rpm < rpm) {
+        stats.max_esc_rpm = rpm;
     }
 #endif
 }
@@ -728,7 +759,9 @@ static bool osdDisplayStat(int statistic, uint8_t displayRow)
         tfp_sprintf(buff, "%d%c", osdConvertTemperatureToSelectedUnit(stats.max_esc_temp), osdGetTemperatureSymbolForSelectedUnit());
         osdDisplayStatisticLabel(displayRow, "MAX ESC TEMP", buff);
         return true;
+#endif
 
+#if defined(USE_ESC_SENSOR) || defined(USE_DSHOT_TELEMETRY)
     case OSD_STAT_MAX_ESC_RPM:
         itoa(stats.max_esc_rpm, buff, 10);
         osdDisplayStatisticLabel(displayRow, "MAX ESC RPM", buff);
@@ -760,7 +793,7 @@ static bool osdDisplayStat(int statistic, uint8_t displayRow)
 
 #ifdef USE_RX_RSSI_DBM
     case OSD_STAT_MIN_RSSI_DBM:
-        tfp_sprintf(buff, "%3d", stats.min_rssi_dbm * -1);
+        tfp_sprintf(buff, "%3d", stats.min_rssi_dbm);
         osdDisplayStatisticLabel(displayRow, "MIN RSSI DBM", buff);
         return true;
 #endif
@@ -1046,10 +1079,10 @@ bool osdNeedsAccelerometer(void)
 }
 #endif // USE_ACC
 
-displayPort_t *osdGetDisplayPort(osdDisplayPortDevice_e *displayPortDevice)
+displayPort_t *osdGetDisplayPort(osdDisplayPortDevice_e *displayPortDeviceType)
 {
-    if (displayPortDevice) {
-        *displayPortDevice = osdDisplayPortDevice;
+    if (displayPortDeviceType) {
+        *displayPortDeviceType = osdDisplayPortDeviceType;
     }
     return osdDisplayPort;
 }

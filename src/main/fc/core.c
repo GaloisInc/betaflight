@@ -25,10 +25,10 @@
 
 #include "platform.h"
 
-#include "build/debug.h"
-
 #include "blackbox/blackbox.h"
 #include "blackbox/blackbox_fielddefs.h"
+
+#include "build/debug.h"
 
 #include "cli/cli.h"
 
@@ -39,6 +39,7 @@
 #include "common/maths.h"
 #include "common/utils.h"
 
+#include "config/config.h"
 #include "config/feature.h"
 
 #include "drivers/dshot.h"
@@ -50,21 +51,20 @@
 #include "drivers/time.h"
 #include "drivers/transponder_ir.h"
 
-#include "config/config.h"
 #include "fc/controlrate_profile.h"
-#include "fc/core.h"
 #include "fc/rc.h"
 #include "fc/rc_adjustments.h"
 #include "fc/rc_controls.h"
 #include "fc/runtime_config.h"
 #include "fc/stats.h"
-#include "fc/tasks.h"
 
 #include "flight/failsafe.h"
 #include "flight/gps_rescue.h"
+
 #if defined(USE_GYRO_DATA_ANALYSE)
 #include "flight/gyroanalyse.h"
 #endif
+
 #include "flight/imu.h"
 #include "flight/mixer.h"
 #include "flight/pid.h"
@@ -104,6 +104,8 @@
 #include "sensors/gyro.h"
 
 #include "telemetry/telemetry.h"
+
+#include "core.h"
 
 
 enum {
@@ -149,7 +151,6 @@ static bool flipOverAfterCrashActive = false;
 
 static timeUs_t disarmAt;     // Time of automatic disarm when "Don't spin the motors when armed" is enabled and auto_disarm_delay is nonzero
 
-bool isRXDataNew;
 static int lastArmingDisabledReason = 0;
 static timeUs_t lastDisarmTimeUs;
 static int tryingToArm = ARMING_DELAYED_DISARMED;
@@ -276,7 +277,7 @@ void updateArmingStatus(void)
             // We also need to prevent arming until it's possible to send DSHOT commands.
             // Otherwise if the initial arming is in crash-flip the motor direction commands
             // might not be sent.
-            && dshotCommandsAreEnabled()
+            && (!isMotorProtocolDshot() || dshotCommandsAreEnabled(DSHOT_CMD_TYPE_INLINE))
 #endif
         ) {
             // If so, unset the grace time arming disable flag
@@ -322,7 +323,7 @@ void updateArmingStatus(void)
             unsetArmingDisabled(ARMING_DISABLED_ANGLE);
         }
 
-        if (averageSystemLoadPercent > 100) {
+        if (getAverageSystemLoadPercent() > LOAD_PERCENTAGE_ONE) {
             setArmingDisabled(ARMING_DISABLED_LOAD);
         } else {
             unsetArmingDisabled(ARMING_DISABLED_LOAD);
@@ -387,33 +388,37 @@ void updateArmingStatus(void)
         }
 #endif
 
+        if (!isMotorProtocolEnabled()) {
+            setArmingDisabled(ARMING_DISABLED_MOTOR_PROTOCOL);
+        }
+
         if (!isUsingSticksForArming()) {
-          /* Ignore ARMING_DISABLED_CALIBRATING if we are going to calibrate gyro on first arm */
-          bool ignoreGyro = armingConfig()->gyro_cal_on_first_arm
-                         && !(getArmingDisableFlags() & ~(ARMING_DISABLED_ARM_SWITCH | ARMING_DISABLED_CALIBRATING));
-
-          /* Ignore ARMING_DISABLED_THROTTLE (once arm switch is on) if we are in 3D mode */
-          bool ignoreThrottle = featureIsEnabled(FEATURE_3D)
-                             && !IS_RC_MODE_ACTIVE(BOX3D)
-                             && !flight3DConfig()->switched_mode3d
-                             && !(getArmingDisableFlags() & ~(ARMING_DISABLED_ARM_SWITCH | ARMING_DISABLED_THROTTLE));
-
-           if (!IS_RC_MODE_ACTIVE(BOXARM)) {
+            if (!IS_RC_MODE_ACTIVE(BOXARM)) {
 #ifdef USE_RUNAWAY_TAKEOFF
-               unsetArmingDisabled(ARMING_DISABLED_RUNAWAY_TAKEOFF);
+                unsetArmingDisabled(ARMING_DISABLED_RUNAWAY_TAKEOFF);
 #endif
-               unsetArmingDisabled(ARMING_DISABLED_CRASH_DETECTED);
-           }
+                unsetArmingDisabled(ARMING_DISABLED_CRASH_DETECTED);
+            }
 
-          // If arming is disabled and the ARM switch is on
-          if (isArmingDisabled()
-              && !ignoreGyro
-              && !ignoreThrottle
-              && IS_RC_MODE_ACTIVE(BOXARM)) {
-              setArmingDisabled(ARMING_DISABLED_ARM_SWITCH);
-          } else if (!IS_RC_MODE_ACTIVE(BOXARM)) {
-              unsetArmingDisabled(ARMING_DISABLED_ARM_SWITCH);
-          }
+            /* Ignore ARMING_DISABLED_CALIBRATING if we are going to calibrate gyro on first arm */
+            bool ignoreGyro = armingConfig()->gyro_cal_on_first_arm
+                && !(getArmingDisableFlags() & ~(ARMING_DISABLED_ARM_SWITCH | ARMING_DISABLED_CALIBRATING));
+
+            /* Ignore ARMING_DISABLED_THROTTLE (once arm switch is on) if we are in 3D mode */
+            bool ignoreThrottle = featureIsEnabled(FEATURE_3D)
+                 && !IS_RC_MODE_ACTIVE(BOX3D)
+                 && !flight3DConfig()->switched_mode3d
+                 && !(getArmingDisableFlags() & ~(ARMING_DISABLED_ARM_SWITCH | ARMING_DISABLED_THROTTLE));
+
+            // If arming is disabled and the ARM switch is on
+            if (isArmingDisabled()
+                && !ignoreGyro
+                && !ignoreThrottle
+                && IS_RC_MODE_ACTIVE(BOXARM)) {
+                setArmingDisabled(ARMING_DISABLED_ARM_SWITCH);
+            } else if (!IS_RC_MODE_ACTIVE(BOXARM)) {
+                unsetArmingDisabled(ARMING_DISABLED_ARM_SWITCH);
+            }
         }
 
         if (isArmingDisabled()) {
@@ -453,7 +458,7 @@ void disarm(flightLogDisarmReason_e reason)
         BEEP_OFF;
 #ifdef USE_DSHOT
         if (isMotorProtocolDshot() && flipOverAfterCrashActive && !featureIsEnabled(FEATURE_3D)) {
-            dshotCommandWrite(ALL_MOTORS, getMotorCount(), DSHOT_CMD_SPIN_DIRECTION_NORMAL, false);
+            dshotCommandWrite(ALL_MOTORS, getMotorCount(), DSHOT_CMD_SPIN_DIRECTION_NORMAL, DSHOT_CMD_TYPE_INLINE);
         }
 #endif
         flipOverAfterCrashActive = false;
@@ -504,7 +509,7 @@ void tryArm(void)
             if (!(IS_RC_MODE_ACTIVE(BOXFLIPOVERAFTERCRASH) || (tryingToArm == ARMING_DELAYED_CRASHFLIP))) {
                 flipOverAfterCrashActive = false;
                 if (!featureIsEnabled(FEATURE_3D)) {
-                    dshotCommandWrite(ALL_MOTORS, getMotorCount(), DSHOT_CMD_SPIN_DIRECTION_NORMAL, false);
+                    dshotCommandWrite(ALL_MOTORS, getMotorCount(), DSHOT_CMD_SPIN_DIRECTION_NORMAL, DSHOT_CMD_TYPE_INLINE);
                 }
             } else {
                 flipOverAfterCrashActive = true;
@@ -512,7 +517,7 @@ void tryArm(void)
                 runawayTakeoffCheckDisabled = false;
 #endif
                 if (!featureIsEnabled(FEATURE_3D)) {
-                    dshotCommandWrite(ALL_MOTORS, getMotorCount(), DSHOT_CMD_SPIN_DIRECTION_REVERSED, false);
+                    dshotCommandWrite(ALL_MOTORS, getMotorCount(), DSHOT_CMD_SPIN_DIRECTION_REVERSED, DSHOT_CMD_TYPE_INLINE);
                 }
             }
         }
@@ -731,7 +736,6 @@ bool isAirmodeActivated()
 }
 
 
-
 /*
  * processRx called from taskUpdateRxMain
  */
@@ -742,9 +746,17 @@ bool processRx(timeUs_t currentTimeUs)
     static bool sharedPortTelemetryEnabled = false;
 #endif
 
+    timeDelta_t frameAgeUs;
+    timeDelta_t frameDeltaUs = rxGetFrameDelta(&frameAgeUs);
+
+    DEBUG_SET(DEBUG_RX_TIMING, 0, MIN(frameDeltaUs / 10, INT16_MAX));
+    DEBUG_SET(DEBUG_RX_TIMING, 1, MIN(frameAgeUs / 10, INT16_MAX));
+
     if (!calculateRxChannelsAndUpdateFailsafe(currentTimeUs)) {
         return false;
     }
+
+    updateRcRefreshRate(currentTimeUs);
 
     // in 3D mode, we need to be able to disarm by switch at any time
     if (featureIsEnabled(FEATURE_3D)) {
@@ -1150,12 +1162,16 @@ static FAST_CODE_NOINLINE void subTaskPidSubprocesses(timeUs_t currentTimeUs)
 }
 
 #ifdef USE_TELEMETRY
+#define GYRO_TEMP_READ_DELAY_US 3e6    // Only read the gyro temp every 3 seconds
 void subTaskTelemetryPollSensors(timeUs_t currentTimeUs)
 {
-    UNUSED(currentTimeUs);
+    static timeUs_t lastGyroTempTimeUs = 0;
 
-    // Read out gyro temperature if used for telemmetry
-    gyroReadTemperature();
+    if (cmpTimeUs(currentTimeUs, lastGyroTempTimeUs) >= GYRO_TEMP_READ_DELAY_US) {
+        // Read out gyro temperature if used for telemmetry
+        gyroReadTemperature();
+        lastGyroTempTimeUs = currentTimeUs;
+    }
 }
 #endif
 
@@ -1273,8 +1289,8 @@ FAST_CODE void taskMainPidLoop(timeUs_t currentTimeUs)
     subTaskPidSubprocesses(currentTimeUs);
 
     if (debugMode == DEBUG_CYCLETIME) {
-        debug[0] = getTaskDeltaTime(TASK_SELF);
-        debug[1] = averageSystemLoadPercent;
+        DEBUG_SET(DEBUG_CYCLETIME, 0, getTaskDeltaTimeUs(TASK_SELF));
+        DEBUG_SET(DEBUG_CYCLETIME, 1, getAverageSystemLoadPercent());
     }
 }
 

@@ -94,13 +94,16 @@ static FAST_RAM_ZERO_INIT bool zeroThrottleItermReset;
 
 PG_REGISTER_WITH_RESET_TEMPLATE(pidConfig_t, pidConfig, PG_PID_CONFIG, 2);
 
-#ifdef STM32F10X
-#define PID_PROCESS_DENOM_DEFAULT       1
-#elif defined(USE_GYRO_SPI_MPU6000) || defined(USE_GYRO_SPI_MPU6500)  || defined(USE_GYRO_SPI_ICM20689)
+#if defined(STM32F1)
+#define PID_PROCESS_DENOM_DEFAULT       8
+#elif defined(STM32F3)
 #define PID_PROCESS_DENOM_DEFAULT       4
-#else
+#elif defined(STM32F411xE)
 #define PID_PROCESS_DENOM_DEFAULT       2
+#else
+#define PID_PROCESS_DENOM_DEFAULT       1
 #endif
+
 #if defined(USE_D_MIN)
 #define D_MIN_GAIN_FACTOR 0.00005f
 #define D_MIN_SETPOINT_GAIN_FACTOR 0.00005f
@@ -136,7 +139,7 @@ static FAST_RAM_ZERO_INIT float airmodeThrottleOffsetLimit;
 
 #define LAUNCH_CONTROL_YAW_ITERM_LIMIT 50 // yaw iterm windup limit when launch mode is "FULL" (all axes)
 
-PG_REGISTER_ARRAY_WITH_RESET_FN(pidProfile_t, PID_PROFILE_COUNT, pidProfiles, PG_PID_PROFILE, 14);
+PG_REGISTER_ARRAY_WITH_RESET_FN(pidProfile_t, PID_PROFILE_COUNT, pidProfiles, PG_PID_PROFILE, 15);
 
 void resetPidProfile(pidProfile_t *pidProfile)
 {
@@ -144,7 +147,7 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .pid = {
             [PID_ROLL] =  { 42, 85, 35, 90 },
             [PID_PITCH] = { 46, 90, 38, 95 },
-            [PID_YAW] =   { 30, 90, 0, 90 },
+            [PID_YAW] =   { 45, 90, 0, 90 },
             [PID_LEVEL] = { 50, 50, 75, 0 },
             [PID_MAG] =   { 40, 0, 0, 0 },
         },
@@ -206,8 +209,8 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .use_integrated_yaw = false,
         .integrated_yaw_relax = 200,
         .thrustLinearization = 0,
-        .d_min = { 20, 22, 0 },      // roll, pitch, yaw
-        .d_min_gain = 27,
+        .d_min = { 23, 25, 0 },      // roll, pitch, yaw
+        .d_min_gain = 37,
         .d_min_advance = 20,
         .motor_output_limit = 100,
         .auto_profile_cell_count = AUTO_PROFILE_CELL_COUNT_STAY,
@@ -223,8 +226,9 @@ void resetPidProfile(pidProfile_t *pidProfile)
         .ff_max_rate_limit = 100,
         .ff_smooth_factor = 37,
         .ff_boost = 15,
-        .dyn_lpf_curve_expo = 0,
+        .dyn_lpf_curve_expo = 5,
         .level_race_mode = false,
+        .vbat_sag_compensation = 0,
     );
 #ifndef USE_D_MIN
     pidProfile->pid[PID_ROLL].D = 30;
@@ -1453,13 +1457,21 @@ void FAST_CODE pidController(const pidProfile_t *pidProfile, timeUs_t currentTim
         }
 
         // -----calculate I component
+        float Ki;
+        float axisDynCi;
 #ifdef USE_LAUNCH_CONTROL
-        // if launch control is active override the iterm gains
-        const float Ki = launchControlActive ? launchControlKi : pidCoefficient[axis].Ki;
-#else
-        const float Ki = pidCoefficient[axis].Ki;
+        // if launch control is active override the iterm gains and apply iterm windup protection to all axes
+        if (launchControlActive) {
+            Ki = launchControlKi;
+            axisDynCi = dynCi;
+        } else 
 #endif
-        pidData[axis].I = constrainf(previousIterm + (Ki * dynCi + agGain) * itermErrorRate, -itermLimit, itermLimit);
+        {
+            Ki = pidCoefficient[axis].Ki;
+            axisDynCi = (axis == FD_YAW) ? dynCi : dT; // only apply windup protection to yaw
+        }
+
+        pidData[axis].I = constrainf(previousIterm + (Ki * axisDynCi + agGain) * itermErrorRate, -itermLimit, itermLimit);
 
         // -----calculate pidSetpointDelta
         float pidSetpointDelta = 0;

@@ -33,8 +33,6 @@
 #include "config/config.h"
 #include "config/feature.h"
 
-#include "drivers/time.h"
-
 #include "fc/controlrate_profile.h"
 #include "fc/core.h"
 #include "fc/rc.h"
@@ -71,7 +69,10 @@ static float setpointRate[3], rcDeflection[3], rcDeflectionAbs[3];
 static float throttlePIDAttenuation;
 static bool reverseMotors = false;
 static applyRatesFn *applyRates;
-uint16_t currentRxRefreshRate;
+static uint16_t currentRxRefreshRate;
+static bool isRxDataNew = false;
+static float rcCommandDivider = 500.0f;
+static float rcCommandYawDivider = 500.0f;
 
 FAST_RAM_ZERO_INIT uint8_t interpolationChannels;
 static FAST_RAM_ZERO_INIT uint32_t rcFrameNumber;
@@ -193,6 +194,32 @@ float applyKissRates(const int axis, float rcCommandf, const float rcCommandfAbs
     return kissAngle;
 }
 
+float applyActualRates(const int axis, float rcCommandf, const float rcCommandfAbs)
+{
+    float expof = currentControlRateProfile->rcExpo[axis] / 100.0f;
+    expof = rcCommandfAbs * (powerf(rcCommandf, 5) * expof + rcCommandf * (1 - expof));
+
+    const float centerSensitivity = currentControlRateProfile->rcRates[axis] * 10.0f;
+    const float stickMovement = MAX(0, currentControlRateProfile->rates[axis] * 10.0f - centerSensitivity);
+    const float angleRate = rcCommandf * centerSensitivity + stickMovement * expof;
+
+    return angleRate;
+}
+
+float applyQuickRates(const int axis, float rcCommandf, const float rcCommandfAbs)
+{
+    const uint16_t rcRate = currentControlRateProfile->rcRates[axis] * 2;
+    const uint16_t maxDPS = MAX(currentControlRateProfile->rates[axis] * 10, rcRate);
+    const float linearity = currentControlRateProfile->rcExpo[axis] / 100.0f;
+    const float superFactorConfig = ((float)maxDPS / rcRate - 1) / ((float)maxDPS / rcRate);
+
+    float curve = power3(rcCommandfAbs) * linearity + rcCommandfAbs * (1 - linearity);
+    float superfactor = 1.0f / (constrainf(1.0f - (curve * superFactorConfig), 0.01f, 1.00f));
+    float angleRate = constrainf(rcCommandf * rcRate * superfactor, -SETPOINT_RATE_LIMIT, SETPOINT_RATE_LIMIT);
+
+    return angleRate;
+}
+
 float applyCurve(int axis, float deflection)
 {
     return applyRates(axis, deflection, fabsf(deflection));
@@ -220,7 +247,13 @@ static void calculateSetpointRate(int axis)
 #endif
     {
         // scale rcCommandf to range [-1.0, 1.0]
-        float rcCommandf = rcCommand[axis] / 500.0f;
+        float rcCommandf;
+        if (axis == FD_YAW) {
+            rcCommandf = rcCommand[axis] / rcCommandYawDivider;
+        } else {
+            rcCommandf = rcCommand[axis] / rcCommandDivider;
+        }
+        
         rcDeflection[axis] = rcCommandf;
         const float rcCommandfAbs = fabsf(rcCommandf);
         rcDeflectionAbs[axis] = rcCommandfAbs;
@@ -304,7 +337,7 @@ static FAST_CODE uint8_t processRcInterpolation(void)
             rxRefreshRate = rxGetRefreshRate();
         }
 
-        if (isRXDataNew && rxRefreshRate > 0) {
+        if (isRxDataNew && rxRefreshRate > 0) {
             rcInterpolationStepCount = rxRefreshRate / targetPidLooptime;
 
             for (int channel = 0; channel < PRIMARY_CHANNEL_COUNT; channel++) {
@@ -336,6 +369,24 @@ static FAST_CODE uint8_t processRcInterpolation(void)
 
     return updatedChannel;
 
+}
+
+void updateRcRefreshRate(timeUs_t currentTimeUs)
+{
+    static timeUs_t lastRxTimeUs;
+
+    timeDelta_t frameAgeUs;
+    timeDelta_t refreshRateUs = rxGetFrameDelta(&frameAgeUs);
+    if (!refreshRateUs || cmpTimeUs(currentTimeUs, lastRxTimeUs) <= frameAgeUs) {
+        refreshRateUs = cmpTimeUs(currentTimeUs, lastRxTimeUs); // calculate a delta here if not supplied by the protocol
+    }
+    lastRxTimeUs = currentTimeUs;
+    currentRxRefreshRate = constrain(refreshRateUs, 1000, 30000);
+}
+
+uint16_t getCurrentRxRefreshRate(void)
+{
+    return currentRxRefreshRate;
 }
 
 #ifdef USE_RC_SMOOTHING_FILTER
@@ -523,7 +574,7 @@ static FAST_CODE uint8_t processRcSmoothingFilter(void)
         }
     }
 
-    if (isRXDataNew) {
+    if (isRxDataNew) {
 
         // store the new raw channel values
         for (int i = 0; i < PRIMARY_CHANNEL_COUNT; i++) {
@@ -629,19 +680,24 @@ FAST_CODE void processRcCommand(void)
 {
     uint8_t updatedChannel;
 
-    if (isRXDataNew) {
+    if (isRxDataNew) {
         rcFrameNumber++;
     }
 
-    if (isRXDataNew && pidAntiGravityEnabled()) {
+    if (isRxDataNew && pidAntiGravityEnabled()) {
         checkForThrottleErrorResetState(currentRxRefreshRate);
     }
 
 #ifdef USE_INTERPOLATED_SP
-    if (isRXDataNew) {
+    if (isRxDataNew) {
         for (int i = FD_ROLL; i <= FD_YAW; i++) {
             oldRcCommand[i] = rcCommand[i];
-            const float rcCommandf = rcCommand[i] / 500.0f;
+            float rcCommandf;
+            if (i == FD_YAW) {
+                rcCommandf = rcCommand[i] / rcCommandYawDivider;
+            } else {
+                rcCommandf = rcCommand[i] / rcCommandDivider;
+            }
             const float rcCommandfAbs = fabsf(rcCommandf);
             rawSetpoint[i] = applyRates(i, rcCommandf, rcCommandfAbs);
             rawDeflection[i] = rcCommandf;
@@ -661,8 +717,8 @@ FAST_CODE void processRcCommand(void)
         break;
     }
 
-    if (isRXDataNew || updatedChannel) {
-        const uint8_t maxUpdatedAxis = isRXDataNew ? FD_YAW : MIN(updatedChannel, FD_YAW); // throttle channel doesn't require rate calculation
+    if (isRxDataNew || updatedChannel) {
+        const uint8_t maxUpdatedAxis = isRxDataNew ? FD_YAW : MIN(updatedChannel, FD_YAW); // throttle channel doesn't require rate calculation
 #if defined(SIMULATOR_BUILD)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunsafe-loop-optimizations"
@@ -682,13 +738,13 @@ FAST_CODE void processRcCommand(void)
         }
     }
 
-    if (isRXDataNew) {
-        isRXDataNew = false;
-    }
+    isRxDataNew = false;
 }
 
 FAST_CODE_NOINLINE void updateRcCommands(void)
 {
+    isRxDataNew = true;
+
     // PITCH & ROLL only dynamic PID adjustment,  depending on throttle value
     int32_t prop;
     if (rcData[THROTTLE] < currentControlRateProfile->tpa_breakpoint) {
@@ -792,6 +848,9 @@ bool isMotorsReversed(void)
 
 void initRcProcessing(void)
 {
+    rcCommandDivider = 500.0f - rcControlsConfig()->deadband;
+    rcCommandYawDivider = 500.0f - rcControlsConfig()->yaw_deadband;
+
     for (int i = 0; i < THROTTLE_LOOKUP_LENGTH; i++) {
         const int16_t tmp = 10 * i - currentControlRateProfile->thrMid8;
         uint8_t y = 1;
@@ -815,6 +874,14 @@ void initRcProcessing(void)
         break;
     case RATES_TYPE_KISS:
         applyRates = applyKissRates;
+
+        break;
+    case RATES_TYPE_ACTUAL:
+        applyRates = applyActualRates;
+
+        break;
+    case RATES_TYPE_QUICK:
+        applyRates = applyQuickRates;
 
         break;
     }

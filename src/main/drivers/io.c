@@ -168,7 +168,7 @@ uint32_t IO_EXTI_Line(IO_t io)
     return 1 << IO_GPIOPinIdx(io);
 #elif defined(STM32F3)
     return IO_GPIOPinIdx(io);
-#elif defined(SIMULATOR_BUILD) || defined(RISCV_K210)
+#elif defined(SIMULATOR_BUILD)
     return 0;
 #else
 # error "Unknown target type"
@@ -426,12 +426,6 @@ void IOConfigGPIOAF(IO_t io, ioConfig_t cfg, uint8_t af)
         .GPIO_PuPd = (cfg >> 5) & 0x03,
     };
     GPIO_Init(IO_GPIO(io), &init);
-}
-
-#elif defined(RISCV_K210)
-
-void IOConfigGPIO(IO_t io, ioConfig_t cfg)
-{
 }
 #endif
 

@@ -22,6 +22,8 @@
 // Firmware related menu contents and support functions
 //
 
+#include <ctype.h>
+
 #include <stdbool.h>
 
 #include "platform.h"
@@ -65,8 +67,9 @@ static char accCalibrationStatus[CALIBRATION_STATUS_MAX_LENGTH];
 static char baroCalibrationStatus[CALIBRATION_STATUS_MAX_LENGTH];
 #endif
 
-static const void *cmsx_CalibrationOnDisplayUpdate(const OSD_Entry *selected)
+static const void *cmsx_CalibrationOnDisplayUpdate(displayPort_t *pDisp, const OSD_Entry *selected)
 {
+    UNUSED(pDisp);
     UNUSED(selected);
 
     tfp_sprintf(gyroCalibrationStatus, sensors(SENSOR_GYRO) ? gyroIsCalibrationComplete() ? CALIBRATION_STATUS_OK : CALIBRATION_STATUS_WAIT: CALIBRATION_STATUS_OFF);
@@ -131,7 +134,7 @@ static const OSD_Entry menuCalibrateAccEntries[] = {
     { NULL, OME_END, NULL, NULL, 0 }
 };
 
-static CMS_Menu cmsx_menuCalibrateAcc = {
+CMS_Menu cmsx_menuCalibrateAcc = {
 #ifdef CMS_MENU_DEBUG
     .GUARD_text = "ACCCALIBRATION",
     .GUARD_type = OME_MENU,
@@ -142,7 +145,7 @@ static CMS_Menu cmsx_menuCalibrateAcc = {
     .entries = menuCalibrateAccEntries
 };
 
-static const void *cmsCalibrateAccMenu(displayPort_t *pDisp, const void *self)
+const void *cmsCalibrateAccMenu(displayPort_t *pDisp, const void *self)
 {
     UNUSED(self);
 
@@ -184,15 +187,13 @@ static CMS_Menu cmsx_menuCalibration = {
 static char infoGitRev[GIT_SHORT_REVISION_LENGTH + 1];
 static char infoTargetName[] = __TARGET__;
 
-static const void *cmsx_FirmwareInit(void)
+static const void *cmsx_FirmwareInit(displayPort_t *pDisp)
 {
+    UNUSED(pDisp);
+
     unsigned i;
     for (i = 0 ; i < GIT_SHORT_REVISION_LENGTH ; i++) {
-        if (shortGitRevision[i] >= 'a' && shortGitRevision[i] <= 'f') {
-            infoGitRev[i] = shortGitRevision[i] - 'a' + 'A';
-        } else {
-            infoGitRev[i] = shortGitRevision[i];
-        }
+        infoGitRev[i] = toupper(shortGitRevision[i]);
     }
 
     infoGitRev[i] = 0x0; // Terminate string

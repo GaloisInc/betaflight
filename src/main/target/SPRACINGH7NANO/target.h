@@ -127,8 +127,13 @@
 #define I2C1_SDA                PB9
 #define I2C_DEVICE              (I2CDEV_1)
 
+#define USE_I2C_DEVICE_4        // Shared with motor outputs 5/6
+#define I2C4_SCL                PB6
+#define I2C4_SDA                PB7
+
 #define USE_MAG
 #define USE_MAG_HMC5883
+#define USE_MAG_QMC5883
 
 #define USE_BARO
 #define USE_BARO_BMP388
@@ -196,7 +201,6 @@
 //#define UART8_TX_DMA_OPT        7
 #define ADC1_DMA_OPT 8
 #define ADC3_DMA_OPT 9
-
 //#define ADC2_DMA_OPT 10 // ADC2 not used.
 #else
 #define ADC1_DMA_STREAM DMA2_Stream0

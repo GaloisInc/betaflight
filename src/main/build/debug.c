@@ -20,8 +20,9 @@
 
 #include <stdint.h>
 
-#include <platform.h>
-#include <debug.h>
+#include "platform.h"
+
+#include "debug.h"
 
 int16_t debug[DEBUG16_VALUE_COUNT];
 uint8_t debugMode;
@@ -94,4 +95,5 @@ const char * const debugModeNames[DEBUG_COUNT] = {
     "FF_INTERPOLATED",
     "BLACKBOX_OUTPUT",
     "GYRO_SAMPLE",
+    "RX_TIMING",
 };

@@ -43,6 +43,7 @@
 
 #include "pg/rx.h"
 
+#include "rx/frsky_crc.h"
 #include "rx/rx.h"
 #include "rx/sbus_channels.h"
 #include "rx/fport.h"
@@ -60,8 +61,6 @@
 
 #define FPORT_ESCAPE_CHAR 0x7D
 #define FPORT_ESCAPE_MASK 0x20
-
-#define FPORT_CRC_VALUE 0xFF
 
 #define FPORT_BAUDRATE 115200
 
@@ -130,6 +129,7 @@ static const smartPortPayload_t emptySmartPortFrame = { .frameId = 0, .valueId =
 typedef struct fportBuffer_s {
     uint8_t data[BUFFER_SIZE];
     uint8_t length;
+    timeUs_t frameStartTimeUs;
 } fportBuffer_t;
 
 static fportBuffer_t rxBuffer[NUM_RX_BUFFERS];
@@ -150,6 +150,8 @@ static serialPort_t *fportPort;
 static bool telemetryEnabled = false;
 #endif
 
+static timeUs_t lastRcFrameTimeUs = 0;
+
 static void reportFrameError(uint8_t errorReason) {
     static volatile uint16_t frameErrors = 0;
 
@@ -169,7 +171,7 @@ static void fportDataReceive(uint16_t c, void *data)
     static timeUs_t lastFrameReceivedUs = 0;
     static bool telemetryFrame = false;
 
-    const timeUs_t currentTimeUs = micros();
+    const timeUs_t currentTimeUs = microsISR();
 
     clearToSend = false;
 
@@ -203,6 +205,8 @@ static void fportDataReceive(uint16_t c, void *data)
 
         frameStartAt = currentTimeUs;
         framePosition = 1;
+
+        rxBuffer[rxBufferWriteIndex].frameStartTimeUs = currentTimeUs;
     } else if (framePosition > 0) {
         if (framePosition >= BUFFER_SIZE + 1) {
                 framePosition = 0;
@@ -240,18 +244,6 @@ static void smartPortWriteFrameFport(const smartPortPayload_t *payload)
 }
 #endif
 
-static bool checkChecksum(uint8_t *data, uint8_t length)
-{
-    uint16_t checksum = 0;
-    for (unsigned i = 0; i < length; i++) {
-        checksum = checksum + *(uint8_t *)(data + i);
-    }
-
-    checksum = (checksum & 0xff) + (checksum >> 8);
-
-    return checksum == FPORT_CRC_VALUE;
-}
-
 static uint8_t fportFrameStatus(rxRuntimeState_t *rxRuntimeState)
 {
     static bool hasTelemetryRequest = false;
@@ -271,7 +263,7 @@ static uint8_t fportFrameStatus(rxRuntimeState_t *rxRuntimeState)
         if (frameLength != bufferLength - 2) {
             reportFrameError(DEBUG_FPORT_ERROR_SIZE);
         } else {
-            if (!checkChecksum(&rxBuffer[rxBufferReadIndex].data[0], bufferLength)) {
+            if (!frskyCheckSumIsGood(&rxBuffer[rxBufferReadIndex].data[0], bufferLength)) {
                 reportFrameError(DEBUG_FPORT_ERROR_CHECKSUM);
             } else {
                 fportFrame_t *frame = (fportFrame_t *)&rxBuffer[rxBufferReadIndex].data[1];
@@ -286,6 +278,10 @@ static uint8_t fportFrameStatus(rxRuntimeState_t *rxRuntimeState)
                         setRssi(scaleRange(frame->data.controlData.rssi, 0, 100, 0, RSSI_MAX_VALUE), RSSI_SOURCE_RX_PROTOCOL);
 
                         lastRcFrameReceivedMs = millis();
+
+                        if (!(result & (RX_FRAME_FAILSAFE | RX_FRAME_DROPPED))) {
+                            lastRcFrameTimeUs = rxBuffer[rxBufferReadIndex].frameStartTimeUs;
+                        }
                     }
 
                     break;
@@ -390,6 +386,11 @@ static bool fportProcessFrame(const rxRuntimeState_t *rxRuntimeState)
     return true;
 }
 
+static timeUs_t fportFrameTimeUs(void)
+{
+    return lastRcFrameTimeUs;
+}
+
 bool fportRxInit(const rxConfig_t *rxConfig, rxRuntimeState_t *rxRuntimeState)
 {
     static uint16_t sbusChannelData[SBUS_MAX_CHANNEL];
@@ -401,6 +402,7 @@ bool fportRxInit(const rxConfig_t *rxConfig, rxRuntimeState_t *rxRuntimeState)
 
     rxRuntimeState->rcFrameStatusFn = fportFrameStatus;
     rxRuntimeState->rcProcessFrameFn = fportProcessFrame;
+    rxRuntimeState->rcFrameTimeUsFn = fportFrameTimeUs;
 
     const serialPortConfig_t *portConfig = findSerialPortConfig(FUNCTION_RX_SERIAL);
     if (!portConfig) {

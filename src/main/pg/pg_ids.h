@@ -96,7 +96,7 @@
 
 // betaflight specific parameter group ids start at 500
 #define PG_BETAFLIGHT_START 500
-#define PG_MODE_ACTIVATION_OPERATOR_CONFIG 500
+//#define PG_MODE_ACTIVATION_OPERATOR_CONFIG 500 removed
 #define PG_OSD_CONFIG 501
 #define PG_BEEPER_CONFIG 502
 #define PG_BEEPER_DEV_CONFIG 503
@@ -129,8 +129,7 @@
 #define PG_PINIOBOX_CONFIG 530
 #define PG_USB_CONFIG 531
 #define PG_SDIO_CONFIG 532
-#define PG_FLASH_RISCV_K210_CONFIG 533
-//#define PG_DISPLAY_PORT_CRSF_CONFIG 533  // no longer required -- never released
+#define PG_DISPLAY_PORT_CRSF_CONFIG 533  // no longer required -- never released
 #define PG_TIMER_IO_CONFIG 534 // used to store the index for timer use in timerHardware array in target.c
 #define PG_SPI_PREINIT_IPU_CONFIG 535
 #define PG_SPI_PREINIT_OPU_CONFIG 536
@@ -150,7 +149,8 @@
 #define PG_SDIO_PIN_CONFIG 550
 #define PG_PULLUP_CONFIG 551
 #define PG_PULLDOWN_CONFIG 552
-#define PG_BETAFLIGHT_END 552
+#define PG_MODE_ACTIVATION_CONFIG 553
+#define PG_BETAFLIGHT_END 553
 
 
 // OSD configuration (subject to change)

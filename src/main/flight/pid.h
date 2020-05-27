@@ -46,11 +46,13 @@
 
 // Full iterm suppression in setpoint mode at high-passed setpoint rate > 40deg/sec
 #define ITERM_RELAX_SETPOINT_THRESHOLD 40.0f
-#define ITERM_RELAX_CUTOFF_DEFAULT 20
+#define ITERM_RELAX_CUTOFF_DEFAULT 15
 
 // Anti gravity I constant
 #define AG_KI 21.586988f;
 
+#define ITERM_ACCELERATOR_GAIN_OFF 1000
+#define ITERM_ACCELERATOR_GAIN_MAX 30000
 typedef enum {
     PID_ROLL,
     PID_PITCH,
@@ -190,6 +192,7 @@ typedef struct pidProfile_s {
     uint8_t ff_smooth_factor;               // Amount of smoothing for interpolated FF steps
     uint8_t dyn_lpf_curve_expo;             // set the curve for dynamic dterm lowpass filter
     uint8_t level_race_mode;                // NFE race mode - when true pitch setpoint calcualtion is gyro based in level mode
+    uint8_t vbat_sag_compensation;          // Reduce motor output by this percentage of the maximum compensation amount
 } pidProfile_t;
 
 PG_DECLARE_ARRAY(pidProfile_t, PID_PROFILE_COUNT, pidProfiles);

@@ -67,11 +67,11 @@
 #ifndef UART5_RX_DMA_CHANNEL
 #define UART5_RX_DMA_CHANNEL NULL
 #endif
-#ifndef UART6_TX_DMA_CHANNEL
-#define UART6_TX_DMA_CHANNEL NULL
+#ifndef UART9_TX_DMA_CHANNEL
+#define UART9_TX_DMA_CHANNEL NULL
 #endif
-#ifndef UART6_RX_DMA_CHANNEL
-#define UART6_RX_DMA_CHANNEL NULL
+#ifndef UART9_RX_DMA_CHANNEL
+#define UART9_RX_DMA_CHANNEL NULL
 #endif
 
 const uartHardware_t uartHardware[UARTDEV_COUNT] = {
@@ -95,7 +95,7 @@ const uartHardware_t uartHardware[UARTDEV_COUNT] = {
             { DEFIO_TAG_E(PB6),  GPIO_AF7_USART1 },
             { DEFIO_TAG_E(PC4),  GPIO_AF7_USART1 },
         },
-        .rcc_apb2 = RCC_APB2(USART1),
+        .rcc = RCC_APB2(USART1),
         .rxIrq = USART1_IRQn,
         .txPriority = NVIC_PRIO_SERIALUART1_TXDMA,
         .rxPriority = NVIC_PRIO_SERIALUART1,
@@ -126,7 +126,7 @@ const uartHardware_t uartHardware[UARTDEV_COUNT] = {
             { DEFIO_TAG_E(PA14), GPIO_AF7_USART2 },
             { DEFIO_TAG_E(PB3),  GPIO_AF7_USART2 },
         },
-        .rcc_apb1 = RCC_APB11(USART2),
+        .rcc = RCC_APB11(USART2),
         .rxIrq = USART2_IRQn,
         .txPriority = NVIC_PRIO_SERIALUART2_TXDMA,
         .rxPriority = NVIC_PRIO_SERIALUART2,
@@ -157,7 +157,7 @@ const uartHardware_t uartHardware[UARTDEV_COUNT] = {
             { DEFIO_TAG_E(PB10), GPIO_AF7_USART3 },
             { DEFIO_TAG_E(PC10), GPIO_AF7_USART3 },
         },
-        .rcc_apb1 = RCC_APB11(USART3),
+        .rcc = RCC_APB11(USART3),
         .rxIrq = USART3_IRQn,
         .txPriority = NVIC_PRIO_SERIALUART3_TXDMA,
         .rxPriority = NVIC_PRIO_SERIALUART3,
@@ -184,7 +184,7 @@ const uartHardware_t uartHardware[UARTDEV_COUNT] = {
         .txPins = {
             { DEFIO_TAG_E(PC10), GPIO_AF5_UART4 },
         },
-        .rcc_apb1 = RCC_APB11(UART4),
+        .rcc = RCC_APB11(UART4),
         .rxIrq = UART4_IRQn,
         .txPriority = NVIC_PRIO_SERIALUART4_TXDMA,
         .rxPriority = NVIC_PRIO_SERIALUART4,
@@ -211,7 +211,7 @@ const uartHardware_t uartHardware[UARTDEV_COUNT] = {
         .txPins = {
             { DEFIO_TAG_E(PC12), GPIO_AF5_UART5 },
         },
-        .rcc_apb1 = RCC_APB11(UART5),
+        .rcc = RCC_APB11(UART5),
         .rxIrq = UART5_IRQn,
         .txPriority = NVIC_PRIO_SERIALUART5_TXDMA,
         .rxPriority = NVIC_PRIO_SERIALUART5,
@@ -222,16 +222,16 @@ const uartHardware_t uartHardware[UARTDEV_COUNT] = {
     },
 #endif
 
-#ifdef USE_UART6
-    // On G474, UART6 is implemented as LPUART1
+#ifdef USE_UART9
+    // On G474, UART9 is implemented as LPUART1
     {
-        .device = UARTDEV_6,
+        .device = UARTDEV_9,
         .reg = LPUART1,
 #ifdef USE_DMA
         .rxDMAChannel = DMA_REQUEST_LPUART1_RX,
-        .rxDMAResource = (dmaResource_t *)UART6_RX_DMA_CHANNEL,
+        .rxDMAResource = (dmaResource_t *)UART9_RX_DMA_CHANNEL,
         .txDMAChannel = DMA_REQUEST_LPUART1_TX,
-        .txDMAResource = (dmaResource_t *)UART6_TX_DMA_CHANNEL,
+        .txDMAResource = (dmaResource_t *)UART9_TX_DMA_CHANNEL,
 #endif
         .rxPins = {
             { DEFIO_TAG_E(PA3),  GPIO_AF12_LPUART1 },
@@ -243,14 +243,14 @@ const uartHardware_t uartHardware[UARTDEV_COUNT] = {
             { DEFIO_TAG_E(PB11), GPIO_AF8_LPUART1 },
             { DEFIO_TAG_E(PC1),  GPIO_AF8_LPUART1 },
         },
-        .rcc_apb1 = RCC_APB12(LPUART1),
+        .rcc = RCC_APB12(LPUART1),
         .rxIrq = LPUART1_IRQn,
         .txPriority = NVIC_PRIO_SERIALUART6_TXDMA,
         .rxPriority = NVIC_PRIO_SERIALUART6,
-        .txBuffer = uart6TxBuffer,
-        .rxBuffer = uart6RxBuffer,
-        .txBufferSize = sizeof(uart6TxBuffer),
-        .rxBufferSize = sizeof(uart6RxBuffer),
+        .txBuffer = uart9TxBuffer,
+        .rxBuffer = uart9RxBuffer,
+        .txBufferSize = sizeof(uart9TxBuffer),
+        .rxBufferSize = sizeof(uart9RxBuffer),
     },
 #endif
 };

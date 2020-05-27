@@ -47,6 +47,7 @@
 #include "config/config.h"
 #include "fc/controlrate_profile.h"
 #include "fc/core.h"
+#include "fc/rc.h"
 #include "fc/rc_adjustments.h"
 #include "fc/rc_controls.h"
 
@@ -99,12 +100,13 @@
 #include "pg/stats.h"
 #include "pg/board.h"
 
-#include "rx/rx.h"
+#include "rx/a7105_flysky.h"
 #include "rx/cc2500_frsky_common.h"
 #include "rx/cc2500_sfhss.h"
-#include "rx/spektrum.h"
+#include "rx/crsf.h"
 #include "rx/cyrf6936_spektrum.h"
-#include "rx/a7105_flysky.h"
+#include "rx/rx.h"
+#include "rx/spektrum.h"
 
 #include "sensors/acceleration.h"
 #include "sensors/barometer.h"
@@ -127,14 +129,14 @@
 const char * const lookupTableAccHardware[] = {
     "AUTO", "NONE", "ADXL345", "MPU6050", "MMA8452", "BMA280", "LSM303DLHC",
     "MPU6000", "MPU6500", "MPU9250", "ICM20601", "ICM20602", "ICM20608G", "ICM20649", "ICM20689", "ICM42605",
-    "BMI160", "FAKE"
+    "BMI160", "BMI270", "FAKE"
 };
 
 // sync with gyroHardware_e
 const char * const lookupTableGyroHardware[] = {
     "AUTO", "NONE", "MPU6050", "L3G4200D", "MPU3050", "L3GD20",
     "MPU6000", "MPU6500", "MPU9250", "ICM20601", "ICM20602", "ICM20608G", "ICM20649", "ICM20689", "ICM42605",
-    "BMI160", "FAKE"
+    "BMI160", "BMI270", "FAKE"
 };
 
 #if defined(USE_SENSOR_NAMES) || defined(USE_BARO)
@@ -192,7 +194,7 @@ static const char * const lookupTableGPSProvider[] = {
 };
 
 static const char * const lookupTableGPSSBASMode[] = {
-    "AUTO", "EGNOS", "WAAS", "MSAS", "GAGAN"
+    "AUTO", "EGNOS", "WAAS", "MSAS", "GAGAN", "NONE"
 };
 
 static const char * const lookupTableGPSUBLOXMode[] = {
@@ -253,7 +255,8 @@ static const char * const lookupTableRxSpi[] = {
     "KN",
     "SFHSS",
     "SPEKTRUM",
-    "FRSKY_X_LBT"
+    "FRSKY_X_LBT",
+    "REDPINE"
 };
 #endif
 
@@ -273,10 +276,9 @@ static const char * const lookupTableCameraControlMode[] = {
 #endif
 
 static const char * const lookupTablePwmProtocol[] = {
-    "OFF", "ONESHOT125", "ONESHOT42", "MULTISHOT", "BRUSHED",
-#ifdef USE_DSHOT
-    "DSHOT150", "DSHOT300", "DSHOT600", "PROSHOT1000"
-#endif
+    "PWM", "ONESHOT125", "ONESHOT42", "MULTISHOT", "BRUSHED",
+    "DSHOT150", "DSHOT300", "DSHOT600", "PROSHOT1000",
+    "DISABLED"
 };
 
 static const char * const lookupTableRcInterpolation[] = {
@@ -336,7 +338,7 @@ static const char * const lookupTableGyroOverflowCheck[] = {
 #endif
 
 static const char * const lookupTableRatesType[] = {
-    "BETAFLIGHT", "RACEFLIGHT", "KISS"
+    "BETAFLIGHT", "RACEFLIGHT", "KISS", "ACTUAL", "QUICK"
 };
 
 #ifdef USE_OVERCLOCK
@@ -372,11 +374,11 @@ const char * const lookupTableRescueAltitudeMode[] = {
 };
 #endif
 
-#ifdef USE_MAX7456
+#if defined(USE_MAX7456) || defined(USE_FRSKYOSD)
 static const char * const lookupTableVideoSystem[] = {
     "AUTO", "PAL", "NTSC"
 };
-#endif // USE_MAX7456
+#endif
 
 #if defined(USE_ITERM_RELAX)
 const char * const lookupTableItermRelax[] = {
@@ -566,9 +568,9 @@ const lookupTableEntry_t lookupTables[] = {
     LOOKUP_TABLE_ENTRY(lookupTableGyro),
 #endif
     LOOKUP_TABLE_ENTRY(lookupTableThrottleLimitType),
-#ifdef USE_MAX7456
+#if defined(USE_MAX7456) || defined(USE_FRSKYOSD)
     LOOKUP_TABLE_ENTRY(lookupTableVideoSystem),
-#endif // USE_MAX7456
+#endif
 #if defined(USE_ITERM_RELAX)
     LOOKUP_TABLE_ENTRY(lookupTableItermRelax),
     LOOKUP_TABLE_ENTRY(lookupTableItermRelaxType),
@@ -721,7 +723,7 @@ const clivalue_t valueTable[] = {
     { "rc_smoothing_debug_axis",    VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_RC_SMOOTHING_DEBUG }, PG_RX_CONFIG, offsetof(rxConfig_t, rc_smoothing_debug_axis) },
     { "rc_smoothing_input_type",    VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_RC_SMOOTHING_INPUT_TYPE }, PG_RX_CONFIG, offsetof(rxConfig_t, rc_smoothing_input_type) },
     { "rc_smoothing_derivative_type",VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_RC_SMOOTHING_DERIVATIVE_TYPE }, PG_RX_CONFIG, offsetof(rxConfig_t, rc_smoothing_derivative_type) },
-    { "rc_smoothing_auto_smoothness",VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 50 }, PG_RX_CONFIG, offsetof(rxConfig_t, rc_smoothing_auto_factor) },
+    { "rc_smoothing_auto_smoothness",VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { RC_SMOOTHING_AUTO_FACTOR_MIN, RC_SMOOTHING_AUTO_FACTOR_MAX }, PG_RX_CONFIG, offsetof(rxConfig_t, rc_smoothing_auto_factor) },
 #endif // USE_RC_SMOOTHING_FILTER
 
     { "fpv_mix_degrees",            VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 90 }, PG_RX_CONFIG, offsetof(rxConfig_t, fpvCamAngleDegrees) },
@@ -740,6 +742,9 @@ const clivalue_t valueTable[] = {
 #endif
 #if defined(USE_SERIALRX_SBUS)
     { "sbus_baud_fast",           VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_RX_CONFIG, offsetof(rxConfig_t, sbus_baud_fast) },
+#endif
+#if defined(USE_SERIALRX_CRSF)
+    { "crsf_use_rx_snr",          VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_RX_CONFIG, offsetof(rxConfig_t, crsf_use_rx_snr) },
 #endif
     { "airmode_start_throttle_percent",     VAR_UINT8 | MASTER_VALUE, .config.minmaxUnsigned = { 0, 100 }, PG_RX_CONFIG, offsetof(rxConfig_t, airModeActivateThreshold) },
     { "rx_min_usec",                VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { PWM_PULSE_MIN, PWM_PULSE_MAX }, PG_RX_CONFIG, offsetof(rxConfig_t, rx_min_usec) },
@@ -834,10 +839,13 @@ const clivalue_t valueTable[] = {
     { "cbat_alert_percent",         VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 100 }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, consumptionWarningPercentage) },
     { "vbat_cutoff_percent",        VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 100 }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, lvcPercentage) },
     { "force_battery_cell_count",   VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 24 }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, forceBatteryCellCount) },
-    { "vbat_lpf_period",            VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, UINT8_MAX }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, vbatLpfPeriod) },
+    { "vbat_display_lpf_period",    VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 1, UINT8_MAX }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, vbatDisplayLpfPeriod) },
+#if defined(USE_BATTERY_VOLTAGE_SAG_COMPENSATION)
+    { "vbat_sag_lpf_period",        VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 1, UINT8_MAX }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, vbatSagLpfPeriod) },
+#endif
     { "ibat_lpf_period",            VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, UINT8_MAX }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, ibatLpfPeriod) },
     { "vbat_duration_for_warning",  VAR_UINT8  | MASTER_VALUE, .config.minmax = { 0, 150 }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, vbatDurationForWarning) },
-    { "vbat_duration_for_critical",  VAR_UINT8  | MASTER_VALUE, .config.minmax = { 0, 150 }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, vbatDurationForCritical) },
+    { "vbat_duration_for_critical", VAR_UINT8  | MASTER_VALUE, .config.minmax = { 0, 150 }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, vbatDurationForCritical) },
 
 //  PG_VOLTAGE_SENSOR_ADC_CONFIG
     { "vbat_scale",                 VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { VBAT_SCALE_MIN, VBAT_SCALE_MAX }, PG_VOLTAGE_SENSOR_ADC_CONFIG, offsetof(voltageSensorADCConfig_t, vbatscale) },
@@ -933,6 +941,7 @@ const clivalue_t valueTable[] = {
 #ifdef USE_GPS
     { "gps_provider",               VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_GPS_PROVIDER }, PG_GPS_CONFIG, offsetof(gpsConfig_t, provider) },
     { "gps_sbas_mode",              VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_GPS_SBAS_MODE }, PG_GPS_CONFIG, offsetof(gpsConfig_t, sbasMode) },
+    { "gps_sbas_integrity",         VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_GPS_CONFIG, offsetof(gpsConfig_t, sbas_integrity) }, 
     { "gps_auto_config",            VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_GPS_CONFIG, offsetof(gpsConfig_t, autoConfig) },
     { "gps_auto_baud",              VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_GPS_CONFIG, offsetof(gpsConfig_t, autoBaud) },
     { "gps_ublox_use_galileo",      VAR_UINT8  | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_GPS_CONFIG, offsetof(gpsConfig_t, gps_ublox_use_galileo) },
@@ -1000,10 +1009,13 @@ const clivalue_t valueTable[] = {
     { "dterm_notch_hz",             VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { 0, FILTER_FREQUENCY_MAX }, PG_PID_PROFILE, offsetof(pidProfile_t, dterm_notch_hz) },
     { "dterm_notch_cutoff",         VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { 0, FILTER_FREQUENCY_MAX }, PG_PID_PROFILE, offsetof(pidProfile_t, dterm_notch_cutoff) },
     { "vbat_pid_gain",              VAR_UINT8  | PROFILE_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_PID_PROFILE, offsetof(pidProfile_t, vbatPidCompensation) },
+#if defined(USE_BATTERY_VOLTAGE_SAG_COMPENSATION)
+    { "vbat_sag_compensation",      VAR_UINT8  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, 150 }, PG_PID_PROFILE, offsetof(pidProfile_t, vbat_sag_compensation) },
+#endif
     { "pid_at_min_throttle",        VAR_UINT8  | PROFILE_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_PID_PROFILE, offsetof(pidProfile_t, pidAtMinThrottle) },
     { "anti_gravity_mode",          VAR_UINT8  | PROFILE_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_ANTI_GRAVITY_MODE }, PG_PID_PROFILE, offsetof(pidProfile_t, antiGravityMode) },
     { "anti_gravity_threshold",     VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { 20, 1000 }, PG_PID_PROFILE, offsetof(pidProfile_t, itermThrottleThreshold) },
-    { "anti_gravity_gain",          VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { 1000, 30000 }, PG_PID_PROFILE, offsetof(pidProfile_t, itermAcceleratorGain) },
+    { "anti_gravity_gain",          VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { ITERM_ACCELERATOR_GAIN_OFF, ITERM_ACCELERATOR_GAIN_MAX }, PG_PID_PROFILE, offsetof(pidProfile_t, itermAcceleratorGain) },
     { "feedforward_transition",     VAR_UINT8  | PROFILE_VALUE, .config.minmaxUnsigned = { 0, 100 }, PG_PID_PROFILE, offsetof(pidProfile_t, feedForwardTransition) },
     { "acc_limit_yaw",              VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { 0, 500 }, PG_PID_PROFILE, offsetof(pidProfile_t, yawRateAccelLimit) },
     { "acc_limit",                  VAR_UINT16 | PROFILE_VALUE, .config.minmaxUnsigned = { 0, 500 }, PG_PID_PROFILE, offsetof(pidProfile_t, rateAccelLimit) },
@@ -1233,10 +1245,10 @@ const clivalue_t valueTable[] = {
 
     { "osd_rssi_alarm",             VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 100 }, PG_OSD_CONFIG, offsetof(osdConfig_t, rssi_alarm) },
 #ifdef USE_RX_LINK_QUALITY_INFO
-    { "osd_link_quality_alarm",     VAR_UINT16  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 300 }, PG_OSD_CONFIG, offsetof(osdConfig_t, link_quality_alarm) },
+    { "osd_link_quality_alarm",     VAR_UINT16  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 100 }, PG_OSD_CONFIG, offsetof(osdConfig_t, link_quality_alarm) },
 #endif
 #ifdef USE_RX_RSSI_DBM
-    { "osd_rssi_dbm_alarm",         VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, 130 }, PG_OSD_CONFIG, offsetof(osdConfig_t, rssi_dbm_alarm) },
+    { "osd_rssi_dbm_alarm",         VAR_INT16   | MASTER_VALUE, .config.minmaxUnsigned = { CRSF_RSSI_MIN, CRSF_SNR_MAX }, PG_OSD_CONFIG, offsetof(osdConfig_t, rssi_dbm_alarm) },
 #endif
     { "osd_cap_alarm",              VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 0, 20000 }, PG_OSD_CONFIG, offsetof(osdConfig_t, cap_alarm) },
     { "osd_alt_alarm",              VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 0, 10000 }, PG_OSD_CONFIG, offsetof(osdConfig_t, alt_alarm) },
@@ -1263,7 +1275,7 @@ const clivalue_t valueTable[] = {
     { "osd_link_quality_pos",       VAR_UINT16  | MASTER_VALUE, .config.minmaxUnsigned = { 0, OSD_POSCFG_MAX }, PG_OSD_ELEMENT_CONFIG, offsetof(osdElementConfig_t, item_pos[OSD_LINK_QUALITY]) },
 #endif
 #ifdef USE_RX_RSSI_DBM
-    { "osd_rssi_dbm_pos",           VAR_UINT8  | MASTER_VALUE, .config.minmaxUnsigned = { 0, OSD_POSCFG_MAX }, PG_OSD_ELEMENT_CONFIG, offsetof(osdElementConfig_t, item_pos[OSD_RSSI_DBM_VALUE]) },
+    { "osd_rssi_dbm_pos",           VAR_UINT16  | MASTER_VALUE, .config.minmaxUnsigned = { 0, OSD_POSCFG_MAX }, PG_OSD_ELEMENT_CONFIG, offsetof(osdElementConfig_t, item_pos[OSD_RSSI_DBM_VALUE]) },
 #endif
     { "osd_tim_1_pos",              VAR_UINT16  | MASTER_VALUE, .config.minmaxUnsigned = { 0, OSD_POSCFG_MAX }, PG_OSD_ELEMENT_CONFIG, offsetof(osdElementConfig_t, item_pos[OSD_ITEM_TIMER_1]) },
     { "osd_tim_2_pos",              VAR_UINT16  | MASTER_VALUE, .config.minmaxUnsigned = { 0, OSD_POSCFG_MAX }, PG_OSD_ELEMENT_CONFIG, offsetof(osdElementConfig_t, item_pos[OSD_ITEM_TIMER_2]) },
@@ -1337,6 +1349,7 @@ const clivalue_t valueTable[] = {
 
     { "osd_rcchannels_pos",     VAR_UINT16  | MASTER_VALUE, .config.minmaxUnsigned = { 0, OSD_POSCFG_MAX }, PG_OSD_ELEMENT_CONFIG, offsetof(osdElementConfig_t, item_pos[OSD_RC_CHANNELS]) },
     { "osd_camera_frame_pos",   VAR_UINT16  | MASTER_VALUE, .config.minmaxUnsigned = { 0, OSD_POSCFG_MAX }, PG_OSD_ELEMENT_CONFIG, offsetof(osdElementConfig_t, item_pos[OSD_CAMERA_FRAME]) },
+    { "osd_efficiency_pos",     VAR_UINT16  | MASTER_VALUE, .config.minmaxUnsigned = { 0, OSD_POSCFG_MAX }, PG_OSD_ELEMENT_CONFIG, offsetof(osdElementConfig_t, item_pos[OSD_EFFICIENCY]) },
 
     // OSD stats enabled flags are stored as bitmapped values inside a 32bit parameter
     // It is recommended to keep the settings order the same as the enumeration. This way the settings are displayed in the cli in the same order making it easier on the users
@@ -1424,7 +1437,7 @@ const clivalue_t valueTable[] = {
 #endif
 
 // PG_VCD_CONFIG
-#ifdef USE_MAX7456
+#if defined(USE_MAX7456) || defined(USE_FRSKYOSD)
     { "vcd_video_system",           VAR_UINT8   | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_VIDEO_SYSTEM }, PG_VCD_CONFIG, offsetof(vcdProfile_t, video_system) },
     { "vcd_h_offset",               VAR_INT8    | MASTER_VALUE, .config.minmax = { -32, 31 }, PG_VCD_CONFIG, offsetof(vcdProfile_t, h_offset) },
     { "vcd_v_offset",               VAR_INT8    | MASTER_VALUE, .config.minmax = { -15, 16 }, PG_VCD_CONFIG, offsetof(vcdProfile_t, v_offset) },
@@ -1444,10 +1457,6 @@ const clivalue_t valueTable[] = {
     { "displayport_msp_serial",     VAR_INT8    | MASTER_VALUE, .config.minmax = { SERIAL_PORT_NONE, SERIAL_PORT_IDENTIFIER_MAX }, PG_DISPLAY_PORT_MSP_CONFIG, offsetof(displayPortProfile_t, displayPortSerial) },
     { "displayport_msp_attrs",      VAR_UINT8   | MASTER_VALUE | MODE_ARRAY, .config.array.length = 4, PG_DISPLAY_PORT_MSP_CONFIG, offsetof(displayPortProfile_t, attrValues) },
     { "displayport_msp_use_device_blink",   VAR_UINT8   | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_OFF_ON }, PG_DISPLAY_PORT_MSP_CONFIG, offsetof(displayPortProfile_t, useDeviceBlink) },
-#ifdef USE_DISPLAYPORT_MSP_VENDOR_SPECIFIC
-    { "displayport_msp_vendor_init", VAR_UINT8   | MASTER_VALUE | MODE_ARRAY, .config.array.length = 253, PG_DISPLAY_PORT_MSP_CONFIG, offsetof(displayPortProfile_t, vendorInit) },
-    { "displayport_msp_vendor_init_length", VAR_UINT8   | MASTER_VALUE, .config.minmaxUnsigned = { 0, 252 }, PG_DISPLAY_PORT_MSP_CONFIG, offsetof(displayPortProfile_t, vendorInitLength) },
-#endif // USE_DISPLAYPORT_MSP_VENDOR_SPECIFIC
 #endif
 
 // PG_DISPLAY_PORT_MSP_CONFIG
@@ -1580,10 +1589,10 @@ const clivalue_t valueTable[] = {
 
 #ifdef USE_RPM_FILTER
     { "gyro_rpm_notch_harmonics",  VAR_UINT8 | MASTER_VALUE, .config.minmaxUnsigned = { 0, 3 }, PG_RPM_FILTER_CONFIG, offsetof(rpmFilterConfig_t, gyro_rpm_notch_harmonics) },
-    { "gyro_rpm_notch_q",  VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 1, 3000 }, PG_RPM_FILTER_CONFIG, offsetof(rpmFilterConfig_t, gyro_rpm_notch_q) },
+    { "gyro_rpm_notch_q",  VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 250, 3000 }, PG_RPM_FILTER_CONFIG, offsetof(rpmFilterConfig_t, gyro_rpm_notch_q) },
     { "gyro_rpm_notch_min",  VAR_UINT8 | MASTER_VALUE, .config.minmaxUnsigned = { 50, 200 }, PG_RPM_FILTER_CONFIG, offsetof(rpmFilterConfig_t, gyro_rpm_notch_min) },
     { "dterm_rpm_notch_harmonics",  VAR_UINT8 | MASTER_VALUE, .config.minmaxUnsigned = { 0, 3 }, PG_RPM_FILTER_CONFIG, offsetof(rpmFilterConfig_t, dterm_rpm_notch_harmonics) },
-    { "dterm_rpm_notch_q",  VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 1, 3000 }, PG_RPM_FILTER_CONFIG, offsetof(rpmFilterConfig_t, dterm_rpm_notch_q) },
+    { "dterm_rpm_notch_q",  VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 250, 3000 }, PG_RPM_FILTER_CONFIG, offsetof(rpmFilterConfig_t, dterm_rpm_notch_q) },
     { "dterm_rpm_notch_min",  VAR_UINT8 | MASTER_VALUE, .config.minmaxUnsigned = { 50, 200 }, PG_RPM_FILTER_CONFIG, offsetof(rpmFilterConfig_t, dterm_rpm_notch_min) },
     { "rpm_notch_lpf",  VAR_UINT16 | MASTER_VALUE, .config.minmaxUnsigned = { 100, 500 }, PG_RPM_FILTER_CONFIG, offsetof(rpmFilterConfig_t, rpm_lpf) },
 #endif
@@ -1607,6 +1616,14 @@ const clivalue_t valueTable[] = {
 
 // PG_POSITION
     { "position_alt_source",           VAR_INT8   | MASTER_VALUE | MODE_LOOKUP, .config.lookup = { TABLE_POSITION_ALT_SOURCE }, PG_POSITION, offsetof(positionConfig_t, altSource) },
+
+// PG_MODE_ACTIVATION_CONFIG
+#if defined(USE_CUSTOM_BOX_NAMES)
+    { "box_user_1_name", VAR_UINT8 | MASTER_VALUE | MODE_STRING, .config.string = { 1, MAX_BOX_USER_NAME_LENGTH, STRING_FLAGS_NONE }, PG_MODE_ACTIVATION_CONFIG, offsetof(modeActivationConfig_t, box_user_1_name) },
+    { "box_user_2_name", VAR_UINT8 | MASTER_VALUE | MODE_STRING, .config.string = { 1, MAX_BOX_USER_NAME_LENGTH, STRING_FLAGS_NONE }, PG_MODE_ACTIVATION_CONFIG, offsetof(modeActivationConfig_t, box_user_2_name) },
+    { "box_user_3_name", VAR_UINT8 | MASTER_VALUE | MODE_STRING, .config.string = { 1, MAX_BOX_USER_NAME_LENGTH, STRING_FLAGS_NONE }, PG_MODE_ACTIVATION_CONFIG, offsetof(modeActivationConfig_t, box_user_3_name) },
+    { "box_user_4_name", VAR_UINT8 | MASTER_VALUE | MODE_STRING, .config.string = { 1, MAX_BOX_USER_NAME_LENGTH, STRING_FLAGS_NONE }, PG_MODE_ACTIVATION_CONFIG, offsetof(modeActivationConfig_t, box_user_4_name) },
+#endif
 };
 
 const uint16_t valueTableEntryCount = ARRAYLEN(valueTable);

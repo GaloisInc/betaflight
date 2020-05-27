@@ -39,9 +39,7 @@
 #define SPI1_SCK_PIN            PA5
 #define SPI1_MISO_PIN           PA6
 #define SPI1_MOSI_PIN           PA7
-else ifeq ($(TARGET),$(filter $(TARGET), $(SITL_TARGETS)))
-TARGET_MCU := SITL
-SIMULATOR_BUILD = yes
+
 #define GYRO_1_CS_PIN           PC2
 #define GYRO_1_SPI_INSTANCE     SPI1
 

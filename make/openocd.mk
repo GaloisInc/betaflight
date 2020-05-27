@@ -9,9 +9,7 @@ OPENOCD_CFG := target/stm32f4x.cfg
 
 else ifeq ($(TARGET_MCU),STM32F7)
 OPENOCD_CFG := target/stm32f7x.cfg
-
-else ifeq ($(TARGET_MCU),RISCV_K210)
-OPENOCD_CFG := target/openocd.cfg
+else
 endif
 
 ifneq ($(OPENOCD_CFG),)
