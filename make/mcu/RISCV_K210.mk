@@ -1,63 +1,54 @@
-# flash size is 1024kB = 1MB
-TARGET_FLASH_SIZE 	:= 1024
-LINKER_DIR      	:= $(ROOT)/src/link
-RISCV_SRC         	:= $(ROOT)/lib/main/RISCV_K210
+# External Flash size for the GD25LQ128D---------------------------#
+vpath %.ld ../../src/link/riscv_flash_k210.ld
+TARGET_FLASH_SIZE 	:= 16128
+LINKER_DIR			:= $(ROOT)/src/link
+STDPERIPH_DIR		:= $(ROOT)/lib/main/RISCV_K210
+SRC_DIR				:= $(ROOT)/src/main
+TARGET_FLAGS		= -D$(TARGET_MCU)
 # Object file--------------------------------------------------#
 OPBL = yes
 #--------------------------------------------------------------#
-# EXST = yes
-# this flag is used for eeprom mem config
-#MAIXBIT linker
-LD_SCRIPT       	= $(LINKER_DIR)/riscv_flash_k210.ld
+LD_SCRIPT			= $(LINKER_DIR)/riscv_flash_k210.ld
 #---------------------------------------------------------------#
-TARGET_MAP  		= $(OBJECT_DIR)/$(FORKNAME)_$(TARGET).map
 DEVICE_FLAGS  		+= -DRISCV_K210
-TARGET_FLAGS  		:= -D$(TARGET)
-STARTUP_SRC         = crt.S
-#---------------------------------------------------------------#
-#Source------------------------------------------------------#
-STDPERIPH_DIR   = $(ROOT)/lib/main/RISCV_K210
-STDPERIPH_SRC   = $(notdir $(wildcard $(STDPERIPH_DIR)/bsp/*.c)) \
-                    $(notdir $(wildcard $(STDPERIPH_DIR)/drivers/*.c))
-EXCLUDES        = 
-STDPERIPH_SRC   := $(filter-out ${EXCLUDES}, $(STDPERIPH_SRC))
-DEVICE_STDPERIPH_SRC = $(STDPERIPH_SRC)
-TARGET_SRC			= \
+# -----------------------------------------------------------------
+STARTUP_SRC 		= $(ROOT)/src/main/startup/startup_riscv_k210.s
+# -----------------------------------------------------------------
+TARGET_SRC			:= \
+					$(wildcard $(STDPERIPH_DIR)/drivers/*.c) \
+					$(wildcard $(STDPERIPH_DIR)/bsp/*.c) \
+					target/$(TARGET)/target.c \
 					drivers/flash_riscv_k210.c \
-					capstone_print.c \
-					pg/flash_riscv_k210.c
-#-----------------------------------------------------------------#
+					pg/flash_riscv_k210.c \
+#---------------------------------------------------------------
 #Includes
-DRIVER_INCLUDES 	= $(RISCV_SRC)/drivers/include
-BSP_INCLUDES 		= $(RISCV_SRC)/bsp/include
-UTILS_INCLUDES 		= $(RISCV_SRC)/utils/include
-THIRD_PARTY 		= $(RISCV_SRC)/xtl/include
-NNCASE				= $(RISCV_SRC)/nncase/include
-
-VPATH              += \
-					$(ROOT)/lib/main/RISCV_K210/bsp \
-                    $(ROOT)/lib/main/RISCV_K210/drivers
-
+DRIVER_INCLUDES 	= $(STDPERIPH_DIR)/drivers/include
+BSP_INCLUDES 		= $(STDPERIPH_DIR)/bsp/include
+UTILS_INCLUDES 		= $(STDPERIPH_DIR)/utils/include
+THIRD_PARTY 		= $(STDPERIPH_DIR)/xtl/include
+NNCASE				= $(STDPERIPH_DIR)/nncase/include
+NNCASE_TARGETS		= $(STDPERIPH_DIR)/nncase/include/targets
+SYSTEM				= $(ROOT)/sysroot
 #-----------------------------------------------------------------#
-INCLUDE_DIRS    	:= \
+INCLUDE_DIRS		:= \
 					$(INCLUDE_DIRS) \
-					$(RISCV_SRC) \
+					$(STDPERIPH_DIR) \
 					$(DRIVER_INCLUDES) \
 					$(BSP_INCLUDES) \
 					$(UTILS_INCLUDES) \
 					$(THIRD_PARTY)\
 					$(NNCASE)\
 					$(ROOT)/src/main/target/$(TARGET) \
-
-
-#-------------------------------------------------------------------#
+					$(ROOT)/src/main/build \
+					$(ROOT)/src/main \
+					$(ROOT)/src
 # ARCH_FLAGS 														#
 ARCH_FLAGS      	= -march=rv64imafc -mabi=lp64f -mcmodel=medany	#
 #-------------------------------------------------------------------#
 # Assembly FLAGS-----------------------------------------------------
 ASFLAGS   			= $(ARCH_FLAGS) \
 					-x assembler-with-cpp -D __riscv64 \
-					$(addprefix -I,$(INCLUDE_DIRS)) 
+					$(addprefix -I,$(INCLUDE_DIRS))
 #-------------------------------------------------------------------#
 # Linker FLAGS
 LD_FLAGS       		= \
@@ -76,14 +67,14 @@ LD_FLAGS       		= \
 					-lstdc++ \
 					-lc -lgloss -lgcc\
 					-specs=nano.specs -specs=nosys.specs\
-               		-lnosys \
+					-lnosys \
 					-Wl,-gc-sections,-Map,$(TARGET_MAP) \
 					-Wl,--cref \
 					-Wl,--print-memory-usage \
 					-lnosys \
-					$(LTO_FLAGS) 
+					$(LTO_FLAGS)
 #--------------------------------------------------------------------#
-# GCC FLAGS 
+# GCC FLAGS
 CFLAGS			 = \
 					$(ARCH_FLAGS) \
 					-std=gnu11 \
@@ -139,4 +130,3 @@ OPTIMISE_SPEED      :=
 OPTIMISE_SIZE       :=
 LTO_FLAGS           := $(OPTIMISATION_BASE) $(OPTIMISE_DEFAULT)
 endif
-#---------------------------------------------------------------
