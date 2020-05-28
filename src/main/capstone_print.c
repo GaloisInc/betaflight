@@ -1,7 +1,7 @@
 /*
  * This file is temp for debugging purpose - riscv team
  */
-#pragma once
+
 #include <stdio.h>
 
 #define NO_DEBUG_CAP
