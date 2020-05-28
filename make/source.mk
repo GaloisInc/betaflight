@@ -204,7 +204,6 @@ COMMON_SRC = \
 			build/build_config.c \
 			build/version.c \
 			capstone_print.c \
-			main.c \
 			fc/init.c \
 			pg/pg.c\
 			sensors/initialisation.c \
@@ -222,8 +221,16 @@ COMMON_SRC = \
 			drivers/bus_spi_config.c \
 			pg/flash.c\
 			rx/rx.c \
-			drivers/io.c
+			drivers/io.c \
+			main.c
+
+ifeq ($(TEST),yes)
+TCOMMON_SRC += main.c
+endif
+
+
 #endif
+
 #--------------------------------------------------+
 ifeq ($(EXST),yes)
 TARGET_FLAGS := -DUSE_EXST $(TARGET_FLAGS)

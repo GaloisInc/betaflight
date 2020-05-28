@@ -92,21 +92,7 @@
 #undef USE_OVERCLOCK
 #undef USE_RTC_TIME
 #undef USE_RCDEVICE
-//RISCV flags
-//#define __riscv64
-//#define TCB_SPAN_NO_EXCEPTIONS
-//#define TCB_SPAN_NO_CONTRACT_CHECKING
-/*
-#define NNCASE_TARGET k210
-#define KENDRYTE_SDK_TYPE 1
-#define KENDRYTE_SDK_TYPE_STANDALONE 1
-#define KENDRYTE_SDK_TYPE_FREERTOS 2
-#define KENDRYTE_SDK_RELEASE_DATE 0
-#define DEBUG 1
-#define LOG_KERNEL
-#define LV_CONF_INCLUDE_SIMPLE
-#define LINKER_LANGUAGE C
-*/
+
 // Declare typedefs needed for config storage compilation
 typedef struct{
 	void* test;

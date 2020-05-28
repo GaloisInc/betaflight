@@ -4,6 +4,7 @@ TARGET_FLASH_SIZE 	:= 16128
 LINKER_DIR			:= $(ROOT)/src/link
 STDPERIPH_DIR		:= $(ROOT)/lib/main/RISCV_K210
 SRC_DIR				:= $(ROOT)/src/main
+TEST_DIR			:= $(ROOR)/unit_testing_k210
 TARGET_FLAGS		= -D$(TARGET_MCU)
 # Object file--------------------------------------------------#
 OPBL = yes
@@ -14,6 +15,7 @@ DEVICE_FLAGS  		+= -DRISCV_K210
 # -----------------------------------------------------------------
 STARTUP_SRC 		= $(ROOT)/src/main/startup/startup_riscv_k210.s
 # -----------------------------------------------------------------
+
 TARGET_SRC			:= \
 					$(wildcard $(STDPERIPH_DIR)/drivers/*.c) \
 					$(wildcard $(STDPERIPH_DIR)/bsp/*.c) \
