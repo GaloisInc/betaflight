@@ -31,9 +31,10 @@
 
 void run(void);
 
+/**** capstone - for demo ****/
 #include "drivers/flash_riscv_k210.h"
 #define MY_ADDR 0x80200000
-uint8_t my_data_buf[0];
+/**** capstone - end of demo ****/
 
 int main(void)
 {
@@ -41,11 +42,13 @@ int main(void)
     sleep(2);
 
     init();
-
+    
+    /**** capstone - for demo ****/
     // for demo purpose - erase flash every other board reset
     // need to erase previous config or else it
     // will read it again so you won't see it write again --- for dev
     uint32_t my_index = 0x1;
+    uint8_t my_data_buf[0];
     flash_read_data(MY_ADDR, &my_data_buf[0], 1, FLASH_STANDARD);
     if ((int)my_data_buf[0] == 1) {
         my_index = 0x2;
@@ -59,7 +62,8 @@ int main(void)
     }
 
     printf("Board Initialized: OK\n\n");
-
+    /**** capstone - end of demo ****/
+    
     //run();
 
     return 0;
