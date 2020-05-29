@@ -1,3 +1,4 @@
+
 #include <setjmp.h>
 #include <stdio.h>
 #include "../../Unity/src/unity.h"
@@ -13,7 +14,4 @@
 #include "../../../src/main/build/build_config.h"
 #include "../../Unity/examples/unity_config.h"
 #include "../../../src/main/common/crc.h"
-
-
-#define TEST=yes
 #define RUN_TEST(TestFunc)                                             \

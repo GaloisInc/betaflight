@@ -23,6 +23,8 @@ TARGET_SRC			:= \
 					drivers/flash_riscv_k210.c \
 					pg/flash_riscv_k210.c \
 					capstone_print.c
+
+
 #---------------------------------------------------------------
 #Includes
 DRIVER_INCLUDES 	= $(STDPERIPH_DIR)/drivers/include

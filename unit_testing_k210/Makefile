@@ -5,6 +5,8 @@
 TARGET   	 	:= MAIXBIT
 FORKNAME  		:= BETAFLIGHT
 REVISION 		:= RISCVK210
+
+TEST ?= yes
 # -----------------------------------//
 ROOT 			= ../
 TEST_DIR 		= unit_testing_k210
@@ -12,6 +14,7 @@ TEST_SRC		= $(notdir $(wildcard $(TEST_DIR)/test_src/*.c))
 OBJECT_DIR 		= ./obj
 TARGET_DIR     	= $(ROOT)/src/main/target/$(BASE_TARGET)
 TARGET_DIR_SRC 	= $(notdir $(wildcard $(TARGET_DIR)/*.c))
+MCU_COMMON_SRC  = $(notdir $(wildcard $(TEST_SRC)/test_runners/*.c))
 #------------------------------------//
 # Search path for sources
 LD_FLAGS        :=

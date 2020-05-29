@@ -18,7 +18,7 @@
   UnityConcludeTest(); \
 }
 #include "Test_Runner.h"
-
+#define TEST
 /*=======External Functions This Runner Calls=====*/
 extern void setUp(void);
 extern void tearDown(void);

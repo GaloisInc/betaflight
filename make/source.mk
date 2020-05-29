@@ -199,7 +199,7 @@ COMMON_SRC := $(COMMON_SRC) $(COMMON_DEVICE_SRC)
 # ---------------------------------------------- +
 #### RISCV 										|
 #### --------------------------------------------+
-#ifdef ($(TARGET),$(filter $(TARGET),$(MAIXBIT)))
+ifneq ($(TARGET),$(filter $(TARGET),$(MAIXBIT)))
 COMMON_SRC = \
 			build/build_config.c \
 			build/version.c \
@@ -221,16 +221,15 @@ COMMON_SRC = \
 			drivers/bus_spi_config.c \
 			pg/flash.c\
 			rx/rx.c \
-			drivers/io.c \
-			main.c
+			drivers/io.c
 
-ifeq ($(TEST),yes)
-TCOMMON_SRC += main.c
+ifneq ($(TEST),yes)
+MCU_COMMON_SRC := main.c
 endif
 
+endif
 
-#endif
-
+SRC := $(MCU_COMMON_SRC) $(STARTUP_SRC) $(TARGET_SRC) $(COMMON_SRC)
 #--------------------------------------------------+
 ifeq ($(EXST),yes)
 TARGET_FLAGS := -DUSE_EXST $(TARGET_FLAGS)
@@ -397,7 +396,7 @@ endif #!F3
 endif #!F1
 # -------------------------------------------- +
 ## check if target.mk supplied
-SRC := $(STARTUP_SRC) $(TARGET_SRC) $(COMMON_SRC) $(MCU_COMMON_SRC)
+
 ## Files that should not be optimized, useful for debugging IMPRECISE cpu faults.
 ## Specify FULL PATH, e.g. "./lib/main/STM32F7/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c"
 NOT_OPTIMISED_SRC := $(NOT_OPTIMISED_SRC) \
@@ -461,4 +460,3 @@ endif
 ## Search path and source files for the ST stdperiph library
 VPATH        := $(VPATH):$(STDPERIPH_SRC)/src
 VPATH        := $(VPATH):../src
-vpath %.c ../src

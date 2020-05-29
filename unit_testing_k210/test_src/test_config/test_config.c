@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include "test_config.h"
 
-uint32_t flashAddress = 0x00100000 +0x8;
+uint32_t flashAddress = 0x00100000 + 0x8;
 
 // flash_init - Pass: 0; Fail: 1
 void test_flash_init (void) {
