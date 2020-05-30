@@ -22,7 +22,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
+#include <stddef.h>
+#include "../pg/pg.h"
 
 #define EEPROM_CONF_VERSION 172
 

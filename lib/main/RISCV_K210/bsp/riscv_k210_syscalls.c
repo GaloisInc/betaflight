@@ -17,7 +17,6 @@
 
 #include <errno.h>
 #include <limits.h>
-#include <machine/syscall.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -27,7 +26,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/unistd.h>
-#include "riscv_k210_clint.h"
+#include "../drivers/include/riscv_k210_clint.h"
 #include "riscv_k210_dump.h"
 #include "riscv_k210_fpioa.h"
 #include "riscv_k210_interrupt.h"

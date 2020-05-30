@@ -19,7 +19,7 @@
  */
 
 #pragma once
-
+#include <stdint.h>
 struct sbuf_s;
 
 uint16_t crc16_ccitt(uint16_t crc, unsigned char a);

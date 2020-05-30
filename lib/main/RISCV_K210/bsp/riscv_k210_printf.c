@@ -28,9 +28,9 @@
  */
 
 #include <stddef.h>
-#include "riscv_k210_atomic.h"
-#include "riscv_k210_printf.h"
-#include "riscv_k210_syscalls.h"
+#include "include/riscv_k210_atomic.h"
+#include "../include/riscv_k210_printf.h"
+#include "../include/riscv_k210_syscalls.h"
 
 /**
  * Configuration

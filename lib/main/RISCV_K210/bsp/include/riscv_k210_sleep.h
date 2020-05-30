@@ -16,9 +16,9 @@
 #ifndef _BSP_SLEEP_H
 #define _BSP_SLEEP_H
 
-#include <riscv_k210_clint.h>
-#include <riscv_k210_encoding.h>
-#include <riscv_k210_syscalls.h>
+#include 	"../../drivers/include/riscv_k210_clint.h"
+#include "../include/riscv_k210_encoding.h"
+#include  "../include/riscv_k210_syscalls.h"
 
 #ifdef __cplusplus
 extern "C" {

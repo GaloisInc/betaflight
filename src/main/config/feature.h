@@ -20,7 +20,8 @@
 
 #pragma once
 
-#include "pg/pg.h"
+#include "../pg/pg.h"
+#include <stdint.h>
 
 #ifndef DEFAULT_FEATURES
 #define DEFAULT_FEATURES 0

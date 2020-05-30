@@ -37,21 +37,15 @@ VPATH 			:= 	$(VPATH):$(TARGET_DIR) \
 					$(VPATH):$(STDPERIPH_DIR) \
 					$(VPATH):$(TEST_SRC) \
 # ------------------------------------//
-INCLUDE_DIRS    := $(INCLUDE_DIRS) \
-				   $(TARGET_DIR) \
-				   $(ROOT)/lib \
-				   $(ROOT)/src \
-				   $(ROOT)/src/main/$(wildcard *.h)
+INCLUDE_DIRS    	:= 	$(INCLUDE_DIRS) \
+					$(TARGET_DIR) \
+					$(ROOT)/lib \
+					$(ROOT)/src \
+					$(ROOT)/src/main/$(wildcard *.h)
 # ------------------------------------//
 TARGET_FLASH_SIZE := $(MCU_FLASH_SIZE)
 # ------------------------------------//
 DEVICE_FLAGS  	:= $(DEVICE_FLAGS) -DTARGET_FLASH_SIZE=$(TARGET_FLASH_SIZE)
-# -------------------------------------------------//
-ASFLAGS     = $(ARCH_FLAGS) \
-			   $(DEBUG_FLAGS) \
-			   -x assembler-with-cpp \
-			   $(addprefix -I,$(INCLUDE_DIRS)) \
-			   -MMD -MP
 # ------------------------------------------------ //
 .DEFAULT_GOAL 	:= binary
 # -------------------------------------------------//

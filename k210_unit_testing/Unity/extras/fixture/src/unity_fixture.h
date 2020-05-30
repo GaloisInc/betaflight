@@ -7,13 +7,13 @@
 
 #ifndef UNITY_FIXTURE_H_
 #define UNITY_FIXTURE_H_
-
-#include "unity.h"
-#include "unity_internals.h"
+#include "../../../../Unity/src/unity.h"
+#include "../../../../Unity/examples/unity_config.h"
+#include "../../../../Unity/src/unity_internals.h"
 #include "unity_fixture_internals.h"
 
 #ifndef UNITY_FIXTURE_NO_EXTRAS
-#include "unity_memory.h"
+#include "../../../../Unity/extras/memory/src/unity_memory.h"
 #endif
 
 int UnityMain(int argc, const char* argv[], void (*runAllTests)(void));

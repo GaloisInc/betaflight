@@ -18,7 +18,7 @@
 #include <inttypes.h>
 #include <stddef.h>
 #include "riscv_k210_gpio_common.h"
-#include "riscv_k210_platform.h"
+#include "../../bsp/include/riscv_k210_platform.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

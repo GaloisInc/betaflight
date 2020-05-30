@@ -20,7 +20,7 @@
 #include "riscv_k210_io.h"
 #include "riscv_k210_platform.h"
 #include "riscv_k210_plic.h"
-#include "stdbool.h"
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {

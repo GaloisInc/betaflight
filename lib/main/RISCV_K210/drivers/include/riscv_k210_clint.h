@@ -42,7 +42,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "platform.h"
+#include "../../bsp/include/riscv_k210_platform.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -14,8 +14,8 @@
  */
 #include <stddef.h>
 #include <stdint.h>
-#include "riscv_k210_fpioa.h"
-#include "riscv_k210_sysctl.h"
+#include	"include/riscv_k210_fpioa.h"
+#include "include/riscv_k210_sysctl.h"
 
 volatile fpioa_t *const fpioa = (volatile fpioa_t *)FPIOA_BASE_ADDR;
 

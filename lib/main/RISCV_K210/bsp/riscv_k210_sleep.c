@@ -14,9 +14,8 @@
  */
 
 
-#include <riscv_k210_sleep.h>
-#include <riscv_k210_sysctl.h>
-
+#include  "include/riscv_k210_sleep.h"
+#include "../drivers/include/riscv_k210_sysctl.h"
 int usleep(uint64_t usec)
 {
     uint64_t cycle = read_cycle();
