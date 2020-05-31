@@ -9,7 +9,7 @@ MEMORY
 /* Memory with CPU cache.
    *6M CPU SRAM
    */
-FLASH_CONFIG (r)  : ORIGIN = 0x8000ffff , LENGTH = 4096
+FLASH_CONFIG (r)  : ORIGIN = 0x80050000 , LENGTH = 1024
 ram (wxa!ri) : ORIGIN = 0x80000000, LENGTH = (6 * 1024 * 1024)
   /*
    * Memory without CPU cache
@@ -69,6 +69,7 @@ PHDRS
  */
 SECTIONS
 {
+  . = ALIGN(64);
   /* Program code segment, also known as a text segment */
   .text :
   {
@@ -84,7 +85,6 @@ SECTIONS
     . = ALIGN(8);
     PROVIDE( _etext = ABSOLUTE(.) );
   } >ram AT>ram :ram_ro
-
    .pg_registry :
   {
     PROVIDE_HIDDEN (__pg_registry_start = .);
@@ -92,14 +92,14 @@ SECTIONS
     KEEP (*(SORT(.pg_registry.*)))
     PROVIDE_HIDDEN (__pg_registry_end = .);
   } >FLASH_CONFIG
-
+    . = ALIGN(8);
   .pg_resetdata :
   {
     PROVIDE_HIDDEN (__pg_resetdata_start = .);
     KEEP (*(.pg_resetdata))
     PROVIDE_HIDDEN (__pg_resetdata_end = .);
   } >FLASH_CONFIG
-
+    . = ALIGN(64);
 
   /* Read-only data segment */
   .rodata :
