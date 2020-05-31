@@ -305,3 +305,14 @@ static riscv_k210_w25q_t flash_stand_read_data( uint32_t addr, uint8_t* data_buf
 static riscv_k210_w25q_t flash_quad_read_data( uint32_t addr, uint8_t* data_buf, uint32_t length ) {
 	return flash_read_data( addr, data_buf, length, FLASH_QUAD_FAST );
 }
+riscv_k210_w25q_t flash_write_disable(void){
+	uint8_t reg_data = 0;
+	flash_read_status_reg2( &reg_data );
+	if( reg_data & WRITE_DISABLE ) {
+		reg_data &= ( ~WRITE_DISABLE );
+		flash_write_status_reg( 0x00, reg_data );
+	}
+	flash_page_program_fun = flash_page_program;
+	flash_read_fun = flash_stand_read_data;
+	return FLASH_OK;
+}

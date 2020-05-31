@@ -462,7 +462,7 @@ bool loadEEPROM(void)
         crc = crc16_ccitt_update(crc, (uint8_t *)&record, sizeof(record));
         config_streamer_write(&streamer, reg->address, regSize);
         crc = crc16_ccitt_update(crc, reg->address, regSize);
-        printf("Writing PGn %d | Size 0x%x | Version %d | Address of Group in RAM 0x%x\n", record.pgn, record.size, record.version, *(reg->address));
+        printf("Writing PGn %d | Size %dB | Version %d | CRC CHECK %d |Address of Group in RAM %p \n", record.pgn, record.size, record.version,crc, &reg->address);
     }
 
     configFooter_t footer = {

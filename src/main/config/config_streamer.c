@@ -95,6 +95,16 @@ uint8_t eepromData[EEPROM_SIZE];
 void config_streamer_init(config_streamer_t *c)
 {
     memset(c, 0, sizeof(*c));
+	#if defined (RISCV_K210)
+	uint8_t manuf_id, device_id;
+	flash_init(3,0);
+	flash_read_id(&manuf_id, &device_id);
+	printf("manuf_id:0x%02x, device_id:0x%02x\n", manuf_id, device_id);
+	if ((manuf_id!=0xEF && manuf_id!=0xC8) || (device_id!=0x17 && device_id!=0x16)) {
+		printf("manuf_id:0x%02x, device_id:0x%02x\n", manuf_id, device_id);
+		return 0;
+	}
+	#endif
 }
 
 void config_streamer_start(config_streamer_t *c, uintptr_t base, int size)

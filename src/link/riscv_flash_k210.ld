@@ -4,21 +4,13 @@
  * used by the linker, and which memory regions it must avoid.
  */
 
-    /*FLASH_CONFIG (wxa!ri)  : ORIGIN = 0x80500000, LENGTH = (1 * 1024 * 1024)
-    FLASH (rx)   : ORIGIN = 0x80500000, LENGTH = (1 * 1024 * 1024)
-    */
 MEMORY
 {
-    /*
-    FLASH (wxa!ri)        : ORIGIN = 0x08040000, LENGTH = (1 * 1024 * 1024)
-    FLASH_CONFIG (wxa!ri)  : ORIGIN = 0x08050000, LENGTH = (1 * 1024 * 1024)
-    */
-
-  /*
-   * Memory with CPU cache.
+/* Memory with CPU cache.
    *6M CPU SRAM
    */
-  ram (wxa!ri) : ORIGIN = 0x80000000, LENGTH = (6 * 1024 * 1024)
+FLASH_CONFIG (r)  : ORIGIN = 0x8000ffff , LENGTH = 4096
+ram (wxa!ri) : ORIGIN = 0x80000000, LENGTH = (6 * 1024 * 1024)
   /*
    * Memory without CPU cache
    * 6M CPU SRAM
@@ -45,12 +37,10 @@ OUTPUT_ARCH( "riscv" )
  * execute). The symbol _start is defined in crt0.S
  */
 ENTRY(_start)
-
 /* Base address where the config is stored. */
-/*
 __config_start = ORIGIN(FLASH_CONFIG);
 __config_end = ORIGIN(FLASH_CONFIG) + LENGTH(FLASH_CONFIG);
-*/
+
 
 /*
  * The GROUP command is special since the listed archives will be
@@ -94,6 +84,22 @@ SECTIONS
     . = ALIGN(8);
     PROVIDE( _etext = ABSOLUTE(.) );
   } >ram AT>ram :ram_ro
+
+   .pg_registry :
+  {
+    PROVIDE_HIDDEN (__pg_registry_start = .);
+    KEEP (*(.pg_registry))
+    KEEP (*(SORT(.pg_registry.*)))
+    PROVIDE_HIDDEN (__pg_registry_end = .);
+  } >FLASH_CONFIG
+
+  .pg_resetdata :
+  {
+    PROVIDE_HIDDEN (__pg_resetdata_start = .);
+    KEEP (*(.pg_resetdata))
+    PROVIDE_HIDDEN (__pg_resetdata_end = .);
+  } >FLASH_CONFIG
+
 
   /* Read-only data segment */
   .rodata :
@@ -139,36 +145,6 @@ SECTIONS
     PROVIDE_HIDDEN (__fini_array_end = .);
   } >ram AT>ram :ram_ro
 
-  .pg_registry :
-  {
-    PROVIDE_HIDDEN (__pg_registry_start = .);
-    KEEP (*(.pg_registry))
-    KEEP (*(SORT(.pg_registry.*)))
-    PROVIDE_HIDDEN (__pg_registry_end = .);
-  } >ram AT>ram :ram_ro
-  .pg_resetdata :
-  {
-    PROVIDE_HIDDEN (__pg_resetdata_start = .);
-    KEEP (*(.pg_resetdata))
-    PROVIDE_HIDDEN (__pg_resetdata_end = .);
-  } >ram AT>ram :ram_ro
-
-/*
-  .pg_registry :
-  {
-    PROVIDE_HIDDEN (__pg_registry_start = .);
-    KEEP (*(.pg_registry))
-    KEEP (*(SORT(.pg_registry.*)))
-    PROVIDE_HIDDEN (__pg_registry_end = .);
-  } >FLASH_CONFIG
-
-  .pg_resetdata :
-  {
-    PROVIDE_HIDDEN (__pg_resetdata_start = .);
-    KEEP (*(.pg_resetdata))
-    PROVIDE_HIDDEN (__pg_resetdata_end = .);
-  } >FLASH_CONFIG
-*/
 
   .ctors :
   {
@@ -282,7 +258,7 @@ SECTIONS
     *(.gnu.linkonce.tb.*)
     KEEP( *(.tbss.end) )
   } >ram AT>ram :ram
-  
+
   /*
    * End of uninitalized data segement
    *
