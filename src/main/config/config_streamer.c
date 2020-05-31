@@ -99,9 +99,9 @@ void config_streamer_init(config_streamer_t *c)
 	uint8_t manuf_id, device_id;
 	flash_init(3,0);
 	flash_read_id(&manuf_id, &device_id);
-	printf("manuf_id:0x%02x, device_id:0x%02x\n", manuf_id, device_id);
+	printf("GREETINGS ! My manuf_id:0x%02x, device_id:0x%02x\n", manuf_id, device_id);
 	if ((manuf_id!=0xEF && manuf_id!=0xC8) || (device_id!=0x17 && device_id!=0x16)) {
-		printf("manuf_id:0x%02x, device_id:0x%02x\n", manuf_id, device_id);
+		printf("Error manuf_id:0x%02x and device_id:0x%02x\n", manuf_id, device_id);
 		return 0;
 	}
 	#endif
@@ -114,7 +114,7 @@ void config_streamer_start(config_streamer_t *c, uintptr_t base, int size)
     c->size = size;
 
     char buffer[200];
-    sprintf(buffer, "Config File at RAM Address 0x%lx | Total Size Reserved (%d) kB", c->address, (int)(c->size));
+	sprintf(buffer, "Config in FLASH Address 0x%02lx| Total Size Reserved (%d) kB", c->address, (int)(c->size));
     print_my_msg(buffer, __FUNCTION__, __FILE__, __LINE__);
 
     if (!c->unlocked) {
@@ -378,11 +378,10 @@ static int write_word(config_streamer_t *c, config_streamer_buffer_align_type_t 
     }
 #if defined(CONFIG_IN_EXTERNAL_FLASH)
 #if defined(RISCV_K210)
-    uint32_t flashStartAddress = FLASH_START_ADDR;
+	uintptr_t flashStartAddress = FLASH_START_ADDR ;
     uint32_t dataOffset = (uint32_t)(c->address - (uintptr_t)&eepromData[0]);
     uint32_t flashAddress = flashStartAddress + dataOffset;
-
-    printf("Writing to Flash Address 0x%02x\n", flashAddress);
+	printf("Writing to Flash Address 0x%02x \n", flashAddress);
     flash_write_data(flashAddress, (uint8_t *)buffer, CONFIG_STREAMER_BUFFER_SIZE);
 
 #else
@@ -568,6 +567,8 @@ int config_streamer_finish(config_streamer_t *c)
         // TODO overwrite the data in the file on the SD card.
 #elif defined(CONFIG_IN_EXTERNAL_FLASH)
         flashFlush();
+#elif defined (RISCV_K210)
+		// NOP
 #elif defined(CONFIG_IN_RAM)
         // NOP
 #elif defined(CONFIG_IN_FILE)

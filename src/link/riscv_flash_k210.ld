@@ -9,7 +9,7 @@ MEMORY
 /* Memory with CPU cache.
    *6M CPU SRAM
    */
-FLASH_CONFIG (r)  : ORIGIN = 0x80050000 , LENGTH = 1024
+FLASH_CONFIG (r)  : ORIGIN = 0x8000ffff , LENGTH = 4095
 ram (wxa!ri) : ORIGIN = 0x80000000, LENGTH = (6 * 1024 * 1024)
   /*
    * Memory without CPU cache
@@ -37,11 +37,9 @@ OUTPUT_ARCH( "riscv" )
  * execute). The symbol _start is defined in crt0.S
  */
 ENTRY(_start)
-/* Base address where the config is stored. */
-__config_start = ORIGIN(FLASH_CONFIG);
-__config_end = ORIGIN(FLASH_CONFIG) + LENGTH(FLASH_CONFIG);
-
-
+/* Base address where the config is stored. *
+	PROVIDE( __config_start = ORIGIN(FLASH_CONFIG));
+	PROVIDE(__config_end = ORIGIN(FLASH_CONFIG) + LENGTH(FLASH_CONFIG));
 /*
  * The GROUP command is special since the listed archives will be
  * searched repeatedly until there are no new undefined references. We
@@ -69,7 +67,7 @@ PHDRS
  */
 SECTIONS
 {
-  . = ALIGN(64);
+  . = ALIGN(8);
   /* Program code segment, also known as a text segment */
   .text :
   {

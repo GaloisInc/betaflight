@@ -156,7 +156,7 @@ void resetConfig(void)
 
 static void activateConfig(void)
 {
-/*    
+/*
     schedulerOptimizeRate(systemConfig()->schedulerOptimizeRate == SCHEDULER_OPTIMIZE_RATE_ON || (systemConfig()->schedulerOptimizeRate == SCHEDULER_OPTIMIZE_RATE_AUTO && motorConfig()->dev.useDshotTelemetry));
     loadPidProfile();
     loadControlRateProfile();
@@ -187,7 +187,7 @@ static void adjustFilterLimit(uint16_t *parm, uint16_t resetValue)
 {
     if (*parm > FILTER_FREQUENCY_MAX) {
         *parm = resetValue;
-    }    
+    }
 }
 */
 static void validateAndFixConfig(void)
@@ -684,10 +684,12 @@ bool readEEPROM(void)
 
     // Sanity check, read flash
     bool success = loadEEPROM();
-
+	print_my_msg("loadEEPROM", __FUNCTION__,__FILE__,__LINE__);
+	printf("Hello, World ! success is true if [%d = 1] is true \n",success);
     featureInit();
 
     validateAndFixConfig();
+
 
     activateConfig();
 

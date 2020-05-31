@@ -42,28 +42,28 @@ int main(void)
     sleep(2);
 
     init();
-    
+
     /**** capstone - for demo ****/
     // for demo purpose - erase flash every other board reset
     // need to erase previous config or else it
     // will read it again so you won't see it write again --- for dev
-    uint32_t my_index = 0x1;
-    uint8_t my_data_buf[0];
-    flash_read_data(MY_ADDR, &my_data_buf[0], 1, FLASH_STANDARD);
-    if ((int)my_data_buf[0] == 1) {
-        my_index = 0x2;
-        my_data_buf[0] = (uint8_t)(my_index);
-        flash_write_data(MY_ADDR, (uint8_t *)my_data_buf, 8);
-        flash_sector_erase(FLASH_START_ADDR);
-    } else {
-        my_index = 0x1;
-        my_data_buf[0] = (uint8_t)(my_index);
-        flash_write_data(MY_ADDR, (uint8_t *)my_data_buf, 8);
-    }
+//     uint32_t my_index = 0x1;
+//     uint8_t my_data_buf[0];
+//     flash_read_data(MY_ADDR, &my_data_buf[0], 1, FLASH_STANDARD);
+//     if ((int)my_data_buf[0] == 1) {
+//         my_index = 0x2;
+//         my_data_buf[0] = (uint8_t)(my_index);
+//         flash_write_data(MY_ADDR, (uint8_t *)my_data_buf, 8);
+//         flash_sector_erase(FLASH_START_ADDR);
+//     } else {
+//         my_index = 0x1;
+//         my_data_buf[0] = (uint8_t)(my_index);
+//         flash_write_data(MY_ADDR, (uint8_t *)my_data_buf, 8);
+//     }
 
     printf("Board Initialized: OK\n\n");
     /**** capstone - end of demo ****/
-    
+
     //run();
 
     return 0;

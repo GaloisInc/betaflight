@@ -12,21 +12,21 @@ TEST_GROUP(test_config);
 extern int Counter;
 
 TEST_SETUP(test_config){
-	//This is run before EACH TEST
-	Counter = 0x5a5a;
+
 }
 
 TEST_TEAR_DOWN(test_config ) {}
-uint32_t flashAddress = 0x00100000 + 0x8;
+unsigned flashAddress = 0x8000ffff;
+uint8_t buffer[8];
 
-TEST(test_config, testing_configurations){
+TEST(config,test1){
 	// flash_init - Pass: 0; Fail: 1
 
 	TEST_ASSERT_EQUAL_MESSAGE( 0, flash_init( 3, 0 ), "Function flash_init failed" );
 
 	//loadEEPROMFromExternalFlash - Pass: 1; Fail: 0
 
-	TEST_ASSERT_EQUAL_MESSAGE( 1, loadEEPROMFromExternalFlash(), "Function loadEEPROMFromExternalFlash failed" );
+// 	TEST_ASSERT_EQUAL_MESSAGE( 1, loadEEPROMFromExternalFlash(), "Function loadEEPROMFromExternalFlash failed" );
 
 	//readEEPROM - Pass: 1; Fail: 0
 	TEST_ASSERT_EQUAL_MESSAGE( 1, readEEPROM(), "Function readEEPROM failed" );
@@ -55,6 +55,5 @@ TEST(test_config, testing_configurations){
 	TEST_ASSERT_EQUAL_MESSAGE( 0, config_streamer_finish( flashAddress ),
 							   "Function config_streamer_finish failed" );
 
-
-	TEST_ASSERT_EQUAL_MESSAGE(0, flash_write_data(flashAddress, 8,4096), "Function flash_write_data failed");
+	TEST_ASSERT_EQUAL_MESSAGE(0, flash_write_data(flashAddress, buffer,4096), "Function flash_write_data failed");
 }

@@ -1,4 +1,3 @@
-#pragma once
 #include "../../../src/main/build/build_config.h"
 #include "../../../src/main/common/crc.h"
 #include "../../../src/main/config/config.h"
