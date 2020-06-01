@@ -9,7 +9,7 @@ MEMORY
 /* Memory with CPU cache.
    *6M CPU SRAM
    */
-FLASH_CONFIG (r)  : ORIGIN = 0x8000ffff , LENGTH = 4095
+FLASH_CONFIG (r)  : ORIGIN = 0x800Affff , LENGTH = 4095
 ram (wxa!ri) : ORIGIN = 0x80000000, LENGTH = (6 * 1024 * 1024)
   /*
    * Memory without CPU cache
@@ -37,11 +37,11 @@ OUTPUT_ARCH( "riscv" )
  * execute). The symbol _start is defined in crt0.S
  */
 ENTRY(_start)
-/* Base address where the config is stored. *
+/* Base address where the config is stored. */
 	PROVIDE( __config_start = ORIGIN(FLASH_CONFIG));
 	PROVIDE(__config_end = ORIGIN(FLASH_CONFIG) + LENGTH(FLASH_CONFIG));
-/*
- * The GROUP command is special since the listed archives will be
+
+/* The GROUP command is special since the listed archives will be
  * searched repeatedly until there are no new undefined references. We
  * need this since -lc depends on -lgloss and -lgloss depends on -lc. I
  * thought gcc would automatically include -lgcc when needed, but
@@ -67,7 +67,7 @@ PHDRS
  */
 SECTIONS
 {
-  . = ALIGN(8);
+
   /* Program code segment, also known as a text segment */
   .text :
   {
@@ -83,21 +83,6 @@ SECTIONS
     . = ALIGN(8);
     PROVIDE( _etext = ABSOLUTE(.) );
   } >ram AT>ram :ram_ro
-   .pg_registry :
-  {
-    PROVIDE_HIDDEN (__pg_registry_start = .);
-    KEEP (*(.pg_registry))
-    KEEP (*(SORT(.pg_registry.*)))
-    PROVIDE_HIDDEN (__pg_registry_end = .);
-  } >FLASH_CONFIG
-    . = ALIGN(8);
-  .pg_resetdata :
-  {
-    PROVIDE_HIDDEN (__pg_resetdata_start = .);
-    KEEP (*(.pg_resetdata))
-    PROVIDE_HIDDEN (__pg_resetdata_end = .);
-  } >FLASH_CONFIG
-    . = ALIGN(64);
 
   /* Read-only data segment */
   .rodata :
@@ -143,6 +128,24 @@ SECTIONS
     PROVIDE_HIDDEN (__fini_array_end = .);
   } >ram AT>ram :ram_ro
 
+  . = ALIGN(64);
+ .pg_registry :
+  {
+    PROVIDE_HIDDEN (__pg_registry_start = ABSOLUTE(.));
+    KEEP (*(.pg_registry))
+    KEEP (*(SORT(.pg_registry.*)))
+    PROVIDE_HIDDEN (__pg_registry_end = ABSOLUTE(.));
+  } >FLASH_CONFIG
+
+
+  .pg_resetdata :
+  {
+    PROVIDE_HIDDEN (__pg_resetdata_start = ABSOLUTE(.));
+    KEEP (*(.pg_resetdata))
+    PROVIDE_HIDDEN (__pg_resetdata_end = ABSOLUTE(.));
+  } >FLASH_CONFIG
+
+.= ALIGN(64);
 
   .ctors :
   {
@@ -191,6 +194,7 @@ SECTIONS
 
   . = ALIGN(8);
 
+    . = ALIGN(8);
   /* .data, .sdata and .srodata segment */
   .data :
   {
