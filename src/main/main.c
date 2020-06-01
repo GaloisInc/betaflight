@@ -41,8 +41,6 @@ void run(void);
 int main(void)
 {
     // this is temp..to allow minicom to boot up
-    sleep(2);
-
     init();
 
     /**** capstone - for demo ****/

@@ -98,7 +98,7 @@ bool loadEEPROMFromExternalFlash(void)
     uint32_t totalBytesRead = 0;
 	char buffer[200];
     // flash_read_data will return FLASH_OK = 0 if successful
-   bool success = flash_read_data ( flashStartAddress, &eepromData[totalBytesRead], EEPROM_SIZE, FLASH_STANDARD );
+   bool success = flash_read_data ( flashStartAddress, &eepromData[totalBytesRead], EEPROM_SIZE, FLASH_QUAD_FAST );
 	sprintf(buffer, "READING from flash is successful if 0=%d ", success);
 	print_my_msg(buffer, __FUNCTION__, __FILE__, __LINE__);
     return !success;

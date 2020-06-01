@@ -67,7 +67,6 @@ PHDRS
  */
 SECTIONS
 {
-
   /* Program code segment, also known as a text segment */
   .text :
   {

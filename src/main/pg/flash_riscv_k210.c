@@ -20,11 +20,11 @@
 
 #include "platform.h"
 
-#ifdef  USE_FLASH_RISCV_K210
+#ifdef  		USE_RISCV_K210
 #include "pg/pg.h"
 #include "pg/pg_ids.h"
 #include "pg/flash_riscv_k210.h"
 #include "drivers/flash_riscv_k210.h"
 
-PG_REGISTER_ARRAY(flashK210Config_t, K210SPIDEV_COUNT, flashK210Config, PG_FLASH_RISCV_K210_CONFIG,0);
+PG_REGISTER_ARRAY(flashK210Config_t, K210SPIDEV_COUNT, flashK210Config, PG_RISCV_K210 ,0);
 #endif

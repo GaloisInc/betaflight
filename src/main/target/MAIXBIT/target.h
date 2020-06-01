@@ -22,6 +22,7 @@
 #pragma once
 #define TARGET_BOARD_IDENTIFIER "MAIX"
 #define USBD_PRODUCT_STRING 		"MAIX"
+#define USE_RISCV_K210
 
 // these flags are used for config mem
 #define CONFIG_IN_EXTERNAL_FLASH

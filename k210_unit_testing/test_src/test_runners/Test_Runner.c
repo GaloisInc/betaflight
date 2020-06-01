@@ -46,12 +46,18 @@ extern void test_loadEEPROM (void);
 extern void test_isEEPROMStructureValid (void);
 extern void test_isEEPROMVersionValid (void);
 extern void test_writeSettingsToEEPROM (void);
-//extern void test_write_word (void);
 extern void test_config_streamer_write (void);
 extern void test_config_streamer_flush (void);
 extern void test_config_streamer_finish (void);
-//extern void test_flash_write_data (void);
-
+extern void test_flash_read_id(void);
+extern void test_flash_is_busy(void);
+extern void test_flash_sector_erase(void);
+extern void test_flash_32k_block_erase(void);
+extern void test_flash_chip_erase(void);
+extern void test_flash_write_data(void);
+extern void test_flash_read_data(void);
+extern int  testflash();
+extern int testconfig();
 
 /*=======Test Reset Option=====*/
 void resetTest(void);
@@ -65,19 +71,36 @@ void resetTest(void)
 /*=======MAIN=====*/
 int main(void)
 {
-	UnityBegin("test_src/test_config/test_config.c");
-  RUN_TEST(test_flash_init);
-  RUN_TEST(test_loadEEPROMFromExternalFlash);
-  RUN_TEST(test_readEEPROM);
-  RUN_TEST(test_loadEEPROM);
-  RUN_TEST(test_isEEPROMStructureValid);
-  RUN_TEST(test_isEEPROMVersionValid);
-  RUN_TEST(test_writeSettingsToEEPROM);
-  //RUN_TEST(test_write_word);
-  RUN_TEST(test_config_streamer_write);
-  RUN_TEST(test_config_streamer_flush);
-  RUN_TEST(test_config_streamer_finish);
-  //RUN_TEST(test_flash_write_data);
+	testconfig();
+	testflash();
 
+	return 0;
+}
+int testflash(){
+	void resetTest(void);
+	UnityBegin("test_src/test_flash/test_flash.c");
+	RUN_TEST(test_flash_read_id);
+	RUN_TEST(test_flash_is_busy);
+	RUN_TEST(test_flash_sector_erase);
+	RUN_TEST(test_flash_32k_block_erase);
+	RUN_TEST(test_flash_chip_erase);
+	RUN_TEST(test_flash_write_data);
+	RUN_TEST(test_flash_read_data);
+	RUN_TEST(test_flash_init);
+	return (UnityEnd());
+}
+int  testconfig(){
+	void resetTest(void);
+	UnityBegin("test_src/test_config/test_config.c");
+	RUN_TEST(test_flash_init);
+	RUN_TEST(test_loadEEPROMFromExternalFlash);
+	RUN_TEST(test_readEEPROM);
+	RUN_TEST(test_loadEEPROM);
+	RUN_TEST(test_isEEPROMStructureValid);
+	RUN_TEST(test_isEEPROMVersionValid);
+	RUN_TEST(test_writeSettingsToEEPROM);
+	RUN_TEST(test_config_streamer_write);
+	RUN_TEST(test_config_streamer_flush);
+	RUN_TEST(test_config_streamer_finish);
 	return (UnityEnd());
 }

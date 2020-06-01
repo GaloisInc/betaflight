@@ -221,7 +221,8 @@ COMMON_SRC = \
 			drivers/bus_spi_config.c \
 			pg/flash.c\
 			rx/rx.c \
-			drivers/io.c
+			drivers/io.c \
+			pg/flash_riscv_k210.c
 
 ifneq ($(TEST),yes)
 MCU_COMMON_SRC := main.c
