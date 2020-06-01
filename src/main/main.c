@@ -28,7 +28,6 @@
 #include "platform.h"
 
 #include "fc/init.h"
-void blink();
 //#include "scheduler/scheduler.h"
 
 void run(void);
@@ -40,66 +39,41 @@ void run(void);
 
 int main(void)
 {
-    // this is temp..to allow minicom to boot up
-    init();
+	// this is temp..to allow minicom to boot up
+	init();
 
-    /**** capstone - for demo ****/
-    // for demo purpose - erase flash every other board reset
-    // need to erase previous config or else it
-    // will read it again so you won't see it write again --- for dev
-    uint32_t my_index = 0x1;
-    uint8_t my_data_buf[0];
-    flash_read_data(MY_ADDR, &my_data_buf[0], 1, FLASH_STANDARD);
-    if ((int)my_data_buf[0] == 1) {
-        my_index = 0x2;
-        my_data_buf[0] = (uint8_t)(my_index);
-        flash_write_data(MY_ADDR, (uint8_t *)my_data_buf, 8);
-        flash_sector_erase(FLASH_START_ADDR);
-    } else {
-        my_index = 0x1;
-        my_data_buf[0] = (uint8_t)(my_index);
-        flash_write_data(MY_ADDR, (uint8_t *)my_data_buf, 8);
-    }
-    printf("Board Initialized: OK\n\n");
-    /**** capstone - end of demo ****/
-	blink();
-    //run();
-
-    return 0;
-}
-void blink() {
-	gpio_init();
-	gpio_pin_value_t value = GPIO_PV_HIGH;
-	fpioa_set_function( 24, FUNC_GPIO3 );
-	fpioa_set_function( 25, FUNC_GPIO4 );
-	fpioa_set_function( 26, FUNC_GPIO5 );
-	gpio_set_drive_mode( 3, GPIO_DM_OUTPUT );
-	gpio_set_drive_mode( 4, GPIO_DM_OUTPUT );
-	gpio_set_drive_mode( 5, GPIO_DM_OUTPUT );
-	gpio_set_pin( 3, value );
-	gpio_set_pin( 4, !value );
-	gpio_set_pin( 5, value );
-	while( 1 ) {
-		sleep( 1 );
-		gpio_set_pin( 3, value = !value );
-		printf("LED 1 is %d\n", value);
-		sleep( 1 );
-		gpio_set_pin( 4, value = !value );
-		printf("LED 2 is %d\n", value);
-		sleep( 1 );
-		gpio_set_pin( 5, value = !value );
-		printf("LED 3 is %d\n",value);
+	/**** capstone - for demo ****/
+	// for demo purpose - erase flash every other board reset
+	// need to erase previous config or else it
+	// will read it again so you won't see it write again --- for dev
+	uint32_t my_index = 0x1;
+	uint8_t my_data_buf[0];
+	flash_read_data(MY_ADDR, &my_data_buf[0], 1, FLASH_STANDARD);
+	if ((int)my_data_buf[0] == 1) {
+		my_index = 0x2;
+		my_data_buf[0] = (uint8_t)(my_index);
+		flash_write_data(MY_ADDR, (uint8_t *)my_data_buf, 8);
+		flash_sector_erase(FLASH_START_ADDR);
+	} else {
+		my_index = 0x1;
+		my_data_buf[0] = (uint8_t)(my_index);
+		flash_write_data(MY_ADDR, (uint8_t *)my_data_buf, 8);
 	}
+	printf("Board Initialized: OK\n\n");
+	/**** capstone - end of demo ****/
+	blink();
+	//run();
+
 	return 0;
 }
 /*
-void FAST_CODE FAST_CODE_NOINLINE run(void) {
-    while (true) {
-        scheduler();
-        processLoopback();
+   void FAST_CODE FAST_CODE_NOINLINE run(void) {
+   while (true) {
+   scheduler();
+   processLoopback();
 #ifdef SIMULATOR_BUILD
-        delayMicroseconds_real(50); // max rate 20kHz
+delayMicroseconds_real(50); // max rate 20kHz
 #endif
-    }
+}
 }
 */

@@ -569,7 +569,7 @@ int config_streamer_finish(config_streamer_t *c)
 #elif defined(CONFIG_IN_EXTERNAL_FLASH)
 		flashFlush();
 #elif defined (RISCV_K210)
-		// NOP
+		flash_sector_erase(FLASH_START_ADDR);
 #elif defined(CONFIG_IN_RAM)
 		// NOP
 #elif defined(CONFIG_IN_FILE)

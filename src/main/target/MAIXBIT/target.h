@@ -94,6 +94,8 @@
 #undef USE_RTC_TIME
 #undef USE_RCDEVICE
 
+void blink();
+
 // Declare typedefs needed for config storage compilation
 typedef struct{
 	void* test;
