@@ -38,12 +38,12 @@ static riscv_k210_w25q_t flash_send_data( uint8_t* cmd_buff, uint8_t cmd_len, ui
 	return FLASH_OK;
 }
 static riscv_k210_w25q_t flash_receive_data_enhanced( uint32_t* cmd_buff, uint8_t cmd_len, uint8_t* rx_buff,
-                                                      uint32_t rx_len ) {
+		uint32_t rx_len ) {
 	spi_receive_data_multiple( spi_bus_no, spi_chip_select, cmd_buff, cmd_len, rx_buff, rx_len );
 	return FLASH_OK;
 }
 static riscv_k210_w25q_t flash_send_data_enhanced( uint32_t* cmd_buff, uint8_t cmd_len, uint8_t* tx_buff,
-                                                   uint32_t tx_len ) {
+		uint32_t tx_len ) {
 	spi_send_data_multiple( spi_bus_no, spi_chip_select, cmd_buff, cmd_len, tx_buff, tx_len );
 	return FLASH_OK;
 }
@@ -168,7 +168,7 @@ static riscv_k210_w25q_t flash_quad_page_program( uint32_t addr, uint8_t* data_b
 	flash_write_enable();
 	spi_init( spi_bus_no, SPI_WORK_MODE_0, SPI_FF_QUAD, DATALENGTH, 0 );
 	spi_init_non_standard( spi_bus_no, 8 /*instrction length*/, 24 /*address length*/, 0 /*wait cycles*/,
-	                       SPI_AITM_STANDARD /*spi address trans mode*/ );
+			SPI_AITM_STANDARD /*spi address trans mode*/ );
 	flash_send_data_enhanced( cmd, 2, data_buf, length );
 	while( flash_is_busy() == FLASH_BUSY ) {}
 	return FLASH_OK;
@@ -258,7 +258,7 @@ riscv_k210_w25q_t _flash_read_data( uint32_t addr, uint8_t* data_buf, uint32_t l
 			cmd[ 1 ] = addr;
 			spi_init( spi_bus_no, SPI_WORK_MODE_0, SPI_FF_DUAL, DATALENGTH, 0 );
 			spi_init_non_standard( spi_bus_no, 8 /*instrction length*/, 24 /*address length*/,
-			                       8 /*wait cycles*/, SPI_AITM_STANDARD /*spi address trans mode*/ );
+					8 /*wait cycles*/, SPI_AITM_STANDARD /*spi address trans mode*/ );
 			flash_receive_data_enhanced( cmd, 2, data_buf, length );
 			break;
 		case FLASH_DUAL_FAST:
@@ -266,7 +266,7 @@ riscv_k210_w25q_t _flash_read_data( uint32_t addr, uint8_t* data_buf, uint32_t l
 			cmd[ 1 ] = addr << 8;
 			spi_init( spi_bus_no, SPI_WORK_MODE_0, SPI_FF_DUAL, DATALENGTH, 0 );
 			spi_init_non_standard( spi_bus_no, 8 /*instrction length*/, 32 /*address length*/,
-			                       0 /*wait cycles*/, SPI_AITM_ADDR_STANDARD /*spi address trans mode*/ );
+					0 /*wait cycles*/, SPI_AITM_ADDR_STANDARD /*spi address trans mode*/ );
 			flash_receive_data_enhanced( cmd, 2, data_buf, length );
 			break;
 		case FLASH_QUAD:
@@ -274,7 +274,7 @@ riscv_k210_w25q_t _flash_read_data( uint32_t addr, uint8_t* data_buf, uint32_t l
 			cmd[ 1 ] = addr;
 			spi_init( spi_bus_no, SPI_WORK_MODE_0, SPI_FF_QUAD, DATALENGTH, 0 );
 			spi_init_non_standard( spi_bus_no, 8 /*instrction length*/, 24 /*address length*/,
-			                       8 /*wait cycles*/, SPI_AITM_STANDARD /*spi address trans mode*/ );
+					8 /*wait cycles*/, SPI_AITM_STANDARD /*spi address trans mode*/ );
 			flash_receive_data_enhanced( cmd, 2, data_buf, length );
 			break;
 		case FLASH_QUAD_FAST:
@@ -282,7 +282,7 @@ riscv_k210_w25q_t _flash_read_data( uint32_t addr, uint8_t* data_buf, uint32_t l
 			cmd[ 1 ] = addr << 8;
 			spi_init( spi_bus_no, SPI_WORK_MODE_0, SPI_FF_QUAD, DATALENGTH, 0 );
 			spi_init_non_standard( spi_bus_no, 8 /*instrction length*/, 32 /*address length*/,
-			                       4 /*wait cycles*/, SPI_AITM_ADDR_STANDARD /*spi address trans mode*/ );
+					4 /*wait cycles*/, SPI_AITM_ADDR_STANDARD /*spi address trans mode*/ );
 			flash_receive_data_enhanced( cmd, 2, data_buf, length );
 			break;
 	}
