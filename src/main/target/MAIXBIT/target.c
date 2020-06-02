@@ -47,6 +47,7 @@ char g_cmd[4];
 volatile uint8_t g_cmd_cnt = 0;
 
 
+void led();
 volatile uint32_t g_uart_send_flag = 0;
 
 void failureMode(failureMode_e mode) {
@@ -103,6 +104,14 @@ int uart_recv_done(void *ctx)
 	uint32_t *v_buf = (uint32_t *)ctx;
 	return 0;
 }
+void led(){
+
+	gpio_set_pin( 3, value = !value );
+	sleep(1);
+	gpio_set_pin( 4, value = !value );
+	sleep( 1);
+	gpio_set_pin( 5, value = !value );
+}
 
 int blink_uart(void)
 {
@@ -111,7 +120,7 @@ int blink_uart(void)
 	uart_init(UART_NUM);
 	uart_configure(UART_NUM, 115200, 8, UART_STOP_1, UART_PARITY_NONE);
 
-	uint8_t *hel = {"hello!\n"};
+	uint8_t *hel = {"UART \n"};
 
 	uint32_t *v_tx_buf = malloc(sizeof(hel) * sizeof(uint32_t));
 	for(uint32_t i = 0; i < strlen(hel); i++)
@@ -154,18 +163,7 @@ int blink_uart(void)
 	while(1)
 	{
 		sleep(1);
-		uart_handle_data_dma(UART_NUM, data, &irq);
-		gpio_set_pin( 3, value = !value );
-		uart_handle_data_dma(UART_NUM, data, &irq);
-		printf("LED 1 is %d\n", value);
-		sleep( 1 );
-		uart_handle_data_dma(UART_NUM, data, &irq);
-		gpio_set_pin( 4, value = !value );
-		printf("LED 2 is %d\n", value);
-		uart_handle_data_dma(UART_NUM, data, &irq);
-		sleep( 1 );
-		gpio_set_pin( 5, value = !value );
-		printf("LED 3 is %d\n",value);
+		led();
 		uart_handle_data_dma(UART_NUM, data, &irq);
 		g_uart_send_flag = 1;
 	}
