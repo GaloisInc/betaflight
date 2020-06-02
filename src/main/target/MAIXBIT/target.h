@@ -94,7 +94,8 @@
 #undef USE_RTC_TIME
 #undef USE_RCDEVICE
 
-void blink();
+int blink_uart();
+void io_mux_init();
 
 // Declare typedefs needed for config storage compilation
 typedef struct{
@@ -116,10 +117,10 @@ typedef enum {
 } EXTITrigger_TypeDef;
 //--------
 typedef struct{
-  uint32_t IDR;
-  uint32_t ODR;
-  uint32_t BSRR;
-  uint32_t BRR;
+	uint32_t IDR;
+	uint32_t ODR;
+	uint32_t BSRR;
+	uint32_t BRR;
 } GPIO_TypeDef;
 //---------
 typedef struct{
@@ -166,15 +167,15 @@ typedef struct
 } I2C_TypeDef;
 // comment below since FLASH_BUSY enum is being used by k210 flash.c
 /*
-typedef enum
-{
-  FLASH_BUSY = 1,
-  FLASH_ERROR_PG,
-  FLASH_ERROR_WRP,
-  FLASH_COMPLETE,
-  FLASH_TIMEOUT
-} FLASH_Status;
-*/
+   typedef enum
+   {
+   FLASH_BUSY = 1,
+   FLASH_ERROR_PG,
+   FLASH_ERROR_WRP,
+   FLASH_COMPLETE,
+   FLASH_TIMEOUT
+   } FLASH_Status;
+   */
 typedef struct {
 	double timestamp;                   // in seconds
 	double imu_angular_velocity_rpy[3]; // rad/s -> range: +/- 8192; +/- 2000 deg/se

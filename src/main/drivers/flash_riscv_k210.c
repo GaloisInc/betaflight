@@ -25,7 +25,7 @@ riscv_k210_w25q_t ( *flash_read_fun )( uint32_t addr, uint8_t* data_buf, uint32_
 static riscv_k210_w25q_t flash_stand_read_data( uint32_t addr, uint8_t* data_buf, uint32_t length );
 static riscv_k210_w25q_t flash_quad_read_data( uint32_t addr, uint8_t* data_buf, uint32_t length );
 static riscv_k210_w25q_t flash_page_program( uint32_t addr, uint8_t* data_buf, uint32_t length );
-static riscv_k210_w25q_t flash_quad_page_program( uint32_t addr, uint8_t* data_buf, uint32_t length );
+riscv_k210_w25q_t flash_quad_page_program( uint32_t addr, uint8_t* data_buf, uint32_t length );
 //----------------------------------------------------------------------------------------------------------- //
 static riscv_k210_w25q_t flash_receive_data( uint8_t* cmd_buff, uint8_t cmd_len, uint8_t* rx_buff, uint32_t rx_len ) {
 	spi_init( spi_bus_no, SPI_WORK_MODE_0, SPI_FF_STANDARD, DATALENGTH, 0 );
@@ -161,7 +161,7 @@ riscv_k210_w25q_t flash_page_program( uint32_t addr, uint8_t* data_buf, uint32_t
 	while( flash_is_busy() == FLASH_BUSY ) {}
 	return FLASH_OK;
 }
-static riscv_k210_w25q_t flash_quad_page_program( uint32_t addr, uint8_t* data_buf, uint32_t length ) {
+riscv_k210_w25q_t flash_quad_page_program( uint32_t addr, uint8_t* data_buf, uint32_t length ) {
 	uint32_t cmd[ 2 ] = { 0 };
 	cmd[ 0 ] = QUAD_PAGE_PROGRAM;
 	cmd[ 1 ] = addr;

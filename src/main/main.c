@@ -25,6 +25,7 @@
 #include "riscv_k210_fpioa.h"
 #include "riscv_k210_gpio.h"
 
+#include "riscv_k210_sysctl.h"
 #include "platform.h"
 
 #include "fc/init.h"
@@ -41,6 +42,10 @@ int main(void)
 {
 	// this is temp..to allow minicom to boot up
 	init();
+	io_mux_init();
+	plic_init();
+	sysctl_enable_irq();
+	
 
 	/**** capstone - for demo ****/
 	// for demo purpose - erase flash every other board reset
@@ -61,7 +66,7 @@ int main(void)
 	}
 	printf("Board Initialized: OK\n\n");
 	/**** capstone - end of demo ****/
-	blink();
+	blink_uart();
 	//run();
 
 	return 0;

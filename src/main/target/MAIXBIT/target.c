@@ -23,18 +23,42 @@
 #include <stdlib.h>
 #include "platform.h"
 #include "drivers/system.h"
+#include "riscv_k210_uart.h"
+#include "riscv_k210_gpiohs.h"
+#include "riscv_k210_sysctl.h"
+#include <unistd.h>
+#include "riscv_k210_platform.h"
+
+
+#define CMD_LENTH  4
+#define UART_NUM    UART_DEVICE_1
+
 
 #include "riscv_k210_fpioa.h"
 #include "riscv_k210_gpio.h"
+
+
+uint32_t recv_buf[48];
+#define RECV_DMA_LENTH  6
+
+gpio_pin_value_t value = GPIO_PV_HIGH;
+volatile uint32_t recv_flag = 0;
+char g_cmd[4];
+volatile uint8_t g_cmd_cnt = 0;
+
+
+volatile uint32_t g_uart_send_flag = 0;
+
 void failureMode(failureMode_e mode) {
-    printf("[failureMode]!!! %d\n", mode);
-    while (1);
+	printf("[failureMode]!!! %d\n", mode);
+	while (1);
 }
 
 // Only for testing and demo
-void blink() {
+void io_mux_init(void)
+{
+
 	gpio_init();
-	gpio_pin_value_t value = GPIO_PV_HIGH;
 	fpioa_set_function( 24, FUNC_GPIO3 );
 	fpioa_set_function( 25, FUNC_GPIO4 );
 	fpioa_set_function( 26, FUNC_GPIO5 );
@@ -44,16 +68,106 @@ void blink() {
 	gpio_set_pin( 3, value );
 	gpio_set_pin( 4, !value );
 	gpio_set_pin( 5, value );
-	while( 1 ) {
-		sleep( 1 );
+	fpioa_set_function(4, FUNC_UART1_RX + UART_NUM * 2);
+	fpioa_set_function(5, FUNC_UART1_TX + UART_NUM * 2);
+}
+
+int uart_send_done(void *ctx)
+{
+	g_uart_send_flag = 1;
+	return 0;
+}
+
+int uart_recv_done(void *ctx)
+{
+	uint32_t *v_dest = ((uint32_t *)ctx) + RECV_DMA_LENTH;
+	if(v_dest >= recv_buf + 48)
+		v_dest = recv_buf;
+
+	uart_data_t data = (uart_data_t)
+	{
+		.rx_channel = DMAC_CHANNEL1,
+			.rx_buf = v_dest,
+			.rx_len = RECV_DMA_LENTH,
+			.transfer_mode = UART_RECEIVE,
+	};
+
+	plic_interrupt_t irq = (plic_interrupt_t)
+	{
+		.callback = uart_recv_done,
+			.ctx = v_dest,
+			.priority = 2,
+	};
+
+	uart_handle_data_dma(UART_NUM, data, &irq);
+	uint32_t *v_buf = (uint32_t *)ctx;
+	return 0;
+}
+
+int blink_uart(void)
+{
+
+
+	uart_init(UART_NUM);
+	uart_configure(UART_NUM, 115200, 8, UART_STOP_1, UART_PARITY_NONE);
+
+	uint8_t *hel = {"hello!\n"};
+
+	uint32_t *v_tx_buf = malloc(sizeof(hel) * sizeof(uint32_t));
+	for(uint32_t i = 0; i < strlen(hel); i++)
+	{
+		v_tx_buf[i] = hel[i];
+	}
+
+	uart_data_t data = (uart_data_t)
+	{
+		.tx_channel = DMAC_CHANNEL0,
+			.tx_buf = v_tx_buf,
+			.tx_len = strlen(hel),
+			.transfer_mode = UART_SEND,
+	};
+
+	plic_interrupt_t irq = (plic_interrupt_t)
+	{
+		.callback = uart_send_done,
+			.ctx = NULL,
+			.priority = 1,
+	};
+
+	uart_handle_data_dma(UART_NUM, data, &irq);
+
+	uart_data_t v_rx_data = (uart_data_t)
+	{
+		.rx_channel = DMAC_CHANNEL1,
+			.rx_buf = recv_buf,
+			.rx_len = RECV_DMA_LENTH,
+			.transfer_mode = UART_RECEIVE,
+	};
+
+	plic_interrupt_t v_rx_irq = (plic_interrupt_t)
+	{
+		.callback = uart_recv_done,
+			.ctx = recv_buf,
+			.priority = 2,
+	};
+	uart_handle_data_dma(UART_NUM, v_rx_data, &v_rx_irq);
+	while(1)
+	{
+		sleep(1);
+		uart_handle_data_dma(UART_NUM, data, &irq);
 		gpio_set_pin( 3, value = !value );
+		uart_handle_data_dma(UART_NUM, data, &irq);
 		printf("LED 1 is %d\n", value);
 		sleep( 1 );
+		uart_handle_data_dma(UART_NUM, data, &irq);
 		gpio_set_pin( 4, value = !value );
 		printf("LED 2 is %d\n", value);
+		uart_handle_data_dma(UART_NUM, data, &irq);
 		sleep( 1 );
 		gpio_set_pin( 5, value = !value );
 		printf("LED 3 is %d\n",value);
+		uart_handle_data_dma(UART_NUM, data, &irq);
+		g_uart_send_flag = 1;
 	}
-	return 0;
 }
+

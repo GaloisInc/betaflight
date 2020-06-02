@@ -68,7 +68,7 @@ typedef enum _flash_read {
 	FLASH_STANDARD = 0, FLASH_STANDARD_FAST, FLASH_DUAL, FLASH_DUAL_FAST, FLASH_QUAD, FLASH_QUAD_FAST,
 } flash_read_t;
 
-static riscv_k210_w25q_t flash_quad_page_program( uint32_t addr, uint8_t* data_buf, uint32_t length );
+riscv_k210_w25q_t flash_quad_page_program( uint32_t addr, uint8_t* data_buf, uint32_t length );
 riscv_k210_w25q_t flash_init ( uint8_t spi_index, uint8_t spi_ss );
 riscv_k210_w25q_t flash_is_busy ( void );
 riscv_k210_w25q_t flash_chip_erase ( void );
