@@ -98,7 +98,6 @@ bool loadEEPROMFromExternalFlash(void)
     uint32_t totalBytesRead = 0;
 	char buffer[200];
 	flash_init(3,0);
-	flash_enable_quad_mode();
     // flash_read_data will return FLASH_OK = 0 if successful
    bool success = flash_read_data ( flashStartAddress, &eepromData[totalBytesRead], EEPROM_SIZE, FLASH_QUAD );
 	sprintf(buffer, "READING from flash is successful if 0=%d ", success);
@@ -444,7 +443,7 @@ bool loadEEPROM(void)
 		config_streamer_write( &streamer, reg->address, regSize );
 		crc = crc16_ccitt_update( crc, reg->address, regSize );
 		printf( "Writing PGn %d | Size %dKB | Version %d | CRC CHECK %d |Address of Group in RAM %p \n",
-		        record.pgn, record.size, record.version, crc, reg->address );
+		        record.pgn, record.size, record.version, crc, &reg->address );
     }
 
     configFooter_t footer = {

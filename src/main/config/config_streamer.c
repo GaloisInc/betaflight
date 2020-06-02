@@ -99,7 +99,6 @@ void config_streamer_init(config_streamer_t *c)
 	uint8_t manuf_id, device_id;
 	flash_init(3,0);
 	flash_read_id(&manuf_id, &device_id);
-	flash_enable_quad_mode();
 	printf("GREETINGS ! My manuf_id:0x%02x, device_id:0x%02x\n", manuf_id, device_id);
 	if ((manuf_id!=0xEF && manuf_id!=0xC8) || (device_id!=0x17 && device_id!=0x16)) {
 		printf("Error manuf_id:0x%02x and device_id:0x%02x\n", manuf_id, device_id);
@@ -569,7 +568,7 @@ int config_streamer_finish(config_streamer_t *c)
 #elif defined(CONFIG_IN_EXTERNAL_FLASH)
 		flashFlush();
 #elif defined (RISCV_K210)
-		flash_sector_erase(FLASH_START_ADDR);
+		// NOP
 #elif defined(CONFIG_IN_RAM)
 		// NOP
 #elif defined(CONFIG_IN_FILE)
