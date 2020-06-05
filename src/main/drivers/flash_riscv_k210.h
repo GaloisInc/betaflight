@@ -32,7 +32,7 @@
 #define WRITE_REG2                         0x31
 #define WRITE_REG3                         0x11
 #define READ_DATA                          0x03
-#define FAST_READ                           0x0C
+#define FAST_READ                           0x0B
 #define FAST_READ_DUAL_OUTPUT         0x3B
 #define FAST_READ_QUAL_OUTPUT         0x6B
 #define FAST_READ_DUAL_IO             0xBB
